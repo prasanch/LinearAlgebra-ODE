@@ -1,0 +1,5 @@
+# Original lecture PDFs are kept locally only
+Rawdata/
+
+# Local editor / tool settings
+.claude/

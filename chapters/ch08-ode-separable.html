@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="th" data-part="ode" data-chapter="8">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8 · ODE 1: Separable Equations — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 8</span><span lang="en">Chapter 8</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 9</span><span lang="en">Week 9</span></span></div>
+  <h1><span lang="th">ODE 1: บทนำและสมการแยกตัวแปรได้</span><span lang="en">ODE 1: Introduction &amp; Separable Equations</span></h1>
+  <p class="lead" lang="th">อนุพันธ์คืออัตราการเปลี่ยนแปลง สมการเชิงอนุพันธ์คือสมการที่มีอนุพันธ์ของฟังก์ชันที่ไม่รู้ค่า เป้าหมายคือหาฟังก์ชันนั้น บทนี้ครอบคลุมอันดับ ระดับขั้น ผลเฉลยทั่วไป/เฉพาะ และวิธีแรกในการแก้: การแยกตัวแปร</p>
+  <p class="lead" lang="en">A derivative is a rate of change; a differential equation is an equation involving derivatives of an unknown function, and the goal is to find that function. This chapter covers order, degree, general vs. particular solutions, and the first solution method: separation of variables.</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_WK9_ODE%231_SeparableEq.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#rates"><span lang="th">อัตราการเปลี่ยนแปลงและอนุพันธ์ย่อย</span><span lang="en">Rates &amp; partial derivatives</span></a></li>
+    <li><a href="#what"><span lang="th">สมการเชิงอนุพันธ์คืออะไร</span><span lang="en">What is a differential equation?</span></a></li>
+    <li><a href="#order"><span lang="th">อันดับและระดับขั้น</span><span lang="en">Order &amp; degree</span></a></li>
+    <li><a href="#solutions"><span lang="th">ผลเฉลยทั่วไป / เฉพาะ</span><span lang="en">General vs particular solutions</span></a></li>
+    <li><a href="#types"><span lang="th">ประเภทของ ODE อันดับหนึ่ง</span><span lang="en">Types of first-order ODEs</span></a></li>
+    <li><a href="#separable"><span lang="th">สมการแยกตัวแปรได้</span><span lang="en">Separable equations</span></a></li>
+    <li><a href="#examples"><span lang="th">ตัวอย่าง</span><span lang="en">Worked examples</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="rates"><span lang="th">1. อัตราการเปลี่ยนแปลงและอนุพันธ์ย่อย</span><span lang="en">1. Rates of change &amp; partial derivatives</span></h2>
+
+<p lang="th">ความเร็ว (m/s) คือระยะทางที่เปลี่ยนต่อเวลา: \(v = \dfrac{\Delta s}{\Delta t} \to \dfrac{ds}{dt}\) เมื่อ \(\Delta t \to 0\) — นี่คืออนุพันธ์ของ \(s(t)\) ในทำนองเดียวกัน \(\dfrac{dy}{dx}\) คืออัตราการเปลี่ยนของ \(y(x)\)</p>
+<p lang="en">Speed (m/s) is change in distance per unit time: \(v = \dfrac{\Delta s}{\Delta t} \to \dfrac{ds}{dt}\) as \(\Delta t \to 0\) — the derivative of \(s(t)\). Likewise \(\dfrac{dy}{dx}\) is the rate of change of \(y(x)\).</p>
+
+<p lang="th">ถ้าฟังก์ชันมีหลายตัวแปร เช่นความสูงบนแผนที่เส้นชั้นความสูง \(z(x, y)\) เราวัดอัตราการเปลี่ยนทีละทิศ เรียกว่า <strong>อนุพันธ์ย่อย</strong> — \(\dfrac{\partial z}{\partial x} \approx \dfrac{\Delta z}{\Delta x}\) (เดินตามแกน \(x\), \(y\) คงที่) และ \(\dfrac{\partial z}{\partial y} \approx \dfrac{\Delta z}{\Delta y}\) เช่น ถ้าเดินจากเส้นชั้น 30 ไป 50 จะได้ \(\Delta z = 50 - 30\)</p>
+<p lang="en">For a function of several variables — like height \(z(x, y)\) on a contour map — we measure the rate in one direction at a time: the <strong>partial derivatives</strong> \(\dfrac{\partial z}{\partial x} \approx \dfrac{\Delta z}{\Delta x}\) (move along \(x\), hold \(y\) fixed) and \(\dfrac{\partial z}{\partial y} \approx \dfrac{\Delta z}{\Delta y}\). Walking from the 30 contour to the 50 contour gives \(\Delta z = 50 - 30\).</p>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 8.1</span><span lang="en">Example 8.1</span></span><span class="title">\(z(x,y) = 5x^2 + 2xy + 3y^4\)</span></header>
+  <div class="body">
+    <div class="math">\[ \frac{\partial z}{\partial x} = 10x + 2y \quad(y = \text{const}),\qquad \frac{\partial z}{\partial y} = 2x + 12y^3 \quad(x = \text{const}) \]</div>
+    <p lang="th">เวกเตอร์ <strong>เกรเดียนต์</strong> \(\nabla z = \left(\tfrac{\partial z}{\partial x}, \tfrac{\partial z}{\partial y}\right)\) ชี้ไปทางที่ชันขึ้นมากที่สุด (div, curl, grad เป็นเครื่องมือของแคลคูลัสเวกเตอร์ที่สร้างจากอนุพันธ์ย่อยเหล่านี้)</p>
+    <p lang="en">The <strong>gradient</strong> \(\nabla z = \left(\tfrac{\partial z}{\partial x}, \tfrac{\partial z}{\partial y}\right)\) points in the direction of steepest ascent. (Div, curl and grad are vector-calculus tools built from these partial derivatives.)</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="what"><span lang="th">2. สมการเชิงอนุพันธ์คืออะไร</span><span lang="en">2. What is a differential equation?</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <p lang="th"><strong>สมการเชิงอนุพันธ์ (DE)</strong> คือสมการที่มีอนุพันธ์ของฟังก์ชันที่ไม่ทราบค่า เช่น \(y(x)\) ถ้ามีตัวแปรอิสระตัวเดียวเรียกว่า <strong>สมการเชิงอนุพันธ์สามัญ (ODE)</strong> การ “แก้” คือหาฟังก์ชัน \(y = f(x)\) ที่เขียนด้วย \(x\) ล้วน ๆ</p>
+  <p lang="en">A <strong>differential equation (DE)</strong> involves derivatives of an unknown function such as \(y(x)\). With a single independent variable it is an <strong>ordinary differential equation (ODE)</strong>. To “solve” it means to find the function \(y = f(x)\), written in terms of \(x\) only.</p>
+</div>
+<div class="math">\[ \text{(1)}\ \ \frac{dy}{dx} = x^2 \qquad \text{(2)}\ \ \frac{d^2y}{dx^2} + 3\frac{dy}{dx} - y = 0 \qquad \text{(3)}\ \ y'' - 3y' - 5xy = 0 \]</div>
+<div class="box warn">
+  <span class="label"><span lang="th">ระวัง</span><span lang="en">Careful</span></span>
+  <p lang="th">การย้ายข้างเป็น \(y = \dfrac{d^2y}{dx^2} + 3\dfrac{dy}{dx}\) <strong>ไม่ใช่</strong>การแก้สมการ — ด้านขวายังมี \(y\) อยู่ในรูปอนุพันธ์ ผลเฉลยต้องเป็นฟังก์ชันของ \(x\) ล้วน ๆ</p>
+  <p lang="en">Rearranging to \(y = \dfrac{d^2y}{dx^2} + 3\dfrac{dy}{dx}\) is <strong>not</strong> solving — the right side still contains \(y\) through its derivatives. A solution must be a function of \(x\) alone.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="order"><span lang="th">3. อันดับ (Order) และระดับขั้น (Degree)</span><span lang="en">3. Order &amp; degree</span></h2>
+<div class="cols">
+  <div class="panel"><h4><span lang="th">อันดับ</span><span lang="en">Order</span></h4>
+    <p lang="th">อนุพันธ์ครั้งที่สูงที่สุดที่ปรากฏในสมการ</p><p lang="en">The highest derivative that appears.</p></div>
+  <div class="panel"><h4><span lang="th">ระดับขั้น</span><span lang="en">Degree</span></h4>
+    <p lang="th">เลขยกกำลังของอนุพันธ์อันดับสูงสุดนั้น</p><p lang="en">The power of that highest-order derivative.</p></div>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">สมการ</span><span lang="en">Equation</span></th><th><span lang="th">อันดับ</span><span lang="en">Order</span></th><th><span lang="th">ระดับขั้น</span><span lang="en">Degree</span></th></tr></thead>
+  <tbody>
+    <tr><td>\(\dfrac{dy}{dx} = 6x^2 + 1\ \ (y' = 6x^2 + 1)\)</td><td>1</td><td>1</td></tr>
+    <tr><td>\(x\,y'' + 2y\,(y')^3 = 0\)</td><td>2</td><td>1</td></tr>
+    <tr><td>\(5xy\,(y'')^3 - x^2(y''')^5 + 6 = 0\)</td><td>3</td><td>5</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="solutions"><span lang="th">4. ผลเฉลยทั่วไปและผลเฉลยเฉพาะ</span><span lang="en">4. General vs particular solutions</span></h2>
+<ul>
+  <li><span lang="th"><strong>ผลเฉลยทั่วไป (General Solution, GS)</strong> — มีค่าคงที่ \(C\) ใด ๆ (เป็นตระกูลของเส้นโค้ง)</span><span lang="en"><strong>General solution (GS)</strong> — contains an arbitrary constant \(C\) (a family of curves).</span></li>
+  <li><span lang="th"><strong>ผลเฉลยเฉพาะ (Particular Solution, PS)</strong> — หา \(C\) ได้จาก<strong>เงื่อนไขเริ่มต้น</strong> เช่น \(y(0) = 4\)</span><span lang="en"><strong>Particular solution (PS)</strong> — \(C\) is fixed by an <strong>initial condition</strong> such as \(y(0) = 4\).</span></li>
+</ul>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 8.2</span><span lang="en">Example 8.2</span></span><span class="title">\(\dfrac{dy}{dx} = 6x^2 + 1,\ \ y(0) = 4\)</span></header>
+  <div class="body">
+    <div class="math">\[ \int dy = \int (6x^2 + 1)\,dx \;\Rightarrow\; y + C_1 = 2x^3 + x + C_2 \;\Rightarrow\; y = 2x^3 + x + C \quad\text{(GS)} \]</div>
+    <p lang="th">(รวมค่าคงที่ \(C = C_2 - C_1\) เป็นตัวเดียว) แทน \(y(0) = 4\): \(4 = 0 + 0 + C \Rightarrow C = 4\)</p>
+    <p lang="en">(The constants merge into one, \(C = C_2 - C_1\).) Apply \(y(0) = 4\): \(4 = 0 + 0 + C \Rightarrow C = 4\).</p>
+    <div class="answer"><span class="label">PS</span>\(y = 2x^3 + x + 4\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="types"><span lang="th">5. ประเภทของ ODE อันดับหนึ่งที่จะเรียน</span><span lang="en">5. Types of first-order ODEs in this course</span></h2>
+<ol>
+  <li><span lang="th"><strong>สมการแยกตัวแปรได้ (Separable)</strong> — บทนี้</span><span lang="en"><strong>Separable equations</strong> — this chapter</span></li>
+  <li><span lang="th"><strong>สมการเอกพันธ์ (Homogeneous)</strong> — บทที่ 9</span><span lang="en"><strong>Homogeneous equations</strong> — Chapter 9</span></li>
+  <li><span lang="th"><strong>สมการแม่นตรง (Exact)</strong> — บทที่ 9</span><span lang="en"><strong>Exact equations</strong> — Chapter 9</span></li>
+  <li><span lang="th"><strong>สมการเชิงเส้น (Linear)</strong> และ <strong>การแปลงลาปลาซ</strong> — หัวข้อถัดไป</span><span lang="en"><strong>Linear equations</strong> and the <strong>Laplace transform</strong> — coming next</span></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="separable"><span lang="th">6. สมการแยกตัวแปรได้</span><span lang="en">6. Separable equations</span></h2>
+
+<div class="box key">
+  <span class="label"><span lang="th">วิธีการ</span><span lang="en">Method</span></span>
+  <p lang="th">แยก \(x\) ไปอยู่กับ \(dx\) และ \(y\) ไปอยู่กับ \(dy\) แล้วอินทิเกรตทั้งสองข้าง:</p>
+  <p lang="en">Put every \(x\) with \(dx\) and every \(y\) with \(dy\), then integrate both sides:</p>
+  <div class="math">\[ M(x)\,dx + N(y)\,dy = 0 \;\Longrightarrow\; \int M(x)\,dx + \int N(y)\,dy = C \]</div>
+  <p lang="th">รูปที่พบบ่อย: \(\dfrac{dy}{dx} = g(x)\,h(y) \;\Rightarrow\; \displaystyle\int \frac{dy}{h(y)} = \int g(x)\,dx\)</p>
+  <p lang="en">Common form: \(\dfrac{dy}{dx} = g(x)\,h(y) \;\Rightarrow\; \displaystyle\int \frac{dy}{h(y)} = \int g(x)\,dx\)</p>
+</div>
+
+<div class="box tip">
+  <span class="label"><span lang="th">เครื่องมือที่ใช้บ่อย</span><span lang="en">Handy tools</span></span>
+  <div class="math">\[
+  \int \frac{f'(u)}{f(u)}\,du = \ln|f(u)| + C,\qquad
+  \int \frac{dx}{1 + x^2} = \tan^{-1}x + C,\qquad
+  a\ln x = \ln x^a,\qquad \ln a + \ln b = \ln ab
+  \]</div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="examples"><span lang="th">7. ตัวอย่าง</span><span lang="en">7. Worked examples</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 8.3</span><span lang="en">Example 8.3</span></span><span class="title">\(3(1 + y^2)\,dx - 5xy\,dy = 0\)</span></header>
+  <div class="body">
+    <p lang="th">หารด้วย \(x(1+y^2)\) เพื่อแยกตัวแปร:</p>
+    <p lang="en">Divide by \(x(1+y^2)\) to separate:</p>
+    <div class="math">\[ 3\int\frac{dx}{x} = 5\int\frac{y}{1 + y^2}\,dy \]</div>
+    <p lang="th">ด้านขวาใช้ \(d(1 + y^2) = 2y\,dy\):</p>
+    <p lang="en">On the right, use \(d(1 + y^2) = 2y\,dy\):</p>
+    <div class="math">\[
+    3\ln|x| = \frac52\int\frac{d(1+y^2)}{1+y^2} = \frac52\ln(1 + y^2) + \ln C_0
+    \;\Rightarrow\; \ln x^3 = \ln\!\big[C_0(1 + y^2)^{5/2}\big]
+    \]</div>
+    <div class="answer"><span class="label">GS</span>\(x^3 = C_0\,(1 + y^2)^{5/2}\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 8.4</span><span lang="en">Example 8.4</span></span><span class="title">\(\dfrac{dy}{dx} = \dfrac{2y^2 - xy^2}{x^2 + 1}\)</span></header>
+  <div class="body">
+    <div class="math">\[ \frac{dy}{dx} = \frac{y^2(2 - x)}{x^2 + 1} \;\Rightarrow\; \int y^{-2}\,dy = \int\frac{2}{x^2+1}\,dx - \int\frac{x}{x^2+1}\,dx \]</div>
+    <div class="math">\[ -\frac1y = 2\tan^{-1}x - \frac12\ln(x^2 + 1) + C \]</div>
+    <div class="answer"><span class="label">GS</span>\(-\dfrac1y = 2\tan^{-1}x - \tfrac12\ln(x^2 + 1) + C\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 8.5</span><span lang="en">Example 8.5</span></span><span class="title">\(\dfrac{dy}{dx} - y = 0,\ \ y(0) = 3\)</span></header>
+  <div class="body">
+    <div class="math">\[ \int\frac{dy}{y} = \int dx \;\Rightarrow\; \ln|y| = x + C \;\Rightarrow\; y = e^{x + C} = e^C e^x = C_0e^x \quad\text{(GS)} \]</div>
+    <p lang="th">แทน \(y(0) = 3\): \(3 = C_0e^0 \Rightarrow C_0 = 3\)</p>
+    <p lang="en">Apply \(y(0) = 3\): \(3 = C_0e^0 \Rightarrow C_0 = 3\).</p>
+    <div class="answer"><span class="label">PS</span>\(y = 3e^x\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 8.6</span><span lang="en">Example 8.6</span></span><span class="title">\((\ln y)^3\,y' = x^4y,\ \ y(2) = 1\)</span></header>
+  <div class="body">
+    <div class="math">\[ \int\frac{(\ln y)^3}{y}\,dy = \int x^4\,dx \]</div>
+    <p lang="th">ด้านซ้ายใช้ \(d(\ln y) = \tfrac1y\,dy\):</p>
+    <p lang="en">On the left, use \(d(\ln y) = \tfrac1y\,dy\):</p>
+    <div class="math">\[ \int(\ln y)^3\,d(\ln y) = \frac{x^5}{5} \;\Rightarrow\; \frac14(\ln y)^4 = \frac{x^5}{5} + C \quad\text{(GS)} \]</div>
+    <p lang="th">แทน \(y(2) = 1\) (\(\ln 1 = 0\)): \(0 = \tfrac{32}{5} + C \Rightarrow C = -\tfrac{32}{5}\)</p>
+    <p lang="en">Apply \(y(2) = 1\) (\(\ln 1 = 0\)): \(0 = \tfrac{32}{5} + C \Rightarrow C = -\tfrac{32}{5}\).</p>
+    <div class="answer"><span class="label">PS</span>\(\tfrac14(\ln y)^4 = \dfrac{x^5}{5} - \dfrac{32}{5}\)</div>
+  </div>
+</section>
+
+<div class="box warn">
+  <span class="label"><span lang="th">ไม่ใช่ทุกสมการที่แยกตัวแปรได้</span><span lang="en">Not every equation separates</span></span>
+  <p lang="th">\(\dfrac{dy}{dx} = \dfrac{xy}{x^2 - y^2}\) แยก \(x\) กับ \(y\) ออกจากกันไม่ได้ ต้องใช้วิธี<strong>สมการเอกพันธ์</strong> ในบทถัดไป</p>
+  <p lang="en">\(\dfrac{dy}{dx} = \dfrac{xy}{x^2 - y^2}\) cannot be separated. It needs the <strong>homogeneous equation</strong> method of the next chapter.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">บอกอันดับและระดับขั้นของ \((y'')^2 + 3y' - xy = \sin x\)</p>
+    <p lang="en">State the order and degree of \((y'')^2 + 3y' - xy = \sin x\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">อันดับ 2 ระดับขั้น 2</p><p lang="en">Order 2, degree 2.</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">แก้ \(\dfrac{dy}{dx} = \dfrac{x}{y},\ y(0) = 2\)</p>
+    <p lang="en">Solve \(\dfrac{dy}{dx} = \dfrac{x}{y},\ y(0) = 2\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \int y\,dy = \int x\,dx \Rightarrow \tfrac{y^2}{2} = \tfrac{x^2}{2} + C;\quad y(0) = 2 \Rightarrow C = 2 \Rightarrow y = \sqrt{x^2 + 4} \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">แก้ \(\dfrac{dy}{dx} = e^{x - y}\)</p>
+    <p lang="en">Solve \(\dfrac{dy}{dx} = e^{x - y}\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ e^{x-y} = e^xe^{-y} \Rightarrow \int e^y\,dy = \int e^x\,dx \Rightarrow e^y = e^x + C \Rightarrow y = \ln(e^x + C) \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">4.</span><div class="qbody">
+    <p lang="th">ประชากรแบคทีเรียโตตาม \(\dfrac{dP}{dt} = 0.2P\) และ \(P(0) = 100\) จงหา \(P(t)\) และ \(P(10)\)</p>
+    <p lang="en">A bacteria population grows as \(\dfrac{dP}{dt} = 0.2P\) with \(P(0) = 100\). Find \(P(t)\) and \(P(10)\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ P = 100e^{0.2t},\qquad P(10) = 100e^{2} \approx 739 \]</div>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>

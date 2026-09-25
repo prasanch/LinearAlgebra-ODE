@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="th" data-part="la" data-chapter="5">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5 · Eigenvalues &amp; Eigenvectors — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+<script defer src="../js/widgets.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 5</span><span lang="en">Chapter 5</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 6</span><span lang="en">Week 6</span></span></div>
+  <h1><span lang="th">ค่าเฉพาะและเวกเตอร์เฉพาะ</span><span lang="en">Eigenvalues &amp; Eigenvectors</span></h1>
+  <p class="lead" lang="th">เวกเตอร์บางตัวถูกเมทริกซ์แปลงแล้ว “ทิศไม่เปลี่ยน” แค่ถูกยืดหรือหดด้วยตัวคูณ \(\lambda\) — เวกเตอร์เหล่านี้คือเวกเตอร์เฉพาะ และตัวคูณคือค่าเฉพาะ ซึ่งเป็นพื้นฐานของ SVD ในบทถัดไป</p>
+  <p class="lead" lang="en">Some vectors keep their direction when a matrix acts on them — they are only stretched or shrunk by a factor \(\lambda\). These are eigenvectors, and the factors are eigenvalues. They are the foundation of SVD in the next chapter.</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_WK6_EigenValue%20EigenVector.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#def"><span lang="th">นิยาม \(A\mathbf{x} = \lambda\mathbf{x}\)</span><span lang="en">Definition \(A\mathbf{x} = \lambda\mathbf{x}\)</span></a></li>
+    <li><a href="#char"><span lang="th">สมการลักษณะเฉพาะ</span><span lang="en">The characteristic equation</span></a></li>
+    <li><a href="#ex2"><span lang="th">ตัวอย่าง 2×2</span><span lang="en">A 2×2 example</span></a></li>
+    <li><a href="#ex3"><span lang="th">ตัวอย่าง 3×3</span><span lang="en">A 3×3 example</span></a></li>
+    <li><a href="#explore"><span lang="th">ทดลอง: มองเห็นเวกเตอร์เฉพาะ</span><span lang="en">Explore: seeing eigenvectors</span></a></li>
+    <li><a href="#props"><span lang="th">สมบัติที่ใช้ตรวจคำตอบ</span><span lang="en">Properties for checking</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="def"><span lang="th">1. นิยาม</span><span lang="en">1. Definition</span></h2>
+
+<p lang="th">ถ้า \(A\) เป็นเมทริกซ์ \(n\times n\) และ \(\mathbf{x}\) เป็นเวกเตอร์ใน \(\mathbb{R}^n\) แล้ว \(A\mathbf{x}\) ก็เป็นเวกเตอร์ใน \(\mathbb{R}^n\) เช่นกัน โดยทั่วไปทิศทางจะเปลี่ยน แต่บางเวกเตอร์ทิศไม่เปลี่ยน:</p>
+<p lang="en">If \(A\) is \(n\times n\) and \(\mathbf{x}\) is in \(\mathbb{R}^n\), then \(A\mathbf{x}\) is also in \(\mathbb{R}^n\). Usually its direction changes, but for special vectors it doesn’t:</p>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <div class="math">\[ A\mathbf{x} = \lambda\mathbf{x}, \qquad \mathbf{x} \ne \mathbf{0} \]</div>
+  <p lang="th">\(\lambda\) (ค่าคงที่) เรียกว่า <strong>ค่าเฉพาะ (eigenvalue)</strong> ของ \(A\) และ \(\mathbf{x}\) เรียกว่า <strong>เวกเตอร์เฉพาะ (eigenvector)</strong> ที่สมนัยกับ \(\lambda\)</p>
+  <p lang="en">The constant \(\lambda\) is an <strong>eigenvalue</strong> of \(A\), and \(\mathbf{x}\) is an <strong>eigenvector</strong> belonging to \(\lambda\).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 5.1</span><span lang="en">Example 5.1</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    A = \begin{bmatrix} 3 & 0 \\ 8 & -1 \end{bmatrix},\;\; \mathbf{x} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}:\qquad
+    A\mathbf{x} = \begin{bmatrix} 3 \\ 6 \end{bmatrix} = 3\begin{bmatrix} 1 \\ 2 \end{bmatrix}
+    \]</div>
+    <p lang="th">ดังนั้น \(\mathbf{x} = (1, 2)\) เป็นเวกเตอร์เฉพาะของ \(A\) ที่มีค่าเฉพาะ \(\lambda = 3\)</p>
+    <p lang="en">So \(\mathbf{x} = (1, 2)\) is an eigenvector of \(A\) with eigenvalue \(\lambda = 3\).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="char"><span lang="th">2. สมการลักษณะเฉพาะ</span><span lang="en">2. The characteristic equation</span></h2>
+
+<p lang="th">เขียน \(\lambda\mathbf{x} = \lambda I\mathbf{x}\) เพื่อให้ทั้งสองข้างเป็นเมทริกซ์คูณเวกเตอร์ แล้วย้ายข้าง:</p>
+<p lang="en">Write \(\lambda\mathbf{x} = \lambda I\mathbf{x}\) so both sides are matrix-times-vector, then rearrange:</p>
+<div class="math">\[ A\mathbf{x} = \lambda I\mathbf{x} \;\Longrightarrow\; (\lambda I - A)\,\mathbf{x} = \mathbf{0} \]</div>
+<p lang="th">นี่คือระบบสมการเอกพันธ์ ซึ่งมีคำตอบ \(\mathbf{x} = \mathbf 0\) เสมอ แต่เราต้องการ \(\mathbf{x} \ne \mathbf{0}\) — จะมีคำตอบที่ไม่ใช่ศูนย์ได้ก็ต่อเมื่อ \(\lambda I - A\) <strong>ไม่มีอินเวอร์ส</strong> (ถ้ามีอินเวอร์ส คูณทั้งสองข้างจะได้ \(\mathbf{x} = \mathbf{0}\) เท่านั้น) นั่นคือดีเทอร์มิแนนต์ต้องเป็นศูนย์:</p>
+<p lang="en">This homogeneous system always has \(\mathbf{x} = \mathbf 0\), but we need \(\mathbf{x} \ne \mathbf{0}\). A non-zero solution exists only when \(\lambda I - A\) is <strong>not invertible</strong> (if it were, multiplying by its inverse would force \(\mathbf{x} = \mathbf{0}\)). So its determinant must vanish:</p>
+
+<div class="box key">
+  <span class="label"><span lang="th">สมการลักษณะเฉพาะ</span><span lang="en">Characteristic equation</span></span>
+  <div class="math">\[ \det(\lambda I - A) = 0 \qquad \Longleftrightarrow \qquad \det(A - \lambda I) = 0 \]</div>
+  <p lang="th">\(\det(\lambda I - A)\) เป็นพหุนามดีกรี \(n\) ใน \(\lambda\) เรียกว่า <strong>พหุนามลักษณะเฉพาะ</strong> ราก (คำตอบ) ของมันคือค่าเฉพาะ</p>
+  <p lang="en">\(\det(\lambda I - A)\) is a degree-\(n\) polynomial in \(\lambda\), the <strong>characteristic polynomial</strong>; its roots are the eigenvalues.</p>
+</div>
+
+<div class="box tip">
+  <span class="label"><span lang="th">ขั้นตอน</span><span lang="en">Procedure</span></span>
+  <ol class="steps">
+    <li><span lang="th">แก้ \(\det(\lambda I - A) = 0\) หาค่าเฉพาะ \(\lambda_1, \lambda_2, \dots\)</span><span lang="en">Solve \(\det(\lambda I - A) = 0\) for the eigenvalues \(\lambda_1, \lambda_2, \dots\)</span></li>
+    <li><span lang="th">สำหรับแต่ละ \(\lambda_i\) แก้ \((A - \lambda_i I)\mathbf{x} = \mathbf 0\) (หา null space) ได้เวกเตอร์เฉพาะ</span><span lang="en">For each \(\lambda_i\), solve \((A - \lambda_i I)\mathbf{x} = \mathbf 0\) (its null space) to get the eigenvectors.</span></li>
+    <li><span lang="th">ตรวจคำตอบด้วย \(A\mathbf{x} = \lambda\mathbf{x}\)</span><span lang="en">Check with \(A\mathbf{x} = \lambda\mathbf{x}\).</span></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ex2"><span lang="th">3. ตัวอย่าง 2×2</span><span lang="en">3. A 2×2 example</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 5.2</span><span lang="en">Example 5.2</span></span><span class="title">\(A = \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}\)</span></header>
+  <div class="body">
+    <h4><span lang="th">ขั้นที่ 1: ค่าเฉพาะ</span><span lang="en">Step 1: eigenvalues</span></h4>
+    <div class="math">\[
+    \det\begin{bmatrix} \lambda - 2 & -1 \\ -1 & \lambda - 2 \end{bmatrix} = (\lambda - 2)^2 - 1 = \lambda^2 - 4\lambda + 3 = (\lambda - 3)(\lambda - 1) = 0
+    \;\Rightarrow\; \lambda = 1,\ 3
+    \]</div>
+    <h4><span lang="th">ขั้นที่ 2: เวกเตอร์เฉพาะ</span><span lang="en">Step 2: eigenvectors</span></h4>
+    <div class="cols">
+      <div class="panel">
+        <p><strong>\(\lambda = 3\)</strong></p>
+        <div class="math">\[ \begin{aligned} 2x + y &= 3x \\ x + 2y &= 3y \end{aligned} \;\Rightarrow\; x = y \]</div>
+        <div class="math">\[ \mathbf{x} = t\begin{bmatrix} 1 \\ 1 \end{bmatrix} \]</div>
+        <p class="small" lang="th">ตรวจ: \(A(4,4) = (12,12) = 3(4,4)\) ✓</p>
+        <p class="small" lang="en">Check: \(A(4,4) = (12,12) = 3(4,4)\) ✓</p>
+      </div>
+      <div class="panel">
+        <p><strong>\(\lambda = 1\)</strong></p>
+        <div class="math">\[ \begin{aligned} 2x + y &= x \\ x + 2y &= y \end{aligned} \;\Rightarrow\; x = -y \]</div>
+        <div class="math">\[ \mathbf{x} = t\begin{bmatrix} 1 \\ -1 \end{bmatrix} \]</div>
+        <p class="small" lang="th">ตรวจ: \(A(2,-2) = (2,-2) = 1\cdot(2,-2)\) ✓</p>
+        <p class="small" lang="en">Check: \(A(2,-2) = (2,-2) = 1\cdot(2,-2)\) ✓</p>
+      </div>
+    </div>
+    <p lang="th">เวกเตอร์เฉพาะไม่ได้มีตัวเดียว — ทุกพหุคูณที่ไม่ใช่ศูนย์ของมันก็เป็นเวกเตอร์เฉพาะเช่นกัน</p>
+    <p lang="en">Eigenvectors are never unique: every non-zero multiple of an eigenvector is also an eigenvector.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="ex3"><span lang="th">4. ตัวอย่าง 3×3</span><span lang="en">4. A 3×3 example</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 5.3</span><span lang="en">Example 5.3</span></span><span class="title">\(A = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 4 & -17 & 8 \end{bmatrix}\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    \det(\lambda I - A) = \det\begin{bmatrix} \lambda & -1 & 0 \\ 0 & \lambda & -1 \\ -4 & 17 & \lambda - 8 \end{bmatrix} = \lambda^3 - 8\lambda^2 + 17\lambda - 4 = 0
+    \]</div>
+    <p lang="th">ลองแทน \(\lambda = 4\): \(64 - 128 + 68 - 4 = 0\) ✓ จึงแยกตัวประกอบได้</p>
+    <p lang="en">Try \(\lambda = 4\): \(64 - 128 + 68 - 4 = 0\) ✓, so we can factor:</p>
+    <div class="math">\[
+    (\lambda - 4)(\lambda^2 - 4\lambda + 1) = 0
+    \;\Rightarrow\;
+    \lambda = 4,\quad \lambda = \frac{4 \pm \sqrt{16 - 4}}{2} = 2 \pm \sqrt3
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">ค่าเฉพาะ</span><span lang="en">Eigenvalues</span></span>\(\lambda = 4,\ \ 2 + \sqrt3,\ \ 2 - \sqrt3\)</div>
+    <p lang="th" style="margin-top:14px">เวกเตอร์เฉพาะของ \(\lambda = 4\): จากแถวที่ 1–2 ของ \((A - 4I)\mathbf{x} = \mathbf 0\) ได้ \(x_2 = 4x_1,\ x_3 = 4x_2\) จึงได้ \(\mathbf{x} = (1, 4, 16)\) — ตรวจ: \(A(1,4,16) = (4, 16, 64) = 4(1,4,16)\) ✓</p>
+    <p lang="en" style="margin-top:14px">Eigenvector for \(\lambda = 4\): rows 1–2 of \((A - 4I)\mathbf{x} = \mathbf 0\) give \(x_2 = 4x_1,\ x_3 = 4x_2\), so \(\mathbf{x} = (1, 4, 16)\). Check: \(A(1,4,16) = (4, 16, 64) = 4(1,4,16)\) ✓</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="explore"><span lang="th">5. ทดลอง: มองเห็นเวกเตอร์เฉพาะ</span><span lang="en">5. Explore: seeing eigenvectors</span></h2>
+<p lang="th">เส้นประสีเขียวคือทิศของเวกเตอร์เฉพาะ — จุดใดบนเส้นนี้ถูกแปลงแล้วยังอยู่บนเส้นเดิม แค่ถูกคูณด้วย \(\lambda\) ลูกศรสีเขียวแสดง \(\lambda\) คูณเวกเตอร์หนึ่งหน่วย ลองเมทริกซ์การหมุน จะพบว่าไม่มีทิศใดคงเดิม (ค่าเฉพาะเป็นจำนวนเชิงซ้อน)</p>
+<p lang="en">The green dashed lines are eigen-directions: any point on them is mapped back onto the same line, just scaled by \(\lambda\). The green arrows show \(\lambda\) times a unit eigenvector. Try the rotation — no direction survives (the eigenvalues are complex).</p>
+
+<section class="widget" data-widget="transform2d" data-eigen="true">
+  <header><span class="label"><span lang="th">ทดลอง</span><span lang="en">Interactive</span></span><span class="title">\(A\mathbf{x} = \lambda\mathbf{x}\)</span></header>
+  <div class="w-body">
+    <div class="w-controls">
+      <span class="inline">A =</span>
+      <div class="matrix-input">
+        <input type="number" step="0.5" value="2" data-m="a" aria-label="a11">
+        <input type="number" step="0.5" value="1" data-m="b" aria-label="a12">
+        <input type="number" step="0.5" value="1" data-m="c" aria-label="a21">
+        <input type="number" step="0.5" value="2" data-m="d" aria-label="a22">
+      </div>
+      <button class="btn" data-preset="2,1,1,2"><span lang="th">ตัวอย่าง 5.2</span><span lang="en">Example 5.2</span></button>
+      <button class="btn" data-preset="3,0,8,-1"><span lang="th">ตัวอย่าง 5.1</span><span lang="en">Example 5.1</span></button>
+      <button class="btn" data-preset="4,1,2,3"><span lang="th">แบบฝึกหัด 1</span><span lang="en">Exercise 1</span></button>
+      <button class="btn" data-preset="0,-1,1,0"><span lang="th">หมุน 90°</span><span lang="en">Rotate 90°</span></button>
+    </div>
+    <canvas></canvas>
+    <div class="w-readout" data-out></div>
+    <div class="legend"><span><i style="background:var(--ode)"></i><span lang="th">ทิศเวกเตอร์เฉพาะ และ λ·(เวกเตอร์หนึ่งหน่วย)</span><span lang="en">eigen-directions and λ·(unit eigenvector)</span></span><span><i style="background:var(--la)"></i>T(e₁)</span><span><i style="background:var(--fa)"></i>T(e₂)</span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="props"><span lang="th">6. สมบัติที่ใช้ตรวจคำตอบ</span><span lang="en">6. Properties useful for checking</span></h2>
+<div class="box key">
+  <span class="label"><span lang="th">ผลรวมและผลคูณของค่าเฉพาะ</span><span lang="en">Sum and product of eigenvalues</span></span>
+  <div class="math">\[ \lambda_1 + \lambda_2 + \cdots + \lambda_n = \operatorname{tr}(A) = a_{11} + a_{22} + \cdots + a_{nn}, \qquad \lambda_1\lambda_2\cdots\lambda_n = \det A \]</div>
+  <p lang="th">ตัวอย่าง 5.2: \(1 + 3 = 4 = 2 + 2\) และ \(1\cdot3 = 3 = \det A\) ✓ · ตัวอย่าง 5.3: \(4 + (2+\sqrt3) + (2-\sqrt3) = 8 = \operatorname{tr}A\) และ \(4\cdot(4 - 3) = 4 = \det A\) ✓</p>
+  <p lang="en">Example 5.2: \(1 + 3 = 4 = 2 + 2\) and \(1\cdot3 = 3 = \det A\) ✓. Example 5.3: \(4 + (2+\sqrt3) + (2-\sqrt3) = 8 = \operatorname{tr}A\) and \(4\cdot(4 - 3) = 4 = \det A\) ✓</p>
+</div>
+<p lang="th">ถ้า \(A\) เป็นเมทริกซ์สมมาตร (\(A = A^T\)) ค่าเฉพาะเป็นจำนวนจริงเสมอ และเวกเตอร์เฉพาะของค่าเฉพาะที่ต่างกันจะตั้งฉากกัน เช่นใน 5.2: \((1,1)\cdot(1,-1) = 0\) — สมบัตินี้คือเหตุผลที่ \(C^TC\) ใน SVD ให้เมทริกซ์เชิงตั้งฉาก \(V\)</p>
+<p lang="en">If \(A\) is symmetric (\(A = A^T\)), its eigenvalues are real and eigenvectors for different eigenvalues are perpendicular — as in 5.2: \((1,1)\cdot(1,-1) = 0\). This is why \(C^TC\) in SVD produces an orthogonal matrix \(V\).</p>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">หาค่าเฉพาะและเวกเตอร์เฉพาะของ \(A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}\)</p>
+    <p lang="en">Find the eigenvalues and eigenvectors of \(A = \begin{bmatrix} 4 & 1 \\ 2 & 3 \end{bmatrix}\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ (\lambda-4)(\lambda-3) - 2 = \lambda^2 - 7\lambda + 10 = (\lambda - 5)(\lambda - 2) \Rightarrow \lambda = 5,\ 2 \]</div>
+      <div class="math">\[ \lambda = 5:\ \begin{bmatrix} -1 & 1 \\ 2 & -2 \end{bmatrix}\mathbf{x} = \mathbf 0 \Rightarrow \mathbf{x} = t(1, 1) \qquad \lambda = 2:\ \begin{bmatrix} 2 & 1 \\ 2 & 1 \end{bmatrix}\mathbf{x} = \mathbf 0 \Rightarrow \mathbf{x} = t(1, -2) \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">ค่าเฉพาะของเมทริกซ์สามเหลี่ยม \(\begin{bmatrix} 2 & 5 & -1 \\ 0 & -3 & 4 \\ 0 & 0 & 7 \end{bmatrix}\) คืออะไร? (ไม่ต้องคำนวณยาว)</p>
+    <p lang="en">What are the eigenvalues of the triangular matrix \(\begin{bmatrix} 2 & 5 & -1 \\ 0 & -3 & 4 \\ 0 & 0 & 7 \end{bmatrix}\)? (No long calculation needed.)</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">\(\det(\lambda I - A) = (\lambda - 2)(\lambda + 3)(\lambda - 7)\) ดังนั้น \(\lambda = 2, -3, 7\) — ค่าเฉพาะของเมทริกซ์สามเหลี่ยมคือสมาชิกบนเส้นทแยงมุม</p>
+      <p lang="en">\(\det(\lambda I - A) = (\lambda - 2)(\lambda + 3)(\lambda - 7)\), so \(\lambda = 2, -3, 7\): a triangular matrix’s eigenvalues are its diagonal entries.</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">ตรวจว่า \(\mathbf{x} = (1, 2+\sqrt3, (2+\sqrt3)^2)\) เป็นเวกเตอร์เฉพาะของเมทริกซ์ในตัวอย่าง 5.3 สำหรับ \(\lambda = 2 + \sqrt3\)</p>
+    <p lang="en">Verify that \(\mathbf{x} = (1, 2+\sqrt3, (2+\sqrt3)^2)\) is an eigenvector of the matrix in Example 5.3 for \(\lambda = 2 + \sqrt3\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">แถว 1–2 ให้ \(\lambda\cdot 1\) และ \(\lambda\cdot\lambda\) ทันที แถวที่ 3: \(4 - 17\lambda + 8\lambda^2\) ต้องเท่ากับ \(\lambda^3\) ซึ่งจริงเพราะ \(\lambda^3 - 8\lambda^2 + 17\lambda - 4 = 0\) (λ เป็นรากของพหุนามลักษณะเฉพาะ) ✓</p>
+      <p lang="en">Rows 1–2 give \(\lambda\cdot 1\) and \(\lambda\cdot\lambda\) immediately. Row 3: \(4 - 17\lambda + 8\lambda^2\) must equal \(\lambda^3\), which holds because \(\lambda^3 - 8\lambda^2 + 17\lambda - 4 = 0\) (λ is a root of the characteristic polynomial) ✓</p>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>

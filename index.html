@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linear Algebra &amp; ODE — Course Notes</title>
+<meta name="description" content="Bilingual (Thai / English) course notes for Linear Algebra and Ordinary Differential Equations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<script src="js/main.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<main class="home">
+  <section class="hero">
+    <div>
+      <div class="kicker"><span lang="th">เอกสารประกอบการเรียน</span><span lang="en">Course notes</span></div>
+      <h1><span lang="th">พีชคณิตเชิงเส้น<br>และสมการเชิงอนุพันธ์</span><span lang="en">Linear Algebra &amp;<br>Differential Equations</span></h1>
+      <p class="lead" lang="th">สรุปเนื้อหาจากการบรรยายทีละสัปดาห์ ตั้งแต่ระบบสมการเชิงเส้น เมทริกซ์ เวกเตอร์ การแปลงเชิงเส้น ค่าเฉพาะ SVD อนุกรมฟูเรียร์ ไปจนถึงสมการเชิงอนุพันธ์สามัญ — พร้อมตัวอย่างแบบละเอียดทีละขั้น แบบฝึกหัดพร้อมเฉลย และกราฟที่ทดลองเล่นได้</p>
+      <p class="lead" lang="en">Week-by-week notes from the lectures — linear systems, matrices, vectors, linear transformations, eigenvalues, SVD, Fourier series and ordinary differential equations — with step-by-step worked examples, exercises with solutions, and interactive graphs.</p>
+      <p><a class="btn" href="chapters/ch01-linear-systems.html" style="text-decoration:none;display:inline-block;padding:9px 18px;font-weight:600"><span lang="th">เริ่มบทที่ 1 →</span><span lang="en">Start Chapter 1 →</span></a></p>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 400 300">
+        <g style="stroke:var(--line);stroke-width:1">
+          <path d="M20 40H380M20 90H380M20 140H380M20 190H380M20 240H380M40 20V280M100 20V280M160 20V280M220 20V280M280 20V280M340 20V280"/>
+        </g>
+        <g style="stroke:var(--la);stroke-width:1.2;opacity:.45;fill:none">
+          <path d="M160 140 L280 110 L340 170 L220 200 Z"/>
+          <path d="M40 170 L160 140 L220 200 L100 230 Z"/>
+          <path d="M100 80 L220 50 L280 110 L160 140 Z"/>
+        </g>
+        <path d="M160 140 L280 110 L340 170 L220 200 Z" style="fill:var(--key);opacity:.15"/>
+        <line x1="160" y1="140" x2="280" y2="110" style="stroke:var(--la);stroke-width:4;stroke-linecap:round"/>
+        <line x1="160" y1="140" x2="220" y2="200" style="stroke:var(--fa);stroke-width:4;stroke-linecap:round"/>
+        <line x1="60" y1="215" x2="360" y2="65" style="stroke:var(--ode);stroke-width:2;stroke-dasharray:8 6"/>
+        <circle cx="160" cy="140" r="5" style="fill:var(--ink)"/>
+        <path d="M20 262 C 45 232, 70 232, 95 262 S 145 292, 170 262 S 220 232, 245 262 S 295 292, 320 262 S 370 232, 380 250" style="fill:none;stroke:var(--fa);stroke-width:2.5"/>
+        <text x="290" y="100" style="font:600 20px var(--font);fill:var(--la)">Ax = λx</text>
+      </svg>
+    </div>
+  </section>
+
+  <div class="how">
+    <div class="item"><strong><span lang="th">สลับภาษาได้</span><span lang="en">Switch language</span></strong><span lang="th">ใช้ปุ่ม ไทย / EN / TH+EN ด้านบนขวา ระบบจะจำค่าที่เลือกไว้</span><span lang="en">Use ไทย / EN / TH+EN at the top right; your choice is remembered.</span></div>
+    <div class="item"><strong><span lang="th">ตัวอย่างทีละขั้น</span><span lang="en">Step-by-step examples</span></strong><span lang="th">ทุกตัวอย่างมาจากการบรรยาย แสดงทุกการดำเนินการตามแถว</span><span lang="en">Every example comes from the lectures, with every row operation shown.</span></div>
+    <div class="item"><strong><span lang="th">ลองทำก่อนดูเฉลย</span><span lang="en">Try before you peek</span></strong><span lang="th">แบบฝึกหัดท้ายบทซ่อนเฉลยไว้ กด “ดูเฉลย” เมื่อทำเสร็จ</span><span lang="en">End-of-chapter solutions are hidden — open “Show solution” when you’re done.</span></div>
+  </div>
+
+  <!-- ================= Part I ================= -->
+  <section class="part" data-part="la">
+    <div class="part-head"><span class="part-no"><span lang="th">ภาคที่ 1</span><span lang="en">Part I</span></span><h2><span lang="th">พีชคณิตเชิงเส้น</span><span lang="en">Linear Algebra</span></h2></div>
+    <div class="cards">
+      <a class="card" href="chapters/ch01-linear-systems.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 1</span><span lang="en">Chapter 1</span></span><span><span lang="th">สัปดาห์ 1</span><span lang="en">Week 1</span></span></div>
+        <h3><span lang="th">ระบบสมการเชิงเส้นและ RREF</span><span lang="en">Linear Systems &amp; RREF</span></h3>
+        <ul lang="th"><li>สมการเชิงเส้นคืออะไร</li><li>เมทริกซ์แต่งเติม การดำเนินการตามแถว</li><li>หาสมการเส้นตรง/พาราโบลาจากจุด</li></ul>
+        <ul lang="en"><li>What makes an equation linear</li><li>Augmented matrices, row operations</li><li>Fitting lines &amp; parabolas through points</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+      <a class="card" href="chapters/ch02-matrices.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 2</span><span lang="en">Chapter 2</span></span><span><span lang="th">สัปดาห์ 2</span><span lang="en">Week 2</span></span></div>
+        <h3><span lang="th">เมทริกซ์และดีเทอร์มิแนนต์</span><span lang="en">Matrices &amp; Determinants</span></h3>
+        <ul lang="th"><li>บวก คูณสเกลาร์ ทรานสโพส คูณเมทริกซ์</li><li>ดีเทอร์มิแนนต์ กฎซาร์รัส โคแฟกเตอร์</li><li>อินเวอร์สด้วย adjoint และ RREF</li></ul>
+        <ul lang="en"><li>Addition, scalar multiple, transpose, product</li><li>Determinants: Sarrus, cofactors</li><li>Inverse via adjoint and RREF</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+      <a class="card" href="chapters/ch03-vectors.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 3</span><span lang="en">Chapter 3</span></span><span><span lang="th">สัปดาห์ 4</span><span lang="en">Week 4</span></span></div>
+        <h3><span lang="th">เวกเตอร์</span><span lang="en">Vectors</span></h3>
+        <ul lang="th"><li>นอร์ม ผลคูณจุด มุมระหว่างเวกเตอร์</li><li>การฉาย ระยะจากจุดถึงเส้นตรง</li><li>ผลคูณไขว้ พื้นที่และปริมาตร</li></ul>
+        <ul lang="en"><li>Norm, dot product, angles</li><li>Projection, point-to-line distance</li><li>Cross product, area &amp; volume</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+      <a class="card" href="chapters/ch04-linear-transformations.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 4</span><span lang="en">Chapter 4</span></span><span><span lang="th">สัปดาห์ 5</span><span lang="en">Week 5</span></span></div>
+        <h3><span lang="th">การแปลงเชิงเส้น</span><span lang="en">Linear Transformations</span></h3>
+        <ul lang="th"><li>กฎของคราเมอร์</li><li>เงื่อนไขความเป็นเชิงเส้น การประกอบ</li><li>เคอร์เนล เรนจ์ แรงก์ ภาวะศูนย์</li></ul>
+        <ul lang="en"><li>Cramer’s rule</li><li>Linearity conditions, composition</li><li>Kernel, range, rank, nullity</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+      <a class="card" href="chapters/ch05-eigen.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 5</span><span lang="en">Chapter 5</span></span><span><span lang="th">สัปดาห์ 6</span><span lang="en">Week 6</span></span></div>
+        <h3><span lang="th">ค่าเฉพาะและเวกเตอร์เฉพาะ</span><span lang="en">Eigenvalues &amp; Eigenvectors</span></h3>
+        <ul lang="th"><li>\(A\mathbf{x} = \lambda\mathbf{x}\)</li><li>สมการลักษณะเฉพาะ \(\det(\lambda I - A) = 0\)</li><li>ตัวอย่าง 2×2 และ 3×3</li></ul>
+        <ul lang="en"><li>\(A\mathbf{x} = \lambda\mathbf{x}\)</li><li>Characteristic equation \(\det(\lambda I - A) = 0\)</li><li>2×2 and 3×3 examples</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+      <a class="card" href="chapters/ch06-svd-least-squares.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 6</span><span lang="en">Chapter 6</span></span><span><span lang="th">สัปดาห์ 7</span><span lang="en">Week 7</span></span></div>
+        <h3><span lang="th">SVD และกำลังสองน้อยที่สุด</span><span lang="en">SVD &amp; Least Squares</span></h3>
+        <ul lang="th"><li>\(C = U\Sigma V^T\) ทีละขั้น</li><li>อินเวอร์สผ่าน SVD</li><li>การประมาณเส้นโค้งและ \(R^2\)</li></ul>
+        <ul lang="en"><li>\(C = U\Sigma V^T\) step by step</li><li>Inverse via SVD</li><li>Curve fitting and \(R^2\)</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= Part II ================= -->
+  <section class="part" data-part="fa">
+    <div class="part-head"><span class="part-no"><span lang="th">ภาคที่ 2</span><span lang="en">Part II</span></span><h2><span lang="th">การวิเคราะห์ฟูเรียร์</span><span lang="en">Fourier Analysis</span></h2></div>
+    <div class="cards">
+      <a class="card" href="chapters/ch07-fourier.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 7</span><span lang="en">Chapter 7</span></span><span><span lang="th">สัปดาห์ 8</span><span lang="en">Week 8</span></span></div>
+        <h3><span lang="th">อนุกรมและการแปลงฟูเรียร์</span><span lang="en">Fourier Series &amp; Transform</span></h3>
+        <ul lang="th"><li>สัมประสิทธิ์ \(a_0, a_n, b_n\)</li><li>คลื่นสี่เหลี่ยม (ทดลองเพิ่มพจน์ได้)</li><li>การแปลงฟูเรียร์ของพัลส์สี่เหลี่ยม</li></ul>
+        <ul lang="en"><li>Coefficients \(a_0, a_n, b_n\)</li><li>Square wave (add terms interactively)</li><li>Fourier transform of a pulse</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= Part III ================= -->
+  <section class="part" data-part="ode">
+    <div class="part-head"><span class="part-no"><span lang="th">ภาคที่ 3</span><span lang="en">Part III</span></span><h2><span lang="th">สมการเชิงอนุพันธ์สามัญ</span><span lang="en">Ordinary Differential Equations</span></h2></div>
+    <div class="cards">
+      <a class="card" href="chapters/ch08-ode-separable.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 8</span><span lang="en">Chapter 8</span></span><span><span lang="th">สัปดาห์ 9</span><span lang="en">Week 9</span></span></div>
+        <h3><span lang="th">ODE 1: บทนำและสมการแยกตัวแปรได้</span><span lang="en">ODE 1: Intro &amp; Separable Equations</span></h3>
+        <ul lang="th"><li>อนุพันธ์ย่อย อันดับและระดับขั้น</li><li>ผลเฉลยทั่วไป / ผลเฉลยเฉพาะ</li><li>การแยกตัวแปร</li></ul>
+        <ul lang="en"><li>Partial derivatives, order &amp; degree</li><li>General vs particular solutions</li><li>Separation of variables</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+      <a class="card" href="chapters/ch09-ode-homogeneous-exact.html">
+        <div class="meta"><span class="ch"><span lang="th">บทที่ 9</span><span lang="en">Chapter 9</span></span><span><span lang="th">สัปดาห์ 10</span><span lang="en">Week 10</span></span></div>
+        <h3><span lang="th">ODE 2: สมการเอกพันธ์และแม่นตรง</span><span lang="en">ODE 2: Homogeneous &amp; Exact</span></h3>
+        <ul lang="th"><li>แทน \(y = vx\)</li><li>ทดสอบ \(M_y = N_x\)</li><li>สรุปการเลือกวิธีแก้</li></ul>
+        <ul lang="en"><li>The substitution \(y = vx\)</li><li>The test \(M_y = N_x\)</li><li>Choosing a method</li></ul>
+        <span class="go"><span lang="th">อ่านบทนี้ →</span><span lang="en">Read →</span></span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <span lang="th">เนื้อหาเรียบเรียงจากเอกสารประกอบการบรรยาย (ต้นฉบับ PDF อยู่ในโฟลเดอร์ Rawdata และลิงก์ไว้ในแต่ละบท)</span>
+    <span lang="en">Content compiled from the handwritten lecture notes (original PDFs are in the Rawdata folder and linked from each chapter).</span>
+  </footer>
+</main>
+</body>
+</html>

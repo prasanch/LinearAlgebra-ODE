@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="th" data-part="la" data-chapter="2">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2 · Matrices &amp; Determinants — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 2</span><span lang="en">Chapter 2</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 2</span><span lang="en">Week 2</span></span></div>
+  <h1><span lang="th">เมทริกซ์และดีเทอร์มิแนนต์</span><span lang="en">Matrices &amp; Determinants</span></h1>
+  <p class="lead" lang="th">การดำเนินการพื้นฐานของเมทริกซ์ (บวก คูณสเกลาร์ ทรานสโพส คูณเมทริกซ์) การหาดีเทอร์มิแนนต์ และการหาเมทริกซ์ผกผันทั้งด้วยสูตร adjoint และด้วย RREF</p>
+  <p class="lead" lang="en">Basic matrix operations (addition, scalar multiplication, transpose, matrix multiplication), determinants, and computing the inverse both with the adjoint formula and with RREF.</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_Wk2_Basic%20Matrice.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#matrix"><span lang="th">เมทริกซ์คืออะไร</span><span lang="en">What is a matrix?</span></a></li>
+    <li><a href="#basic"><span lang="th">การเท่ากันและการบวก</span><span lang="en">Equality &amp; addition</span></a></li>
+    <li><a href="#scalar"><span lang="th">คูณสเกลาร์และทรานสโพส</span><span lang="en">Scalar multiple &amp; transpose</span></a></li>
+    <li><a href="#mult"><span lang="th">การคูณเมทริกซ์</span><span lang="en">Matrix multiplication</span></a></li>
+    <li><a href="#linear-comb"><span lang="th">\(A\mathbf{x}\) คือผลรวมเชิงเส้นของหลัก</span><span lang="en">\(A\mathbf{x}\) as a combination of columns</span></a></li>
+    <li><a href="#det"><span lang="th">ดีเทอร์มิแนนต์</span><span lang="en">Determinants</span></a></li>
+    <li><a href="#cofactor"><span lang="th">การกระจายโคแฟกเตอร์</span><span lang="en">Cofactor expansion</span></a></li>
+    <li><a href="#inverse"><span lang="th">เมทริกซ์ผกผัน</span><span lang="en">The inverse matrix</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="matrix"><span lang="th">1. เมทริกซ์คืออะไร</span><span lang="en">1. What is a matrix?</span></h2>
+
+<p lang="th">เมทริกซ์ขนาด \(m \times n\) คือตารางตัวเลขที่มี \(m\) แถว และ \(n\) หลัก สมาชิกในแถวที่ \(i\) หลักที่ \(j\) เขียนแทนด้วย \(a_{ij}\)</p>
+<p lang="en">An \(m \times n\) matrix is a table of numbers with \(m\) rows and \(n\) columns. The entry in row \(i\), column \(j\) is written \(a_{ij}\).</p>
+
+<div class="math">\[
+A_{m\times n} = \begin{bmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{m1} & a_{m2} & \cdots & a_{mn}
+\end{bmatrix}
+\]</div>
+
+<div class="box tip">
+  <span class="label"><span lang="th">เชื่อมกับบทที่ 1</span><span lang="en">Link to Chapter 1</span></span>
+  <p lang="th">ในระบบสมการ: <strong>แถว ↔ สมการ</strong> และ <strong>หลัก ↔ ตัวแปร</strong></p>
+  <p lang="en">In a linear system: <strong>rows ↔ equations</strong> and <strong>columns ↔ variables</strong>.</p>
+</div>
+
+<p lang="th">เมทริกซ์พิเศษที่ใช้บ่อย:</p>
+<p lang="en">Two special matrices we use constantly:</p>
+<div class="cols">
+  <div class="panel"><h4><span lang="th">เมทริกซ์เอกลักษณ์ \(I\)</span><span lang="en">Identity matrix \(I\)</span></h4>
+    <div class="math">\[ I_2 = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix},\quad AI = IA = A \]</div></div>
+  <div class="panel"><h4><span lang="th">เมทริกซ์ศูนย์ \(0\)</span><span lang="en">Zero matrix \(0\)</span></h4>
+    <div class="math">\[ \begin{bmatrix} 0 & 0 & 0 \\ 0 & 0 & 0 \end{bmatrix},\quad \begin{bmatrix} 0 \\ 0 \end{bmatrix} \]</div></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="basic"><span lang="th">2. การเท่ากันและการบวกเมทริกซ์</span><span lang="en">2. Equality &amp; addition</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <p lang="th">\(A_{m\times n} = B_{p\times q}\) ก็ต่อเมื่อ <strong>ขนาดเท่ากัน</strong> (\(m = p,\ n = q\)) และ <strong>สมาชิกตำแหน่งเดียวกันเท่ากันทุกตัว</strong> (\(a_{ij} = b_{ij}\))</p>
+  <p lang="en">\(A_{m\times n} = B_{p\times q}\) exactly when they have <strong>the same size</strong> (\(m = p,\ n = q\)) and <strong>every corresponding entry is equal</strong> (\(a_{ij} = b_{ij}\)).</p>
+</div>
+
+<p lang="th">การบวก (และลบ) ทำได้เมื่อขนาดเท่ากัน โดยบวกสมาชิกตำแหน่งเดียวกัน:</p>
+<p lang="en">Addition (and subtraction) needs equal sizes and works entry by entry:</p>
+<div class="math">\[
+\begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} + \begin{bmatrix} b_{11} & b_{12} \\ b_{21} & b_{22} \end{bmatrix}
+= \begin{bmatrix} a_{11}+b_{11} & a_{12}+b_{12} \\ a_{21}+b_{21} & a_{22}+b_{22} \end{bmatrix},
+\qquad A - B = A + (-1)B
+\]</div>
+
+<!-- ============================================================ -->
+<h2 id="scalar"><span lang="th">3. การคูณด้วยสเกลาร์และทรานสโพส</span><span lang="en">3. Scalar multiplication &amp; transpose</span></h2>
+
+<p lang="th"><strong>คูณสเกลาร์</strong> \(cA\): คูณ \(c\) เข้าไปทุกสมาชิก \((cA)_{ij} = c\,a_{ij}\)</p>
+<p lang="en"><strong>Scalar multiple</strong> \(cA\): multiply every entry by \(c\), \((cA)_{ij} = c\,a_{ij}\).</p>
+<div class="math">\[
+c = 2,\quad A = \begin{bmatrix} 1 & 8 & -3 \\ 4 & -2 & 5 \end{bmatrix}
+\quad\Rightarrow\quad
+2A = \begin{bmatrix} 2 & 16 & -6 \\ 8 & -4 & 10 \end{bmatrix}
+\]</div>
+
+<p lang="th"><strong>ทรานสโพส</strong> \(A^T\): สลับแถวเป็นหลัก \((A^T)_{ij} = a_{ji}\) — เมทริกซ์ \(m\times n\) จะกลายเป็น \(n\times m\)</p>
+<p lang="en"><strong>Transpose</strong> \(A^T\): rows become columns, \((A^T)_{ij} = a_{ji}\) — an \(m\times n\) matrix becomes \(n\times m\).</p>
+<div class="math">\[
+A = \begin{bmatrix} 1 & 8 & -3 \\ 4 & -2 & 5 \end{bmatrix}
+\quad\Rightarrow\quad
+A^T = \begin{bmatrix} 1 & 4 \\ 8 & -2 \\ -3 & 5 \end{bmatrix}
+\]</div>
+
+<div class="box key">
+  <span class="label"><span lang="th">สมบัติของทรานสโพส</span><span lang="en">Transpose properties</span></span>
+  <div class="math">\[ (cA)^T = cA^T \qquad (A+B)^T = A^T + B^T \qquad (A^T)^T = A \qquad (AB)^T = B^TA^T \]</div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="mult"><span lang="th">4. การคูณเมทริกซ์</span><span lang="en">4. Matrix multiplication</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">เงื่อนไขขนาด</span><span lang="en">Size rule</span></span>
+  <p lang="th">\(A_{m\times n}\,B_{p\times q}\) คูณกันได้ก็ต่อเมื่อ \(n = p\) (หลักของ \(A\) = แถวของ \(B\)) และผลคูณมีขนาด \(m \times q\)</p>
+  <p lang="en">\(A_{m\times n}\,B_{p\times q}\) is defined only when \(n = p\) (columns of \(A\) = rows of \(B\)); the product is \(m \times q\).</p>
+  <p lang="th">สมาชิกตำแหน่ง \((i, j)\) ของผลคูณ = แถวที่ \(i\) ของ \(A\) “คูณจุด” หลักที่ \(j\) ของ \(B\):</p>
+  <p lang="en">Entry \((i, j)\) of the product is row \(i\) of \(A\) “dotted” with column \(j\) of \(B\):</p>
+  <div class="math">\[ (AB)_{ij} = a_{i1}b_{1j} + a_{i2}b_{2j} + \cdots + a_{in}b_{nj} \]</div>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 2.1</span><span lang="en">Example 2.1</span></span><span class="title">\((2\times 2)(2\times 3) = 2\times 3\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    A = \begin{bmatrix} 1 & 2 \\ 3 & 0 \end{bmatrix},\quad
+    B = \begin{bmatrix} 0 & 4 & 3 \\ 5 & 2 & 3 \end{bmatrix}
+    \]</div>
+    <div class="math">\[
+    AB = \begin{bmatrix}
+    (1)(0)+(2)(5) & (1)(4)+(2)(2) & (1)(3)+(2)(3) \\
+    (3)(0)+(0)(5) & (3)(4)+(0)(2) & (3)(3)+(0)(3)
+    \end{bmatrix}
+    = \begin{bmatrix} 10 & 8 & 9 \\ 0 & 12 & 9 \end{bmatrix}
+    \]</div>
+    <p lang="th">สังเกตว่า \(BA\) หาไม่ได้ เพราะ \((2\times3)(2\times2)\) มีขนาดไม่เข้ากัน</p>
+    <p lang="en">Note that \(BA\) is not defined, since \((2\times3)(2\times2)\) sizes don’t match.</p>
+  </div>
+</section>
+
+<div class="box key">
+  <span class="label"><span lang="th">สมบัติการคูณ</span><span lang="en">Properties of multiplication</span></span>
+  <div class="math">\[ (AB)C = A(BC) \qquad (A+B)C = AC + BC \qquad AB \ne BA \]</div>
+  <p class="small" lang="th">(\(AB \ne BA\) โดยทั่วไป — อาจเท่ากันได้ในบางกรณี)</p>
+  <p class="small" lang="en">(\(AB \ne BA\) in general — they can be equal in special cases.)</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 2.2</span><span lang="en">Example 2.2</span></span><span class="title"><span lang="th">เมื่อ \(AB = BA\)</span><span lang="en">When \(AB = BA\)</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    A = \begin{bmatrix} 1 & 2 \\ 1 & 3 \end{bmatrix},\;
+    B = \begin{bmatrix} 3 & -2 \\ -1 & 1 \end{bmatrix}:\quad
+    AB = \begin{bmatrix} 3-2 & -2+2 \\ 3-3 & -2+3 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = BA
+    \]</div>
+    <p lang="th">โดยทั่วไป \(AB \ne BA\) แต่ในกรณีพิเศษ เช่นเมื่อ \(A\) กับ \(B\) เป็น<strong>อินเวอร์สของกันและกัน</strong> จะได้ \(AB = BA = I\)</p>
+    <p lang="en">In general \(AB \ne BA\), but in special cases — for example when \(A\) and \(B\) are <strong>inverses of each other</strong> — we get \(AB = BA = I\).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="linear-comb"><span lang="th">5. \(A\mathbf{x}\) คือผลรวมเชิงเส้นของหลัก</span><span lang="en">5. \(A\mathbf{x}\) is a combination of columns</span></h2>
+
+<p lang="th">เมื่อคูณเมทริกซ์ \(A_{m\times n}\) กับเวกเตอร์ \(\mathbf{x}_{n\times 1}\) ผลลัพธ์ \((A\mathbf{x})_{m\times 1}\) เท่ากับ <strong>ผลรวมเชิงเส้นของหลักของ \(A\)</strong> โดยมี \(x_1, \dots, x_n\) เป็นน้ำหนัก:</p>
+<p lang="en">Multiplying \(A_{m\times n}\) by a vector \(\mathbf{x}_{n\times 1}\) gives \((A\mathbf{x})_{m\times 1}\), which equals a <strong>linear combination of the columns of \(A\)</strong> weighted by \(x_1, \dots, x_n\):</p>
+<div class="math">\[
+A\mathbf{x} =
+\begin{bmatrix} a_{11}x_1 + a_{12}x_2 + \cdots + a_{1n}x_n \\ \vdots \\ a_{m1}x_1 + a_{m2}x_2 + \cdots + a_{mn}x_n \end{bmatrix}
+= x_1\begin{bmatrix} a_{11} \\ \vdots \\ a_{m1} \end{bmatrix}
++ x_2\begin{bmatrix} a_{12} \\ \vdots \\ a_{m2} \end{bmatrix}
++ \cdots
++ x_n\begin{bmatrix} a_{1n} \\ \vdots \\ a_{mn} \end{bmatrix}
+\]</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 2.3</span><span lang="en">Example 2.3</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    A = \begin{bmatrix} -1 & 3 & 2 \\ 1 & 2 & -3 \\ 2 & 1 & -2 \end{bmatrix},\;
+    \mathbf{x} = \begin{bmatrix} 2 \\ -1 \\ 3 \end{bmatrix}:\quad
+    A\mathbf{x} = 2\begin{bmatrix} -1 \\ 1 \\ 2 \end{bmatrix} + (-1)\begin{bmatrix} 3 \\ 2 \\ 1 \end{bmatrix} + 3\begin{bmatrix} 2 \\ -3 \\ -2 \end{bmatrix}
+    = \begin{bmatrix} 1 \\ -9 \\ -3 \end{bmatrix}
+    \]</div>
+    <p lang="th">ในทำนองเดียวกัน <strong>เวกเตอร์แถว</strong> คูณเมทริกซ์ = ผลรวมเชิงเส้นของ<strong>แถว</strong>:</p>
+    <p lang="en">Similarly, a <strong>row vector</strong> times a matrix is a linear combination of the <strong>rows</strong>:</p>
+    <div class="math">\[
+    \begin{bmatrix} 1 & -9 & 3 \end{bmatrix} A
+    = 1\begin{bmatrix} -1 & 3 & 2 \end{bmatrix} + (-9)\begin{bmatrix} 1 & 2 & -3 \end{bmatrix} + 3\begin{bmatrix} 2 & 1 & -2 \end{bmatrix}
+    = \begin{bmatrix} -4 & -12 & 23 \end{bmatrix}
+    \]</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="det"><span lang="th">6. ดีเทอร์มิแนนต์</span><span lang="en">6. Determinants</span></h2>
+
+<p lang="th">ดีเทอร์มิแนนต์ \(\det(A)\) เป็นตัวเลขหนึ่งตัวที่คำนวณได้จากเมทริกซ์จัตุรัส ใช้บอกว่าเมทริกซ์มีอินเวอร์สหรือไม่ (\(\det A \ne 0\)) และใช้ในสูตรอินเวอร์ส</p>
+<p lang="en">The determinant \(\det(A)\) is a single number computed from a square matrix. It tells us whether \(A\) is invertible (\(\det A \ne 0\)) and appears in the inverse formula.</p>
+
+<div class="cols">
+  <div class="panel">
+    <h4>2 × 2</h4>
+    <div class="math">\[ \det\begin{bmatrix} a & b \\ c & d \end{bmatrix} = ad - bc \]</div>
+    <p class="small muted" lang="th">ผลคูณทแยงลง ลบ ผลคูณทแยงขึ้น</p>
+    <p class="small muted" lang="en">down-diagonal product minus up-diagonal product</p>
+  </div>
+  <div class="panel">
+    <h4><span lang="th">3 × 3 (กฎของซาร์รัส)</span><span lang="en">3 × 3 (Sarrus’ rule)</span></h4>
+    <p class="small" lang="th">เขียนหลักที่ 1–2 ต่อท้าย แล้ว (ผลรวมผลคูณทแยงลง) − (ผลรวมผลคูณทแยงขึ้น) — ใช้ได้<strong>เฉพาะ 3×3</strong></p>
+    <p class="small" lang="en">Copy columns 1–2 to the right, then (sum of down-diagonals) − (sum of up-diagonals). Works <strong>only for 3×3</strong>.</p>
+  </div>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 2.4</span><span lang="en">Example 2.4</span></span><span class="title"><span lang="th">กฎของซาร์รัส</span><span lang="en">Sarrus’ rule</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    C = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 1 & 1 \\ 1 & 0 & 3 \end{bmatrix}
+    \quad\Rightarrow\quad
+    \left|\begin{array}{ccc|cc} 1 & 2 & 3 & 1 & 2 \\ 2 & 1 & 1 & 2 & 1 \\ 1 & 0 & 3 & 1 & 0 \end{array}\right|
+    \]</div>
+    <div class="math">\[
+    \underbrace{(1)(1)(3) + (2)(1)(1) + (3)(2)(0)}_{\searrow\ =\ 5}
+    \;-\;
+    \underbrace{\big[(3)(1)(1) + (1)(1)(0) + (2)(2)(3)\big]}_{\nearrow\ =\ 15}
+    = -10
+    \]</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="cofactor"><span lang="th">7. การกระจายโคแฟกเตอร์</span><span lang="en">7. Cofactor expansion</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <p lang="th"><strong>ไมเนอร์</strong> \(M_{ij}\) = ดีเทอร์มิแนนต์ของเมทริกซ์ที่เหลือหลังตัดแถว \(i\) และหลัก \(j\) ทิ้ง (ในสไลด์เขียนว่า \(\det[i|j]\)) และ <strong>โคแฟกเตอร์</strong> คือ</p>
+  <p lang="en">The <strong>minor</strong> \(M_{ij}\) is the determinant left after deleting row \(i\) and column \(j\) (written \(\det[i|j]\) in the lecture). The <strong>cofactor</strong> is</p>
+  <div class="math">\[ C_{ij} = (-1)^{i+j}\,M_{ij} \qquad\qquad \begin{bmatrix} + & - & + \\ - & + & - \\ + & - & + \end{bmatrix} \]</div>
+</div>
+
+<div class="box key">
+  <span class="label"><span lang="th">สูตรกระจาย</span><span lang="en">Expansion formulas</span></span>
+  <div class="math">\[
+  \begin{aligned}
+  \text{row } i:&\quad \det A = a_{i1}C_{i1} + a_{i2}C_{i2} + \cdots + a_{in}C_{in} \\
+  \text{column } j:&\quad \det A = a_{1j}C_{1j} + a_{2j}C_{2j} + \cdots + a_{nj}C_{nj}
+  \end{aligned}
+  \]</div>
+  <p lang="th">เลือกแถวหรือหลักใดก็ได้ ได้คำตอบเท่ากันเสมอ — <strong>เลือกแถว/หลักที่มีเลข 0 มากที่สุด</strong> จะคำนวณน้อยที่สุด ใช้ได้กับเมทริกซ์ทุกขนาด</p>
+  <p lang="en">Any row or column gives the same answer — <strong>pick the one with the most zeros</strong> to save work. Works for any size.</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 2.5</span><span lang="en">Example 2.5</span></span><span class="title"><span lang="th">กระจายตามหลักที่ 1</span><span lang="en">Expanding along column 1</span></span></header>
+  <div class="body">
+    <div class="math">\[ A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 1 & 1 \\ 1 & 0 & 3 \end{bmatrix} \]</div>
+    <div class="math">\[
+    \begin{aligned}
+    C_{11} &= (-1)^{1+1}\det\begin{bmatrix} 1 & 1 \\ 0 & 3 \end{bmatrix} = 3, \qquad
+    C_{21} = (-1)^{2+1}\det\begin{bmatrix} 2 & 3 \\ 0 & 3 \end{bmatrix} = -6, \qquad
+    C_{31} = (-1)^{3+1}\det\begin{bmatrix} 2 & 3 \\ 1 & 1 \end{bmatrix} = -1 \\[4pt]
+    \det A &= a_{11}C_{11} + a_{21}C_{21} + a_{31}C_{31} = (1)(3) + (2)(-6) + (1)(-1) = -10
+    \end{aligned}
+    \]</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 2.6</span><span lang="en">Example 2.6</span></span><span class="title"><span lang="th">เมทริกซ์เดิม กระจายตามแถวที่ 2</span><span lang="en">Same matrix, expanding along row 2</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    \begin{aligned}
+    C_{21} &= -\det\begin{bmatrix} 2 & 3 \\ 0 & 3 \end{bmatrix} = -6, \qquad
+    C_{22} = +\det\begin{bmatrix} 1 & 3 \\ 1 & 3 \end{bmatrix} = 0, \qquad
+    C_{23} = -\det\begin{bmatrix} 1 & 2 \\ 1 & 0 \end{bmatrix} = 2 \\[4pt]
+    \det A &= (2)(-6) + (1)(0) + (1)(2) = -10 \ \checkmark
+    \end{aligned}
+    \]</div>
+    <p lang="th">ได้ \(-10\) เท่ากันทั้งสามวิธี (ซาร์รัส, หลักที่ 1, แถวที่ 2)</p>
+    <p lang="en">All three methods (Sarrus, column 1, row 2) give \(-10\).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="inverse"><span lang="th">8. เมทริกซ์ผกผัน (อินเวอร์ส)</span><span lang="en">8. The inverse matrix</span></h2>
+
+<p lang="th">\(A^{-1}\) คือเมทริกซ์ที่ทำให้ \(AA^{-1} = A^{-1}A = I\) มีได้เมื่อ \(A\) เป็นเมทริกซ์จัตุรัสและ \(\det A \ne 0\) ใช้แก้ระบบสมการได้ทันที: \(A\mathbf{x} = \mathbf{b} \Rightarrow \mathbf{x} = A^{-1}\mathbf{b}\)</p>
+<p lang="en">\(A^{-1}\) is the matrix with \(AA^{-1} = A^{-1}A = I\). It exists when \(A\) is square and \(\det A \ne 0\), and it solves systems directly: \(A\mathbf{x} = \mathbf{b} \Rightarrow \mathbf{x} = A^{-1}\mathbf{b}\).</p>
+
+<h3><span lang="th">วิธีที่ 1: สูตร adjoint</span><span lang="en">Method 1: the adjoint formula</span></h3>
+<div class="box key">
+  <span class="label"><span lang="th">สูตร</span><span lang="en">Formula</span></span>
+  <div class="math">\[ A^{-1} = \frac{1}{\det A}\,\operatorname{adj}(A), \qquad \operatorname{adj}(A) = \big[C_{ij}\big]^T \]</div>
+  <p lang="th">adjoint = ทรานสโพสของเมทริกซ์โคแฟกเตอร์ — สำหรับ 2×2 ได้สูตรลัด \(\begin{bmatrix} a & b \\ c & d\end{bmatrix}^{-1} = \dfrac{1}{ad-bc}\begin{bmatrix} d & -b \\ -c & a\end{bmatrix}\)</p>
+  <p lang="en">The adjoint is the transpose of the cofactor matrix. For 2×2 this gives the shortcut \(\begin{bmatrix} a & b \\ c & d\end{bmatrix}^{-1} = \dfrac{1}{ad-bc}\begin{bmatrix} d & -b \\ -c & a\end{bmatrix}\).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 2.7</span><span lang="en">Example 2.7</span></span><span class="title"><span lang="th">หา adjoint และอินเวอร์ส</span><span lang="en">Adjoint and inverse</span></span></header>
+  <div class="body">
+    <div class="math">\[ A = \begin{bmatrix} 3 & 2 & -1 \\ 1 & 6 & 3 \\ 2 & -4 & 0 \end{bmatrix} \]</div>
+    <p lang="th">คำนวณโคแฟกเตอร์ทีละตัว เช่น</p>
+    <p lang="en">Compute each cofactor, e.g.</p>
+    <div class="math">\[
+    C_{11} = +\det\begin{bmatrix} 6 & 3 \\ -4 & 0 \end{bmatrix} = 12,\quad
+    C_{21} = -\det\begin{bmatrix} 2 & -1 \\ -4 & 0 \end{bmatrix} = 4,\quad
+    C_{32} = -\det\begin{bmatrix} 3 & -1 \\ 1 & 3 \end{bmatrix} = -10
+    \]</div>
+    <div class="math">\[
+    [C_{ij}] = \begin{bmatrix} 12 & 6 & -16 \\ 4 & 2 & 16 \\ 12 & -10 & 16 \end{bmatrix}
+    \quad\Rightarrow\quad
+    \operatorname{adj}(A) = [C_{ij}]^T = \begin{bmatrix} 12 & 4 & 12 \\ 6 & 2 & -10 \\ -16 & 16 & 16 \end{bmatrix}
+    \]</div>
+    <p lang="th">ดีเทอร์มิแนนต์ (กระจายแถวที่ 1): \(\det A = 3(12) + 2(6) + (-1)(-16) = 64\) ดังนั้น</p>
+    <p lang="en">Determinant (row 1 expansion): \(\det A = 3(12) + 2(6) + (-1)(-16) = 64\), so</p>
+    <div class="math">\[ A^{-1} = \frac{1}{64}\begin{bmatrix} 12 & 4 & 12 \\ 6 & 2 & -10 \\ -16 & 16 & 16 \end{bmatrix} \]</div>
+  </div>
+</section>
+
+<h3><span lang="th">วิธีที่ 2: RREF</span><span lang="en">Method 2: RREF</span></h3>
+<div class="box key">
+  <span class="label"><span lang="th">หลักการ</span><span lang="en">Idea</span></span>
+  <div class="math">\[
+  \left[\,A \mid \mathbf{b}\,\right] \xrightarrow{\text{RREF}} \left[\,I \mid \mathbf{x}\,\right]
+  \qquad\qquad
+  \left[\,A \mid I\,\right] \xrightarrow{\text{RREF}} \left[\,I \mid A^{-1}\,\right]
+  \]</div>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 2.8</span><span lang="en">Example 2.8</span></span><span class="title">\(x + 2y = 4,\; x + 3y = 5\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    \left[\begin{array}{cc|cc} 1 & 2 & 1 & 0 \\ 1 & 3 & 0 & 1 \end{array}\right]
+    \xrightarrow{R_2 \to R_2 - R_1}
+    \left[\begin{array}{cc|cc} 1 & 2 & 1 & 0 \\ 0 & 1 & -1 & 1 \end{array}\right]
+    \xrightarrow{R_1 \to R_1 - 2R_2}
+    \left[\begin{array}{cc|cc} 1 & 0 & 3 & -2 \\ 0 & 1 & -1 & 1 \end{array}\right]
+    \]</div>
+    <div class="math">\[
+    A^{-1} = \begin{bmatrix} 3 & -2 \\ -1 & 1 \end{bmatrix}
+    \qquad
+    \mathbf{x} = A^{-1}\mathbf{b} = \begin{bmatrix} 3 & -2 \\ -1 & 1 \end{bmatrix}\begin{bmatrix} 4 \\ 5 \end{bmatrix} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}
+    \]</div>
+    <p lang="th">ตรวจ: \(AA^{-1} = \begin{bmatrix} 1(3)+2(-1) & 1(-2)+2(1) \\ 1(3)+3(-1) & 1(-2)+3(1)\end{bmatrix} = I\) ✓ (ตรงกับตัวอย่าง 2.2)</p>
+    <p lang="en">Check: \(AA^{-1} = \begin{bmatrix} 1(3)+2(-1) & 1(-2)+2(1) \\ 1(3)+3(-1) & 1(-2)+3(1)\end{bmatrix} = I\) ✓ (matches Example 2.2).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">ให้ \(A = \begin{bmatrix} 2 & -1 \\ 0 & 3 \end{bmatrix},\ B = \begin{bmatrix} 1 & 4 \\ -2 & 1 \end{bmatrix}\) จงหา \(AB\), \(BA\) และ \((AB)^T\)</p>
+    <p lang="en">Let \(A = \begin{bmatrix} 2 & -1 \\ 0 & 3 \end{bmatrix},\ B = \begin{bmatrix} 1 & 4 \\ -2 & 1 \end{bmatrix}\). Find \(AB\), \(BA\) and \((AB)^T\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[
+      AB = \begin{bmatrix} 4 & 7 \\ -6 & 3 \end{bmatrix},\quad
+      BA = \begin{bmatrix} 2 & 11 \\ -4 & 5 \end{bmatrix},\quad
+      (AB)^T = \begin{bmatrix} 4 & -6 \\ 7 & 3 \end{bmatrix} = B^TA^T
+      \]</div>
+      <p lang="th">เห็นได้ว่า \(AB \ne BA\)</p><p lang="en">Clearly \(AB \ne BA\).</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">หาดีเทอร์มิแนนต์ของ \(D = \begin{bmatrix} 2 & 0 & 1 \\ 3 & 0 & -2 \\ 1 & 4 & 5 \end{bmatrix}\) (เลือกหลักที่ดีที่สุดในการกระจาย)</p>
+    <p lang="en">Find \(\det D\) for \(D = \begin{bmatrix} 2 & 0 & 1 \\ 3 & 0 & -2 \\ 1 & 4 & 5 \end{bmatrix}\) (choose the best column to expand).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">หลักที่ 2 มีเลข 0 สองตัว เหลือแค่ \(a_{32}C_{32}\):</p>
+      <p lang="en">Column 2 has two zeros, leaving only \(a_{32}C_{32}\):</p>
+      <div class="math">\[ \det D = 4\cdot(-1)^{3+2}\det\begin{bmatrix} 2 & 1 \\ 3 & -2 \end{bmatrix} = 4\cdot(-1)\cdot(-4-3) = 28 \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">หา \(A^{-1}\) ของ \(A = \begin{bmatrix} 4 & 7 \\ 2 & 6 \end{bmatrix}\) ด้วยสูตร 2×2 แล้วตรวจด้วย RREF</p>
+    <p lang="en">Find \(A^{-1}\) for \(A = \begin{bmatrix} 4 & 7 \\ 2 & 6 \end{bmatrix}\) with the 2×2 formula, then check with RREF.</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \det A = 24 - 14 = 10,\qquad A^{-1} = \frac{1}{10}\begin{bmatrix} 6 & -7 \\ -2 & 4 \end{bmatrix} = \begin{bmatrix} 0.6 & -0.7 \\ -0.2 & 0.4 \end{bmatrix} \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">4.</span><div class="qbody">
+    <p lang="th">เขียน \(\begin{bmatrix} 1 & 0 & 2 \\ -1 & 3 & 1 \end{bmatrix}\begin{bmatrix} 3 \\ 1 \\ -2 \end{bmatrix}\) เป็นผลรวมเชิงเส้นของหลัก แล้วคำนวณ</p>
+    <p lang="en">Write \(\begin{bmatrix} 1 & 0 & 2 \\ -1 & 3 & 1 \end{bmatrix}\begin{bmatrix} 3 \\ 1 \\ -2 \end{bmatrix}\) as a combination of columns and evaluate.</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ 3\begin{bmatrix} 1 \\ -1 \end{bmatrix} + 1\begin{bmatrix} 0 \\ 3 \end{bmatrix} - 2\begin{bmatrix} 2 \\ 1 \end{bmatrix} = \begin{bmatrix} -1 \\ -2 \end{bmatrix} \]</div>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>

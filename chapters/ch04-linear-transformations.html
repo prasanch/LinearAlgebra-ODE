@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="th" data-part="la" data-chapter="4">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4 · Linear Transformations — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+<script defer src="../js/widgets.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 4</span><span lang="en">Chapter 4</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 5</span><span lang="en">Week 5</span></span></div>
+  <h1><span lang="th">การแปลงเชิงเส้น</span><span lang="en">Linear Transformations</span></h1>
+  <p class="lead" lang="th">ทบทวน RREF และกฎของคราเมอร์ จากนั้นมองเมทริกซ์เป็น “ฟังก์ชัน” ที่แปลงเวกเตอร์ขาเข้าเป็นเวกเตอร์ขาออก ศึกษาเงื่อนไขความเป็นเชิงเส้น เคอร์เนล เรนจ์ แรงก์ ภาวะศูนย์ และการแปลงผกผัน</p>
+  <p class="lead" lang="en">A recap of RREF and Cramer’s rule, then matrices viewed as <em>functions</em> that turn input vectors into output vectors: the linearity conditions, kernel, range, rank, nullity and inverse transformations.</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_WK5_Linear%20Transformation.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#recap"><span lang="th">ทบทวน: RREF</span><span lang="en">Recap: RREF</span></a></li>
+    <li><a href="#cramer"><span lang="th">กฎของคราเมอร์</span><span lang="en">Cramer’s rule</span></a></li>
+    <li><a href="#functions"><span lang="th">ฟังก์ชันและการแปลง</span><span lang="en">Functions &amp; transformations</span></a></li>
+    <li><a href="#matrix-transform"><span lang="th">การแปลงด้วยเมทริกซ์</span><span lang="en">Matrix transformations</span></a></li>
+    <li><a href="#linear"><span lang="th">เงื่อนไขความเป็นเชิงเส้น</span><span lang="en">Linearity conditions</span></a></li>
+    <li><a href="#explore"><span lang="th">ทดลอง: เมทริกซ์ 2×2</span><span lang="en">Explore: a 2×2 matrix</span></a></li>
+    <li><a href="#composition"><span lang="th">การประกอบการแปลง</span><span lang="en">Composition</span></a></li>
+    <li><a href="#kernel"><span lang="th">เคอร์เนล / ปริภูมิศูนย์</span><span lang="en">Kernel / null space</span></a></li>
+    <li><a href="#range"><span lang="th">เรนจ์</span><span lang="en">Range</span></a></li>
+    <li><a href="#rank"><span lang="th">แรงก์และภาวะศูนย์</span><span lang="en">Rank &amp; nullity</span></a></li>
+    <li><a href="#inverse"><span lang="th">การแปลงผกผัน</span><span lang="en">Inverse transformations</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="recap"><span lang="th">1. ทบทวน: RREF</span><span lang="en">1. Recap: RREF</span></h2>
+<p lang="th">สมการเชิงเส้น ⇄ เมทริกซ์ — เราแก้ \(A\mathbf{x} = \mathbf{b}\) ได้สองแบบ (บทที่ 1–2):</p>
+<p lang="en">Linear equations ⇄ matrices. We can solve \(A\mathbf{x} = \mathbf{b}\) in two ways (Chapters 1–2):</p>
+<div class="math">\[
+\left[\begin{array}{cc|c} a & c & p \\ b & d & q \end{array}\right] \xrightarrow{\text{RREF}} \left[\begin{array}{cc|c} 1 & 0 & x \\ 0 & 1 & y \end{array}\right]
+\qquad\text{or}\qquad
+\left[\begin{array}{cc|cc} a & c & 1 & 0 \\ b & d & 0 & 1 \end{array}\right] \xrightarrow{\text{RREF}} \left[\,I \mid A^{-1}\,\right],\ \ \mathbf{x} = A^{-1}\mathbf{b}
+\]</div>
+
+<!-- ============================================================ -->
+<h2 id="cramer"><span lang="th">2. กฎของคราเมอร์</span><span lang="en">2. Cramer’s rule</span></h2>
+
+<div class="box key">
+  <span class="label"><span lang="th">กฎของคราเมอร์ (ใช้ดีเทอร์มิแนนต์)</span><span lang="en">Cramer’s rule (uses determinants)</span></span>
+  <div class="math">\[ x_i = \frac{\det(A_i)}{\det(A)} \]</div>
+  <p lang="th">\(A_i\) คือเมทริกซ์ \(A\) ที่<strong>แทนหลักที่ \(i\) ด้วยเวกเตอร์ \(\mathbf{b}\)</strong> ใช้ได้เมื่อ \(\det A \ne 0\)</p>
+  <p lang="en">\(A_i\) is \(A\) with <strong>column \(i\) replaced by \(\mathbf{b}\)</strong>. Valid when \(\det A \ne 0\).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 4.1</span><span lang="en">Example 4.1</span></span></header>
+  <div class="body">
+    <div class="math">\[ \begin{bmatrix} 2 & 1 \\ 1 & -1 \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} = \begin{bmatrix} 4 \\ -1 \end{bmatrix},\qquad \det A = -2 - 1 = -3 \]</div>
+    <div class="math">\[
+    x_1 = \frac{\det\begin{bmatrix} 4 & 1 \\ -1 & -1 \end{bmatrix}}{-3} = \frac{-4 - (-1)}{-3} = 1,
+    \qquad
+    x_2 = \frac{\det\begin{bmatrix} 2 & 4 \\ 1 & -1 \end{bmatrix}}{-3} = \frac{-2 - 4}{-3} = 2
+    \]</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="functions"><span lang="th">3. ฟังก์ชันและการแปลง</span><span lang="en">3. Functions &amp; transformations</span></h2>
+
+<p lang="th">ฟังก์ชันคือ “กล่อง” ที่รับค่าขาเข้าแล้วให้ค่าขาออก ลองนับจำนวนขาเข้า : ขาออก:</p>
+<p lang="en">A function is a “box” that takes inputs and returns outputs. Count inputs : outputs:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">ความสัมพันธ์</span><span lang="en">Relation</span></th><th><span lang="th">ขาเข้า : ขาออก</span><span lang="en">inputs : outputs</span></th></tr></thead>
+  <tbody>
+    <tr><td>\(y(x) = mx + c\)</td><td>1 : 1</td></tr>
+    <tr><td>\(C = 2\pi r,\ \ A = \pi r^2\)</td><td>1 : 2</td></tr>
+    <tr><td>\(F = ma,\ \ v = s/t\)</td><td>2 : 1</td></tr>
+    <tr><td>\(y_1 = 5x_1 + 2x_2,\ \ y_2 = -2x_1 + 4x_2\)</td><td>2 : 2</td></tr>
+    <tr><td>\(f(x_1, \dots, x_n)\)</td><td>n : 1 &nbsp;(\(\mathbb{R}^n \to \mathbb{R}\))</td></tr>
+  </tbody>
+</table>
+</div>
+<p lang="th">“มิติ” = จำนวนตัวแปร เช่น คะแนนความสุข \(HF(x_1, x_2, x_3) = 2x_1 - 0.5x_2 + 5x_3\) (ออกกำลังกาย, เล่นเกม, ดื่มน้ำ) เป็นฟังก์ชันจาก \(\mathbb{R}^3\) ไป \(\mathbb{R}\)</p>
+<p lang="en">“Dimension” = number of variables. A happiness score \(HF(x_1, x_2, x_3) = 2x_1 - 0.5x_2 + 5x_3\) (exercise, gaming, drinking water) maps \(\mathbb{R}^3\) to \(\mathbb{R}\).</p>
+
+<div class="box def">
+  <span class="label"><span lang="th">การแปลง</span><span lang="en">Transformation</span></span>
+  <p lang="th">ระบบฟังก์ชัน \(w_i = f_i(x_1, \dots, x_n)\) สำหรับ \(i = 1, \dots, m\) กำหนดการแปลง \(T : \mathbb{R}^n \to \mathbb{R}^m\) โดย \(T(\mathbf{x}) = \mathbf{w}\)</p>
+  <p lang="en">A family of functions \(w_i = f_i(x_1, \dots, x_n)\), \(i = 1, \dots, m\), defines a transformation \(T : \mathbb{R}^n \to \mathbb{R}^m\), \(T(\mathbf{x}) = \mathbf{w}\).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 4.2</span><span lang="en">Example 4.2</span></span><span class="title">\(T : \mathbb{R}^2 \to \mathbb{R}^3\)</span></header>
+  <div class="body">
+    <div class="math">\[ T(x_1, x_2) = \big(x_1 + x_2,\ 3x_1x_2,\ x_1^2 - x_2^2\big) \;\Rightarrow\; T(1, -2) = (-1,\ -6,\ -3) \]</div>
+    <p lang="th">การแปลงนี้<strong>ไม่เป็นเชิงเส้น</strong> (มี \(x_1x_2\) และ \(x_1^2\)) — ดูหัวข้อ 5</p>
+    <p lang="en">This transformation is <strong>not linear</strong> (it has \(x_1x_2\) and \(x_1^2\)) — see Section 5.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="matrix-transform"><span lang="th">4. การแปลงด้วยเมทริกซ์</span><span lang="en">4. Matrix transformations</span></h2>
+
+<p lang="th">ถ้าทุก \(w_i\) เป็นสมการเชิงเส้นของ \(x_1, \dots, x_n\) จะเขียนได้เป็น \(\mathbf{w} = A\mathbf{x}\) — “\(\mathbf{w}\) คือผลจากการแปลง \(\mathbf{x}\) โดยฟังก์ชัน \(A\)” และเรียก \(A\) ว่า <strong>เมทริกซ์มาตรฐาน</strong> ของ \(T\) (เขียน \([T]\) หรือ \(T_A\))</p>
+<p lang="en">If each \(w_i\) is linear in \(x_1, \dots, x_n\), then \(\mathbf{w} = A\mathbf{x}\): “\(\mathbf{w}\) is \(\mathbf{x}\) transformed by the function \(A\)”. \(A\) is the <strong>standard matrix</strong> of \(T\) (written \([T]\) or \(T_A\)).</p>
+<div class="math">\[
+\begin{aligned}
+w_1 &= a_{11}x_1 + \cdots + a_{1n}x_n \\ &\ \ \vdots \\ w_m &= a_{m1}x_1 + \cdots + a_{mn}x_n
+\end{aligned}
+\quad\Longleftrightarrow\quad
+\begin{bmatrix} w_1 \\ \vdots \\ w_m \end{bmatrix} = \begin{bmatrix} a_{11} & \cdots & a_{1n} \\ \vdots & & \vdots \\ a_{m1} & \cdots & a_{mn} \end{bmatrix}\begin{bmatrix} x_1 \\ \vdots \\ x_n \end{bmatrix}
+\]</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 4.3</span><span lang="en">Example 4.3</span></span><span class="title">\(T : \mathbb{R}^4 \to \mathbb{R}^3\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    \begin{aligned} w_1 &= 2x_1 - 3x_2 + x_3 - 5x_4 \\ w_2 &= 4x_1 + x_2 - 2x_3 + x_4 \\ w_3 &= 5x_1 - x_2 + 4x_3 \end{aligned}
+    \quad\Rightarrow\quad
+    A = \begin{bmatrix} 2 & -3 & 1 & -5 \\ 4 & 1 & -2 & 1 \\ 5 & -1 & 4 & 0 \end{bmatrix}
+    \]</div>
+    <p lang="th">หา \(\mathbf{w}\) เมื่อ \((x_1, x_2, x_3, x_4) = (1, -3, 0, 2)\):</p>
+    <p lang="en">Find \(\mathbf{w}\) for \((x_1, x_2, x_3, x_4) = (1, -3, 0, 2)\):</p>
+    <div class="math">\[
+    \mathbf{w} = A\begin{bmatrix} 1 \\ -3 \\ 0 \\ 2 \end{bmatrix}
+    = \begin{bmatrix} 2 + 9 + 0 - 10 \\ 4 - 3 - 0 + 2 \\ 5 + 3 + 0 + 0 \end{bmatrix}
+    = \begin{bmatrix} 1 \\ 3 \\ 8 \end{bmatrix}
+    \]</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="linear"><span lang="th">5. เงื่อนไขความเป็นเชิงเส้น</span><span lang="en">5. Linearity conditions</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม: การแปลงเชิงเส้น</span><span lang="en">Definition: linear transformation</span></span>
+  <p lang="th">\(T : \mathbb{R}^n \to \mathbb{R}^m\) เป็นการแปลงเชิงเส้น ถ้าสำหรับทุก \(\vec u, \vec v \in \mathbb{R}^n\) และทุกสเกลาร์ \(\alpha \in \mathbb{R}\)</p>
+  <p lang="en">\(T : \mathbb{R}^n \to \mathbb{R}^m\) is linear if for all \(\vec u, \vec v \in \mathbb{R}^n\) and every scalar \(\alpha \in \mathbb{R}\)</p>
+  <div class="math">\[ \text{(1)}\ \ T(\vec u + \vec v) = T(\vec u) + T(\vec v) \qquad\qquad \text{(2)}\ \ T(\alpha\vec u) = \alpha\,T(\vec u) \]</div>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 4.4</span><span lang="en">Example 4.4</span></span><span class="title"><span lang="th">พิสูจน์ความเป็นเชิงเส้น</span><span lang="en">Proving linearity</span></span></header>
+  <div class="body">
+    <div class="math">\[ T(\mathbf{x}) = \begin{bmatrix} 5x_1 + 3x_2 \\ 2x_2 + x_3 \end{bmatrix},\qquad T : \mathbb{R}^3 \to \mathbb{R}^2 \]</div>
+    <p lang="th"><strong>ข้อ (1):</strong></p><p lang="en"><strong>Condition (1):</strong></p>
+    <div class="math">\[
+    T(\vec u + \vec v) = \begin{bmatrix} 5(u_1+v_1) + 3(u_2+v_2) \\ 2(u_2+v_2) + (u_3+v_3) \end{bmatrix}
+    = \begin{bmatrix} 5u_1 + 3u_2 \\ 2u_2 + u_3 \end{bmatrix} + \begin{bmatrix} 5v_1 + 3v_2 \\ 2v_2 + v_3 \end{bmatrix}
+    = T(\vec u) + T(\vec v)\ \checkmark
+    \]</div>
+    <p lang="th"><strong>ข้อ (2):</strong></p><p lang="en"><strong>Condition (2):</strong></p>
+    <div class="math">\[
+    T(\alpha\vec u) = \begin{bmatrix} 5\alpha u_1 + 3\alpha u_2 \\ 2\alpha u_2 + \alpha u_3 \end{bmatrix}
+    = \alpha\begin{bmatrix} 5u_1 + 3u_2 \\ 2u_2 + u_3 \end{bmatrix} = \alpha\,T(\vec u)\ \checkmark
+    \]</div>
+  </div>
+</section>
+
+<div class="box tip">
+  <span class="label"><span lang="th">ตัวอย่างค้าน</span><span lang="en">Counter-example</span></span>
+  <p lang="th">ตัวอย่าง 4.2 ไม่เชิงเส้น: \(T(2\cdot(1,1)) = T(2,2) = (4, 12, 0)\) แต่ \(2\,T(1,1) = 2(2, 3, 0) = (4, 6, 0)\) ไม่เท่ากัน — <strong>การแปลงด้วยเมทริกซ์ \(A\mathbf{x}\) เป็นเชิงเส้นเสมอ</strong> และการแปลงเชิงเส้นทุกตัวจาก \(\mathbb{R}^n\) ไป \(\mathbb{R}^m\) เขียนเป็น \(A\mathbf{x}\) ได้</p>
+  <p lang="en">Example 4.2 is not linear: \(T(2\cdot(1,1)) = T(2,2) = (4, 12, 0)\) but \(2\,T(1,1) = 2(2, 3, 0) = (4, 6, 0)\). <strong>Every matrix transformation \(A\mathbf{x}\) is linear</strong>, and every linear transformation \(\mathbb{R}^n \to \mathbb{R}^m\) can be written as \(A\mathbf{x}\).</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="explore"><span lang="th">6. ทดลอง: เมทริกซ์ 2×2 ทำอะไรกับระนาบ</span><span lang="en">6. Explore: what a 2×2 matrix does to the plane</span></h2>
+
+<p lang="th">หลักที่ 1 ของ \(A\) คือตำแหน่งใหม่ของ \(\mathbf{e}_1 = (1,0)\) และหลักที่ 2 คือตำแหน่งใหม่ของ \(\mathbf{e}_2 = (0,1)\) — ลองเปลี่ยนตัวเลขแล้วดูว่าตารางและสี่เหลี่ยมหนึ่งหน่วยถูกยืด หมุน หรือบีบอย่างไร</p>
+<p lang="en">Column 1 of \(A\) is where \(\mathbf{e}_1 = (1,0)\) lands and column 2 is where \(\mathbf{e}_2 = (0,1)\) lands. Change the numbers and watch how the grid and the unit square are stretched, rotated or squashed.</p>
+
+<section class="widget" data-widget="transform2d" data-eigen="false">
+  <header><span class="label"><span lang="th">ทดลอง</span><span lang="en">Interactive</span></span><span class="title">\(T(\mathbf{x}) = A\mathbf{x}\)</span></header>
+  <div class="w-body">
+    <div class="w-controls">
+      <span class="inline">A =</span>
+      <div class="matrix-input">
+        <input type="number" step="0.5" value="1" data-m="a" aria-label="a11">
+        <input type="number" step="0.5" value="1" data-m="b" aria-label="a12">
+        <input type="number" step="0.5" value="0" data-m="c" aria-label="a21">
+        <input type="number" step="0.5" value="1" data-m="d" aria-label="a22">
+      </div>
+      <button class="btn" data-preset="1,0,0,1">I</button>
+      <button class="btn" data-preset="2,0,0,0.5"><span lang="th">ยืด</span><span lang="en">Stretch</span></button>
+      <button class="btn" data-preset="0,-1,1,0"><span lang="th">หมุน 90°</span><span lang="en">Rotate 90°</span></button>
+      <button class="btn" data-preset="1,1,0,1"><span lang="th">เฉือน</span><span lang="en">Shear</span></button>
+      <button class="btn" data-preset="-1,0,0,1"><span lang="th">สะท้อน</span><span lang="en">Reflect</span></button>
+      <button class="btn" data-preset="1,2,2,4"><span lang="th">det = 0</span><span lang="en">det = 0</span></button>
+    </div>
+    <canvas></canvas>
+    <div class="w-readout" data-out></div>
+    <div class="legend"><span><i style="background:var(--la)"></i>T(e₁)</span><span><i style="background:var(--fa)"></i>T(e₂)</span><span><i style="background:var(--key)"></i><span lang="th">ภาพของสี่เหลี่ยมหนึ่งหน่วย</span><span lang="en">image of the unit square</span></span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="composition"><span lang="th">7. การประกอบการแปลง</span><span lang="en">7. Composition of transformations</span></h2>
+<p lang="th">ถ้า \(T_1\) แปลง \(\mathbf{u} \mapsto \mathbf{v}\) แล้ว \(T_2\) แปลง \(\mathbf{v} \mapsto \mathbf{w}\) การแปลงรวม “\(T_2\) circle \(T_1\)” คือ</p>
+<p lang="en">If \(T_1\) sends \(\mathbf{u} \mapsto \mathbf{v}\) and \(T_2\) sends \(\mathbf{v} \mapsto \mathbf{w}\), the combined map “\(T_2\) circle \(T_1\)” is</p>
+<div class="math">\[ (T_2 \circ T_1)(\mathbf{u}) = T_2\big(T_1(\mathbf{u})\big), \qquad [T_2 \circ T_1] = [T_2]\,[T_1] \]</div>
+<p lang="th">เมทริกซ์ของการแปลงประกอบคือผลคูณของเมทริกซ์ (สังเกตลำดับ: ทำ \(T_1\) ก่อน จึงอยู่ทางขวา)</p>
+<p lang="en">The matrix of a composition is the product of the matrices (note the order: \(T_1\) acts first, so it sits on the right).</p>
+
+<!-- ============================================================ -->
+<h2 id="kernel"><span lang="th">8. เคอร์เนล / ปริภูมิศูนย์ (Null space)</span><span lang="en">8. Kernel / null space</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <p lang="th">เคอร์เนลของ \(T_A\) (หรือ null space ของ \(A\)) คือเซตของเวกเตอร์ \(\mathbf{x}\) ทั้งหมดที่ถูกแปลงเป็นเวกเตอร์ศูนย์</p>
+  <p lang="en">The kernel of \(T_A\) (the null space of \(A\)) is the set of all vectors \(\mathbf{x}\) that are sent to the zero vector:</p>
+  <div class="math">\[ \ker(T) = \{\,\mathbf{x} : A\mathbf{x} = \mathbf{0}\,\} \]</div>
+  <p lang="th">หาได้โดยทำ RREF ของ \([\,A \mid \mathbf{0}\,]\)</p>
+  <p lang="en">Find it by row-reducing \([\,A \mid \mathbf{0}\,]\).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 4.5</span><span lang="en">Example 4.5</span></span><span class="title"><span lang="th">null space ของเมทริกซ์ 2×3</span><span lang="en">Null space of a 2×3 matrix</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    A = \begin{bmatrix} 2 & 3 & 5 \\ -4 & 2 & 3 \end{bmatrix}:\quad
+    \left[\begin{array}{ccc|c} 2 & 3 & 5 & 0 \\ -4 & 2 & 3 & 0 \end{array}\right]
+    \xrightarrow{\text{RREF}}
+    \left[\begin{array}{ccc|c} 1 & 0 & \tfrac{1}{16} & 0 \\ 0 & 1 & \tfrac{13}{8} & 0 \end{array}\right]
+    \]</div>
+    <p lang="th">(ทศนิยม: \(\tfrac1{16} = 0.0625,\ \tfrac{13}8 = 1.625\)) จะได้ \(x + \tfrac1{16}z = 0\) และ \(y + \tfrac{13}8z = 0\) โดย \(z\) เป็น<strong>ตัวแปรอิสระ</strong> (เป็นค่าใดก็ได้) ให้ \(z = t\):</p>
+    <p lang="en">(Decimals: \(\tfrac1{16} = 0.0625,\ \tfrac{13}8 = 1.625\).) So \(x + \tfrac1{16}z = 0\) and \(y + \tfrac{13}8z = 0\), where \(z\) is a <strong>free variable</strong> (any value). Let \(z = t\):</p>
+    <div class="math">\[ \ker(T) = \left\{\, t\begin{bmatrix} -\tfrac1{16} \\ -\tfrac{13}{8} \\ 1 \end{bmatrix} : t \in \mathbb{R} \right\} \qquad \text{rank} = 2,\ \ \text{nullity} = 1 \]</div>
+    <p lang="th">ตรวจด้วย \(t = 16\): \((-1, -26, 16)\) → \(2(-1) + 3(-26) + 5(16) = 0\) ✓ และ \(-4(-1) + 2(-26) + 3(16) = 0\) ✓</p>
+    <p lang="en">Check with \(t = 16\): \((-1, -26, 16)\) → \(2(-1) + 3(-26) + 5(16) = 0\) ✓ and \(-4(-1) + 2(-26) + 3(16) = 0\) ✓</p>
+  </div>
+</section>
+
+<div class="box tip">
+  <span class="label"><span lang="th">กรณีเมทริกซ์จัตุรัส</span><span lang="en">Square matrices</span></span>
+  <p lang="th">ถ้า \(A\) เป็นเมทริกซ์จัตุรัสและ \(\det A \ne 0\) เคอร์เนลมีแค่ \(\{\mathbf 0\}\) เช่น \(A = \begin{bmatrix} 1 & 1 & 0 \\ 3 & 4 & 5 \\ 3 & 2 & 1 \end{bmatrix}\) มี \(\det A = 6\) จึงได้ \(\ker(T) = \{\mathbf{0}\}\)</p>
+  <p lang="en">If \(A\) is square with \(\det A \ne 0\), the kernel is just \(\{\mathbf 0\}\). For example \(A = \begin{bmatrix} 1 & 1 & 0 \\ 3 & 4 & 5 \\ 3 & 2 & 1 \end{bmatrix}\) has \(\det A = 6\), so \(\ker(T) = \{\mathbf{0}\}\).</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="range"><span lang="th">9. เรนจ์ (Range)</span><span lang="en">9. Range</span></h2>
+<p lang="th"><strong>เรนจ์</strong> คือเซตของค่าขาออกทั้งหมด — ขึ้นกับทั้งสูตรและ<strong>โดเมน</strong>:</p>
+<p lang="en">The <strong>range</strong> is the set of all outputs — it depends on both the formula and the <strong>domain</strong>:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">ฟังก์ชัน</span><span lang="en">Function</span></th><th><span lang="th">เรนจ์</span><span lang="en">Range</span></th></tr></thead>
+  <tbody>
+    <tr><td>\(f : \mathbb{R} \to \mathbb{R},\ f(x) = 2x\)</td><td>\((-\infty, \infty)\)</td></tr>
+    <tr><td>\(g : \mathbb{R}^+ \to \mathbb{R},\ g(x) = 2x\)</td><td>\([0, \infty)\)</td></tr>
+    <tr><td>\(h : \mathbb{R}^- \to \mathbb{R},\ h(x) = 2x\)</td><td>\((-\infty, 0]\)</td></tr>
+  </tbody>
+</table>
+</div>
+<p lang="th">สำหรับการแปลงด้วยเมทริกซ์ \(T_A\) เรนจ์คือเซตของ \(\mathbf{b}\) ทั้งหมดที่ \(A\mathbf{x} = \mathbf{b}\) มีคำตอบ = ผลรวมเชิงเส้นของหลักทั้งหมดของ \(A\) เรียกว่า <strong>ปริภูมิหลัก (column space)</strong></p>
+<p lang="en">For a matrix transformation \(T_A\), the range is every \(\mathbf{b}\) for which \(A\mathbf{x} = \mathbf{b}\) has a solution — all linear combinations of the columns of \(A\), called the <strong>column space</strong>.</p>
+
+<!-- ============================================================ -->
+<h2 id="rank"><span lang="th">10. แรงก์และภาวะศูนย์ (Rank &amp; Nullity)</span><span lang="en">10. Rank &amp; nullity</span></h2>
+
+<div class="box key">
+  <span class="label"><span lang="th">ทฤษฎีบทแรงก์–ภาวะศูนย์</span><span lang="en">Rank–nullity theorem</span></span>
+  <div class="math">\[ \operatorname{rank}(A) + \operatorname{nullity}(A) = n \]</div>
+  <p lang="th"><strong>แรงก์</strong> = จำนวนตัวแปรนำ (ตัวนำ 1 ใน RREF) · <strong>ภาวะศูนย์</strong> = จำนวนตัวแปรอิสระ = มิติของ null space · \(n\) = จำนวนตัวแปรทั้งหมด (มิติของโดเมน)</p>
+  <p lang="en"><strong>Rank</strong> = number of leading variables (leading 1s in the RREF). <strong>Nullity</strong> = number of free variables = dimension of the null space. \(n\) = total number of variables (dimension of the domain).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 4.6</span><span lang="en">Example 4.6</span></span><span class="title">\(T_A : \mathbb{R}^6 \to \mathbb{R}^4\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    A = \begin{bmatrix} -1 & 2 & 0 & 4 & 5 & -3 \\ 3 & -7 & 2 & 0 & 1 & 4 \\ 2 & -5 & 2 & 4 & 6 & 1 \\ 4 & -9 & 2 & -4 & -4 & 7 \end{bmatrix}
+    \xrightarrow{\text{RREF}}
+    \begin{bmatrix} 1 & 0 & -4 & -28 & -37 & 13 \\ 0 & 1 & -2 & -12 & -16 & 5 \\ 0 & 0 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 \end{bmatrix}
+    \]</div>
+    <p lang="th">ตัวแปรนำ: \(x_1, x_2\) → <strong>rank = 2</strong> · ตัวแปรอิสระ: \(x_3, x_4, x_5, x_6\) → <strong>nullity = 4</strong> · และ \(2 + 4 = 6\) ✓</p>
+    <p lang="en">Leading variables \(x_1, x_2\) → <strong>rank = 2</strong>. Free variables \(x_3, x_4, x_5, x_6\) → <strong>nullity = 4</strong>. And \(2 + 4 = 6\) ✓</p>
+    <p lang="th">ให้ \(x_3 = r,\ x_4 = s,\ x_5 = t,\ x_6 = u\):</p>
+    <p lang="en">Let \(x_3 = r,\ x_4 = s,\ x_5 = t,\ x_6 = u\):</p>
+    <div class="math">\[
+    \begin{aligned} x_1 &= 4r + 28s + 37t - 13u \\ x_2 &= 2r + 12s + 16t - 5u \end{aligned}
+    \quad\Rightarrow\quad
+    \mathbf{x} = r\begin{bmatrix} 4 \\ 2 \\ 1 \\ 0 \\ 0 \\ 0 \end{bmatrix}
+    + s\begin{bmatrix} 28 \\ 12 \\ 0 \\ 1 \\ 0 \\ 0 \end{bmatrix}
+    + t\begin{bmatrix} 37 \\ 16 \\ 0 \\ 0 \\ 1 \\ 0 \end{bmatrix}
+    + u\begin{bmatrix} -13 \\ -5 \\ 0 \\ 0 \\ 0 \\ 1 \end{bmatrix}
+    \]</div>
+    <p lang="th">เวกเตอร์ 4 ตัวนี้เป็นฐานหลักของ null space (มิติ 4)</p>
+    <p lang="en">These four vectors form a basis of the null space (dimension 4).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="inverse"><span lang="th">11. การแปลงผกผัน</span><span lang="en">11. Inverse transformations</span></h2>
+<p lang="th">ถ้า \(\mathbf{w} = T(\mathbf{v})\) การแปลงผกผัน \(T^{-1}\) พาเรากลับ: \(T^{-1}(T(\mathbf{v})) = \mathbf{v}\) และ \(T(T^{-1}(\mathbf{w})) = \mathbf{w}\) — เหมือน \(y = 5x \Leftrightarrow x = \tfrac15y\) สำหรับการแปลงด้วยเมทริกซ์ \([T^{-1}] = [T]^{-1}\)</p>
+<p lang="en">If \(\mathbf{w} = T(\mathbf{v})\), the inverse transformation takes us back: \(T^{-1}(T(\mathbf{v})) = \mathbf{v}\) and \(T(T^{-1}(\mathbf{w})) = \mathbf{w}\) — just like \(y = 5x \Leftrightarrow x = \tfrac15y\). For matrix transformations \([T^{-1}] = [T]^{-1}\).</p>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 4.7</span><span lang="en">Example 4.7</span></span><span class="title">\(T : \mathbb{R}^3 \to \mathbb{R}^3\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    T\begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} 3x_1 + x_2 \\ -2x_1 - 4x_2 + 3x_3 \\ 5x_1 + 4x_2 - 2x_3 \end{bmatrix}
+    = \begin{bmatrix} 3 & 1 & 0 \\ -2 & -4 & 3 \\ 5 & 4 & -2 \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix}
+    \]</div>
+    <div class="math">\[
+    \left[\begin{array}{ccc|ccc} 3 & 1 & 0 & 1 & 0 & 0 \\ -2 & -4 & 3 & 0 & 1 & 0 \\ 5 & 4 & -2 & 0 & 0 & 1 \end{array}\right]
+    \xrightarrow{\text{RREF}}
+    \left[\begin{array}{ccc|ccc} 1 & 0 & 0 & 4 & -2 & -3 \\ 0 & 1 & 0 & -11 & 6 & 9 \\ 0 & 0 & 1 & -12 & 7 & 10 \end{array}\right]
+    \]</div>
+    <div class="math">\[
+    T^{-1}\begin{bmatrix} b_1 \\ b_2 \\ b_3 \end{bmatrix} = \begin{bmatrix} 4b_1 - 2b_2 - 3b_3 \\ -11b_1 + 6b_2 + 9b_3 \\ -12b_1 + 7b_2 + 10b_3 \end{bmatrix}
+    \]</div>
+    <p lang="th">\(\mathbf{b} = A\mathbf{x}\) บอก \(\mathbf{b}\) เป็นฟังก์ชันของ \(\mathbf{x}\) ส่วน \(\mathbf{x} = A^{-1}\mathbf{b}\) บอก \(\mathbf{x}\) เป็นฟังก์ชันของ \(\mathbf{b}\)</p>
+    <p lang="en">\(\mathbf{b} = A\mathbf{x}\) gives \(\mathbf{b}\) as a function of \(\mathbf{x}\); \(\mathbf{x} = A^{-1}\mathbf{b}\) gives \(\mathbf{x}\) as a function of \(\mathbf{b}\).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">ใช้กฎของคราเมอร์แก้ \(3x + 2y = 7,\ x - y = -1\)</p>
+    <p lang="en">Use Cramer’s rule to solve \(3x + 2y = 7,\ x - y = -1\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \det A = -3 - 2 = -5,\quad x = \frac{\det\begin{bmatrix} 7 & 2 \\ -1 & -1\end{bmatrix}}{-5} = \frac{-5}{-5} = 1,\quad y = \frac{\det\begin{bmatrix} 3 & 7 \\ 1 & -1\end{bmatrix}}{-5} = \frac{-10}{-5} = 2 \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">\(T(x, y) = (x + 1,\ y)\) เป็นการแปลงเชิงเส้นหรือไม่?</p>
+    <p lang="en">Is \(T(x, y) = (x + 1,\ y)\) a linear transformation?</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">ไม่เป็น: \(T(0, 0) = (1, 0) \ne \mathbf{0}\) แต่ข้อ (2) กับ \(\alpha = 0\) บังคับว่า \(T(\mathbf 0) = \mathbf 0\) เสมอ (การเลื่อนตำแหน่งไม่ใช่การแปลงเชิงเส้น)</p>
+      <p lang="en">No: \(T(0, 0) = (1, 0) \ne \mathbf{0}\), but condition (2) with \(\alpha = 0\) forces \(T(\mathbf 0) = \mathbf 0\). (A translation is not linear.)</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">หา null space, rank และ nullity ของ \(A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \end{bmatrix}\)</p>
+    <p lang="en">Find the null space, rank and nullity of \(A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \end{bmatrix}\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \text{RREF} = \begin{bmatrix} 1 & 2 & 3 \\ 0 & 0 & 0 \end{bmatrix} \Rightarrow x_1 = -2s - 3t,\quad \mathbf{x} = s\begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix} + t\begin{bmatrix} -3 \\ 0 \\ 1 \end{bmatrix} \]</div>
+      <p>rank = 1, nullity = 2, 1 + 2 = 3 ✓</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">4.</span><div class="qbody">
+    <p lang="th">ให้ \(T_1(x,y) = (2x, y)\) และ \(T_2(x,y) = (y, x)\) จงหาเมทริกซ์ของ \(T_2 \circ T_1\) และ \((T_2 \circ T_1)(1, 3)\)</p>
+    <p lang="en">Let \(T_1(x,y) = (2x, y)\) and \(T_2(x,y) = (y, x)\). Find the matrix of \(T_2 \circ T_1\) and \((T_2 \circ T_1)(1, 3)\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ [T_2][T_1] = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}\begin{bmatrix} 2 & 0 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 2 & 0 \end{bmatrix},\qquad (T_2\circ T_1)(1,3) = (3,\ 2) \]</div>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>

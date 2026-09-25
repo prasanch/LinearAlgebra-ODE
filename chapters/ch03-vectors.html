@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="th" data-part="la" data-chapter="3">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3 · Vectors — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 3</span><span lang="en">Chapter 3</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 4</span><span lang="en">Week 4</span></span></div>
+  <h1><span lang="th">เวกเตอร์และปริภูมิ</span><span lang="en">Vectors &amp; Spaces</span></h1>
+  <p class="lead" lang="th">รู้จักเวกเตอร์ในเชิงเรขาคณิตและเชิงพิกัด ขนาด (นอร์ม) ผลคูณจุด การฉาย ระยะทางจากจุดถึงเส้นตรง และผลคูณไขว้</p>
+  <p class="lead" lang="en">Vectors geometrically and in coordinates, the norm, the dot product and projections, point-to-line distance, and the cross product.</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_WK4_Vector.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#intro"><span lang="th">เวกเตอร์คืออะไร</span><span lang="en">What is a vector?</span></a></li>
+    <li><a href="#ops"><span lang="th">บวก ลบ และคูณสเกลาร์</span><span lang="en">Add, subtract, scale</span></a></li>
+    <li><a href="#coords"><span lang="th">เวกเตอร์ในระบบพิกัด</span><span lang="en">Vectors in coordinates</span></a></li>
+    <li><a href="#norm"><span lang="th">นอร์มของเวกเตอร์</span><span lang="en">Norm of a vector</span></a></li>
+    <li><a href="#dot"><span lang="th">ผลคูณจุด</span><span lang="en">Dot product</span></a></li>
+    <li><a href="#normal"><span lang="th">เวกเตอร์ตั้งฉากกับเส้นตรง</span><span lang="en">Normal vector of a line</span></a></li>
+    <li><a href="#proj"><span lang="th">การฉาย</span><span lang="en">Projection</span></a></li>
+    <li><a href="#distance"><span lang="th">ระยะจากจุดถึงเส้นตรง</span><span lang="en">Point-to-line distance</span></a></li>
+    <li><a href="#cross"><span lang="th">ผลคูณไขว้</span><span lang="en">Cross product</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="intro"><span lang="th">1. เวกเตอร์คืออะไร</span><span lang="en">1. What is a vector?</span></h2>
+
+<p lang="th"><strong>เวกเตอร์</strong> คือปริมาณที่มีทั้ง<strong>ขนาด</strong>และ<strong>ทิศทาง</strong> วาดเป็นลูกศรจากจุดเริ่มต้น \(A\) ไปจุดปลาย \(B\) เขียนแทนด้วย \(\overrightarrow{AB}\) ส่วนปริมาณที่มีแค่ขนาด (ตัวเลขธรรมดา เช่น \(k\)) เรียกว่า <strong>สเกลาร์</strong></p>
+<p lang="en">A <strong>vector</strong> has both <strong>magnitude</strong> and <strong>direction</strong>. We draw it as an arrow from an initial point \(A\) to a terminal point \(B\) and write \(\overrightarrow{AB}\). A quantity with magnitude only (a plain number such as \(k\)) is a <strong>scalar</strong>.</p>
+
+<ul>
+  <li><span lang="th"><strong>เวกเตอร์ขนานกัน</strong> \(\overrightarrow{AB} \parallel \overrightarrow{CD}\) เมื่อ \(\overrightarrow{CD} = k\,\overrightarrow{AB}\) สำหรับสเกลาร์ \(k\) บางค่า</span><span lang="en"><strong>Parallel vectors</strong>: \(\overrightarrow{AB} \parallel \overrightarrow{CD}\) when \(\overrightarrow{CD} = k\,\overrightarrow{AB}\) for some scalar \(k\).</span></li>
+  <li><span lang="th"><strong>เวกเตอร์ที่เท่ากัน (equivalent)</strong> \(\vec u = \vec v\) เมื่อมีขนาดเท่ากันและทิศทางเดียวกัน ไม่ว่าจะวาดไว้ที่ตำแหน่งใด</span><span lang="en"><strong>Equivalent vectors</strong>: \(\vec u = \vec v\) when they have the same length and direction, wherever they are drawn.</span></li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="ops"><span lang="th">2. การบวก ลบ และคูณด้วยสเกลาร์</span><span lang="en">2. Addition, subtraction, scalar multiples</span></h2>
+
+<figure>
+  <div class="fig">
+    <svg class="diagram" viewBox="0 0 420 230" role="img" aria-label="Vector addition: u followed by v gives u + v">
+      <defs>
+        <marker id="ah-la" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="t-la"/></marker>
+        <marker id="ah-fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="t-fa"/></marker>
+        <marker id="ah-ode" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="t-ode"/></marker>
+      </defs>
+      <line class="v1" x1="40" y1="200" x2="180" y2="70" marker-end="url(#ah-la)"/>
+      <line class="v2" x1="180" y1="70" x2="380" y2="100" marker-end="url(#ah-fa)"/>
+      <line class="v3" x1="40" y1="200" x2="380" y2="100" marker-end="url(#ah-ode)"/>
+      <text x="92" y="122" class="t-la">u</text>
+      <text x="278" y="72" class="t-fa">v</text>
+      <text x="230" y="178" class="t-ode">u + v</text>
+    </svg>
+  </div>
+  <figcaption><span lang="th">กฎสามเหลี่ยม: วางหางของ \(\vec v\) ที่หัวของ \(\vec u\) — และ \(\vec u + \vec v = \vec v + \vec u\)</span><span lang="en">Triangle rule: place the tail of \(\vec v\) at the head of \(\vec u\). Also \(\vec u + \vec v = \vec v + \vec u\).</span></figcaption>
+</figure>
+
+<div class="cols">
+  <div class="panel">
+    <h4><span lang="th">คูณด้วยสเกลาร์ \(k\vec u\)</span><span lang="en">Scalar multiple \(k\vec u\)</span></h4>
+    <ul class="small">
+      <li>\(k &gt; 1\): <span lang="th">ยาวขึ้น ทิศเดิม</span><span lang="en">longer, same direction</span></li>
+      <li>\(0 &lt; k &lt; 1\): <span lang="th">สั้นลง ทิศเดิม</span><span lang="en">shorter, same direction</span></li>
+      <li>\(k &lt; 0\): <span lang="th">กลับทิศ (เช่น \(-\vec u\), \(-2\vec u\))</span><span lang="en">reversed (e.g. \(-\vec u\), \(-2\vec u\))</span></li>
+      <li>\(k = 0\): <span lang="th">เวกเตอร์ศูนย์ \(\vec 0\)</span><span lang="en">the zero vector \(\vec 0\)</span></li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h4><span lang="th">การลบ = บวกด้วยนิเสธ</span><span lang="en">Subtraction = adding the negative</span></h4>
+    <div class="math">\[ \vec u - \vec v = \vec u + (-1)\vec v \]</div>
+    <p class="small" lang="th">\(\vec u - \vec v \ne \vec v - \vec u\) — สองเวกเตอร์นี้ยาวเท่ากันแต่ทิศตรงข้าม</p>
+    <p class="small" lang="en">\(\vec u - \vec v \ne \vec v - \vec u\) — they have equal length but opposite directions.</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="coords"><span lang="th">3. เวกเตอร์ในระบบพิกัด</span><span lang="en">3. Vectors in coordinates</span></h2>
+
+<p lang="th">ถ้าวางหางเวกเตอร์ไว้ที่จุดกำเนิด เวกเตอร์จะถูกระบุด้วยพิกัดของหัวลูกศร เช่น \(\vec u = (u_1, u_2)\) และการคำนวณทำทีละส่วนประกอบ:</p>
+<p lang="en">With its tail at the origin, a vector is identified by the coordinates of its head, e.g. \(\vec u = (u_1, u_2)\), and operations act component by component:</p>
+<div class="math">\[ \vec u + \vec v = (u_1 + v_1,\ u_2 + v_2), \qquad k\vec u = (ku_1,\ ku_2) \]</div>
+
+<p lang="th">ใน 3 มิติใช้เวกเตอร์หนึ่งหน่วย \(\hat i, \hat j, \hat k\) ตามแกน \(x, y, z\) เช่น</p>
+<p lang="en">In 3D we use the unit vectors \(\hat i, \hat j, \hat k\) along the \(x, y, z\) axes, for example</p>
+<div class="math">\[ \vec u = (3, 4, 5) = (3,0,0) + (0,4,0) + (0,0,5) = 3\hat i + 4\hat j + 5\hat k \]</div>
+
+<h3><span lang="th">เวกเตอร์ระหว่างสองจุด</span><span lang="en">Vector between two points</span></h3>
+<div class="box key">
+  <span class="label"><span lang="th">สูตร</span><span lang="en">Formula</span></span>
+  <p lang="th">จาก \(\overrightarrow{OP_1} + \overrightarrow{P_1P_2} = \overrightarrow{OP_2}\) จะได้ “ปลายลบต้น”:</p>
+  <p lang="en">From \(\overrightarrow{OP_1} + \overrightarrow{P_1P_2} = \overrightarrow{OP_2}\) we get “head minus tail”:</p>
+  <div class="math">\[ \overrightarrow{P_1P_2} = \overrightarrow{OP_2} - \overrightarrow{OP_1} = (x_2 - x_1,\ y_2 - y_1,\ z_2 - z_1) \]</div>
+</div>
+<p lang="th">ตัวอย่าง: \(P_1(1,2,4),\ P_2(5,5,5) \Rightarrow \overrightarrow{P_1P_2} = (5-1,\ 5-2,\ 5-4) = (4, 3, 1)\)</p>
+<p lang="en">Example: \(P_1(1,2,4),\ P_2(5,5,5) \Rightarrow \overrightarrow{P_1P_2} = (5-1,\ 5-2,\ 5-4) = (4, 3, 1)\)</p>
+
+<h3><span lang="th">การย้ายแกน</span><span lang="en">Translation of axes</span></h3>
+<p lang="th">ถ้าย้ายจุดกำเนิดไปที่ \(O'(k, l)\) จุด \(P(x, y)\) จะมีพิกัดใหม่ในแกน \(x'y'\) เป็น</p>
+<p lang="en">If the origin moves to \(O'(k, l)\), the point \(P(x, y)\) has new coordinates in the \(x'y'\) system</p>
+<div class="math">\[ \overrightarrow{O'P} = \overrightarrow{OP} - \overrightarrow{OO'} = (x - k,\ y - l) \]</div>
+
+<!-- ============================================================ -->
+<h2 id="norm"><span lang="th">4. นอร์ม (ขนาด) ของเวกเตอร์</span><span lang="en">4. Norm (length) of a vector</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <div class="math">\[ \lVert \vec u \rVert = \sqrt{u_1^2 + u_2^2 + \cdots + u_n^2} \]</div>
+  <p lang="th">มาจากทฤษฎีบทพีทาโกรัส บางตำราเขียน \(|\vec u|\) และ <strong>เวกเตอร์หนึ่งหน่วย</strong> ในทิศเดียวกับ \(\vec u\) คือ \(\dfrac{\vec u}{\lVert\vec u\rVert}\)</p>
+  <p lang="en">This comes from Pythagoras; some books write \(|\vec u|\). The <strong>unit vector</strong> in the direction of \(\vec u\) is \(\dfrac{\vec u}{\lVert\vec u\rVert}\).</p>
+</div>
+<p lang="th">ตัวอย่าง: \(\vec u = 3\hat i + 4\hat j \Rightarrow \lVert \vec u \rVert = \sqrt{3^2 + 4^2} = 5\) และเวกเตอร์หนึ่งหน่วยคือ \(\left(\tfrac35, \tfrac45\right)\)</p>
+<p lang="en">Example: \(\vec u = 3\hat i + 4\hat j \Rightarrow \lVert \vec u \rVert = \sqrt{3^2 + 4^2} = 5\), with unit vector \(\left(\tfrac35, \tfrac45\right)\).</p>
+
+<!-- ============================================================ -->
+<h2 id="dot"><span lang="th">5. ผลคูณจุด (Dot product)</span><span lang="en">5. The dot product</span></h2>
+
+<div class="box key">
+  <span class="label"><span lang="th">สองสูตรที่เท่ากัน</span><span lang="en">Two equal formulas</span></span>
+  <div class="math">\[ \vec u \cdot \vec v = \lVert \vec u \rVert\,\lVert \vec v \rVert \cos\theta = u_1v_1 + u_2v_2 + \cdots + u_nv_n \]</div>
+  <p lang="th">\(\theta\) คือมุมระหว่าง \(\vec u\) กับ \(\vec v\) (\(0 \le \theta \le \pi\)) ผลลัพธ์เป็น<strong>สเกลาร์</strong> และ \(\vec u \perp \vec v \iff \vec u\cdot\vec v = 0\)</p>
+  <p lang="en">\(\theta\) is the angle between \(\vec u\) and \(\vec v\) (\(0 \le \theta \le \pi\)). The result is a <strong>scalar</strong>, and \(\vec u \perp \vec v \iff \vec u\cdot\vec v = 0\).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 3.1</span><span lang="en">Example 3.1</span></span><span class="title">\(\vec u = (0,0,1),\ \vec v = (0,2,2)\)</span></header>
+  <div class="body">
+    <p lang="th">มุมระหว่างสองเวกเตอร์คือ \(45^\circ\) คำนวณได้สองวิธี:</p>
+    <p lang="en">The angle between them is \(45^\circ\). Two ways to compute:</p>
+    <div class="math">\[
+    \lVert\vec u\rVert = 1,\quad \lVert\vec v\rVert = \sqrt{0+4+4} = 2\sqrt2
+    \quad\Rightarrow\quad
+    \vec u\cdot\vec v = (1)(2\sqrt2)\left(\tfrac{1}{\sqrt2}\right) = 2
+    \]</div>
+    <div class="math">\[ \vec u\cdot\vec v = (0)(0) + (0)(2) + (1)(2) = 2 \ \checkmark \]</div>
+  </div>
+</section>
+
+<h3><span lang="th">ทำไมสองสูตรเท่ากัน (พิสูจน์ด้วยกฎของโคไซน์)</span><span lang="en">Why the two formulas agree (law of cosines)</span></h3>
+<p lang="th">ให้ \(P = (u_1,u_2,u_3)\) และ \(Q = (v_1,v_2,v_3)\) ดังนั้น \(\overrightarrow{PQ} = \vec v - \vec u\) กฎของโคไซน์ให้</p>
+<p lang="en">Let \(P = (u_1,u_2,u_3)\) and \(Q = (v_1,v_2,v_3)\), so \(\overrightarrow{PQ} = \vec v - \vec u\). The law of cosines gives</p>
+<div class="math">\[
+\lVert \vec v - \vec u \rVert^2 = \lVert\vec u\rVert^2 + \lVert\vec v\rVert^2 - 2\lVert\vec u\rVert\lVert\vec v\rVert\cos\theta
+\;\Rightarrow\;
+\vec u\cdot\vec v = \tfrac12\left[\lVert\vec u\rVert^2 + \lVert\vec v\rVert^2 - \lVert\vec v-\vec u\rVert^2\right]
+\]</div>
+<div class="math">\[
+= \tfrac12\Big[(u_1^2+u_2^2+u_3^2) + (v_1^2+v_2^2+v_3^2) - \big((v_1-u_1)^2 + (v_2-u_2)^2 + (v_3-u_3)^2\big)\Big]
+= u_1v_1 + u_2v_2 + u_3v_3
+\]</div>
+<p lang="th">จึงได้สูตรหามุม \(\cos\theta = \dfrac{\vec u\cdot\vec v}{\lVert\vec u\rVert\,\lVert\vec v\rVert}\)</p>
+<p lang="en">Hence the angle formula \(\cos\theta = \dfrac{\vec u\cdot\vec v}{\lVert\vec u\rVert\,\lVert\vec v\rVert}\).</p>
+
+<!-- ============================================================ -->
+<h2 id="normal"><span lang="th">6. เวกเตอร์ตั้งฉาก (Normal vector) ของเส้นตรง</span><span lang="en">6. The normal vector of a line</span></h2>
+
+<p lang="th">แรง \(\vec F\) ที่ทำมุม \(\theta\) กับแกน \(x\) แยกเป็นส่วนประกอบ \(F\cos\theta\) (ตามแกน) และ \(F\sin\theta\) (ตั้งฉาก) — แนวคิด “แยกส่วนขนาน/ส่วนตั้งฉาก” นี้คือหัวใจของการฉายในหัวข้อถัดไป</p>
+<p lang="en">A force \(\vec F\) at angle \(\theta\) to the \(x\)-axis splits into \(F\cos\theta\) (along the axis) and \(F\sin\theta\) (perpendicular). This “parallel part + perpendicular part” idea is the heart of projection, next section.</p>
+
+<div class="box key">
+  <span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>
+  <p lang="th">สำหรับเส้นตรง \(ax + by + c = 0\) เวกเตอร์ \(\vec n = (a, b)\) <strong>ตั้งฉาก</strong>กับเส้นตรงเสมอ</p>
+  <p lang="en">For the line \(ax + by + c = 0\), the vector \(\vec n = (a, b)\) is always <strong>perpendicular</strong> to the line.</p>
+</div>
+<p lang="th"><strong>เหตุผล:</strong> ให้ \(P_1(x_1,y_1)\) และ \(P_2(x_2,y_2)\) อยู่บนเส้นตรง จะได้ \(ax_1 + by_1 + c = 0\) และ \(ax_2 + by_2 + c = 0\) นำมาลบกัน:</p>
+<p lang="en"><strong>Why:</strong> take \(P_1(x_1,y_1)\) and \(P_2(x_2,y_2)\) on the line, so \(ax_1 + by_1 + c = 0\) and \(ax_2 + by_2 + c = 0\). Subtract:</p>
+<div class="math">\[ a(x_2 - x_1) + b(y_2 - y_1) = 0 \;\Longleftrightarrow\; (a, b)\cdot\overrightarrow{P_1P_2} = 0 \;\Longleftrightarrow\; (a,b) \perp \overrightarrow{P_1P_2} \]</div>
+
+<!-- ============================================================ -->
+<h2 id="proj"><span lang="th">7. การฉาย (Projection)</span><span lang="en">7. Projection</span></h2>
+
+<figure>
+  <div class="fig">
+    <svg class="diagram" viewBox="0 0 420 250" role="img" aria-label="Projection of u onto a">
+      <defs>
+        <marker id="ph-la" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" class="t-la"/></marker>
+        <marker id="ph-fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" class="t-fa"/></marker>
+        <marker id="ph-ode" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" class="t-ode"/></marker>
+        <marker id="ph-mu" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" class="t-muted"/></marker>
+      </defs>
+      <line x1="40" y1="210" x2="400" y2="210" style="stroke:var(--muted);stroke-width:2" marker-end="url(#ph-mu)"/>
+      <line class="v1" x1="40" y1="210" x2="270" y2="50" marker-end="url(#ph-la)"/>
+      <line class="v3" x1="40" y1="210" x2="266" y2="210" marker-end="url(#ph-ode)"/>
+      <line class="v2" x1="270" y1="210" x2="270" y2="56" marker-end="url(#ph-fa)"/>
+      <path d="M270 196 h-14 v14" style="fill:none;stroke:var(--muted);stroke-width:1.5"/>
+      <text x="130" y="112" class="t-la">u</text>
+      <text x="382" y="235" class="t-muted">a</text>
+      <text x="100" y="236" class="t-ode">w₁ = proj_a u</text>
+      <text x="280" y="140" class="t-fa">w₂ = u − w₁</text>
+    </svg>
+  </div>
+  <figcaption><span lang="th">แยก \(\vec u\) เป็นส่วนที่ขนานกับ \(\vec a\) และส่วนที่ตั้งฉากกับ \(\vec a\)</span><span lang="en">Split \(\vec u\) into a part parallel to \(\vec a\) and a part perpendicular to \(\vec a\).</span></figcaption>
+</figure>
+
+<div class="box key">
+  <span class="label"><span lang="th">สูตรการฉาย</span><span lang="en">Projection formulas</span></span>
+  <div class="math">\[
+  \vec u = \vec w_1 + \vec w_2, \qquad
+  \vec w_1 = \operatorname{proj}_{\vec a}\vec u = \frac{\vec u\cdot\vec a}{\lVert\vec a\rVert^2}\,\vec a \;\;(\parallel \vec a), \qquad
+  \vec w_2 = \vec u - \operatorname{proj}_{\vec a}\vec u \;\;(\perp \vec a)
+  \]</div>
+  <p lang="th">ขนาดของเงา: \(\lVert\operatorname{proj}_{\vec a}\vec u\rVert = \dfrac{|\vec u\cdot\vec a|}{\lVert\vec a\rVert}\) — ระวัง: ในสูตรเวกเตอร์ตัวส่วนเป็น \(\lVert\vec a\rVert^{\mathbf 2}\)</p>
+  <p lang="en">Length of the shadow: \(\lVert\operatorname{proj}_{\vec a}\vec u\rVert = \dfrac{|\vec u\cdot\vec a|}{\lVert\vec a\rVert}\). Careful: in the vector formula the denominator is \(\lVert\vec a\rVert^{\mathbf 2}\).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 3.2</span><span lang="en">Example 3.2</span></span><span class="title">\(\vec u = (2,-1,3),\ \vec a = (4,-1,2)\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    \vec u\cdot\vec a = 8 + 1 + 6 = 15,\quad \lVert\vec a\rVert^2 = 16 + 1 + 4 = 21
+    \]</div>
+    <div class="math">\[
+    \vec w_1 = \tfrac{15}{21}(4,-1,2) = \left(\tfrac{20}{7}, -\tfrac57, \tfrac{10}{7}\right),\qquad
+    \vec w_2 = \vec u - \vec w_1 = \left(-\tfrac67, -\tfrac27, \tfrac{11}{7}\right)
+    \]</div>
+    <p lang="th">ตรวจ: \(\vec w_2\cdot\vec a = \tfrac{-24 + 2 + 22}{7} = 0\) ✓ ตั้งฉากจริง</p>
+    <p lang="en">Check: \(\vec w_2\cdot\vec a = \tfrac{-24 + 2 + 22}{7} = 0\) ✓ perpendicular.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="distance"><span lang="th">8. ระยะทางจากจุดถึงเส้นตรง</span><span lang="en">8. Distance from a point to a line</span></h2>
+
+<p lang="th">ให้ \(Q(x_1,y_1)\) เป็นจุดใดก็ได้บนเส้น \(ax+by+c=0\) ระยะ \(D\) จาก \(P_0(x_0,y_0)\) ถึงเส้นตรงคือความยาวของการฉาย \(\overrightarrow{QP_0}\) ลงบนเวกเตอร์ตั้งฉาก \(\vec n = (a,b)\):</p>
+<p lang="en">Let \(Q(x_1,y_1)\) be any point on \(ax+by+c=0\). The distance \(D\) from \(P_0(x_0,y_0)\) is the length of the projection of \(\overrightarrow{QP_0}\) onto the normal \(\vec n = (a,b)\):</p>
+<div class="math">\[
+D = \frac{|\overrightarrow{QP_0}\cdot\vec n|}{\lVert\vec n\rVert}
+= \frac{|a(x_0 - x_1) + b(y_0 - y_1)|}{\sqrt{a^2+b^2}}
+= \frac{|ax_0 + by_0 \overbrace{- ax_1 - by_1}^{=\,c}|}{\sqrt{a^2+b^2}}
+\]</div>
+<div class="box key">
+  <span class="label"><span lang="th">สูตรระยะทาง</span><span lang="en">Distance formula</span></span>
+  <div class="math">\[ D = \frac{|ax_0 + by_0 + c|}{\sqrt{a^2 + b^2}} \]</div>
+</div>
+<p lang="th">ตัวอย่าง: ระยะจาก \((1,-2)\) ถึง \(3x + 4y - 6 = 0\) คือ \(D = \dfrac{|3(1) + 4(-2) - 6|}{\sqrt{9+16}} = \dfrac{|-11|}{5} = \dfrac{11}{5}\)</p>
+<p lang="en">Example: the distance from \((1,-2)\) to \(3x + 4y - 6 = 0\) is \(D = \dfrac{|3(1) + 4(-2) - 6|}{\sqrt{9+16}} = \dfrac{|-11|}{5} = \dfrac{11}{5}\).</p>
+
+<!-- ============================================================ -->
+<h2 id="cross"><span lang="th">9. ผลคูณไขว้ (Cross product)</span><span lang="en">9. The cross product</span></h2>
+
+<p lang="th">สำหรับเวกเตอร์ใน 3 มิติ \(\vec u \times \vec v\) ได้<strong>เวกเตอร์</strong>ที่ตั้งฉากกับทั้ง \(\vec u\) และ \(\vec v\) คำนวณด้วยการกระจายโคแฟกเตอร์ตามแถวแรก (บทที่ 2):</p>
+<p lang="en">For 3D vectors, \(\vec u \times \vec v\) is a <strong>vector</strong> perpendicular to both \(\vec u\) and \(\vec v\). Compute it by cofactor expansion along the first row (Chapter 2):</p>
+<div class="math">\[
+\vec u \times \vec v =
+\begin{vmatrix} \hat i & \hat j & \hat k \\ u_1 & u_2 & u_3 \\ v_1 & v_2 & v_3 \end{vmatrix}
+= \hat i\begin{vmatrix} u_2 & u_3 \\ v_2 & v_3\end{vmatrix}
+- \hat j\begin{vmatrix} u_1 & u_3 \\ v_1 & v_3\end{vmatrix}
++ \hat k\begin{vmatrix} u_1 & u_2 \\ v_1 & v_2\end{vmatrix}
+\]</div>
+<div class="math">\[ \vec u \times \vec v = \big(u_2v_3 - u_3v_2,\ -(u_1v_3 - u_3v_1),\ u_1v_2 - u_2v_1\big) \]</div>
+
+<div class="cols">
+  <div class="panel">
+    <h4><span lang="th">เวกเตอร์หนึ่งหน่วย</span><span lang="en">Unit vectors</span></h4>
+    <div class="math">\[
+    \begin{aligned}
+    \hat i\times\hat j &= \hat k, & \hat j\times\hat k &= \hat i, & \hat k\times\hat i &= \hat j \\
+    \hat j\times\hat i &= -\hat k, & \hat k\times\hat j &= -\hat i, & \hat i\times\hat k &= -\hat j \\
+    \hat i\times\hat i &= \vec 0, & \hat j\times\hat j &= \vec 0, & \hat k\times\hat k &= \vec 0
+    \end{aligned}
+    \]</div>
+  </div>
+  <div class="panel">
+    <h4><span lang="th">ความหมายทางเรขาคณิต</span><span lang="en">Geometric meaning</span></h4>
+    <div class="math">\[ \lVert\vec u\times\vec v\rVert = \lVert\vec u\rVert\,\lVert\vec v\rVert\sin\theta \]</div>
+    <p class="small" lang="th">= <strong>พื้นที่ของสี่เหลี่ยมด้านขนาน</strong>ที่มี \(\vec u, \vec v\) เป็นด้าน (ฐาน \(\lVert\vec u\rVert\) × สูง \(\lVert\vec v\rVert\sin\theta\))</p>
+    <p class="small" lang="en">= the <strong>area of the parallelogram</strong> spanned by \(\vec u, \vec v\) (base \(\lVert\vec u\rVert\) × height \(\lVert\vec v\rVert\sin\theta\)).</p>
+  </div>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 3.3</span><span lang="en">Example 3.3</span></span><span class="title">\(\vec u = (1,2,-2),\ \vec v = (3,0,1)\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    \vec u\times\vec v = \big((2)(1) - (-2)(0),\ -[(1)(1) - (-2)(3)],\ (1)(0) - (2)(3)\big) = (2,\ -7,\ -6)
+    \]</div>
+    <p lang="th">ตรวจการตั้งฉาก: \((2,-7,-6)\cdot\vec u = 2 - 14 + 12 = 0\) ✓ และ \((2,-7,-6)\cdot\vec v = 6 + 0 - 6 = 0\) ✓</p>
+    <p lang="en">Perpendicularity check: \((2,-7,-6)\cdot\vec u = 2 - 14 + 12 = 0\) ✓ and \((2,-7,-6)\cdot\vec v = 6 + 0 - 6 = 0\) ✓</p>
+  </div>
+</section>
+
+<h3><span lang="th">ผลคูณสเกลาร์สามชั้น = ปริมาตร</span><span lang="en">Scalar triple product = volume</span></h3>
+<div class="box key">
+  <span class="label"><span lang="th">สูตร</span><span lang="en">Formula</span></span>
+  <div class="math">\[ \text{Volume} = |\vec u\cdot(\vec v\times\vec w)|, \qquad \vec u\cdot(\vec v\times\vec w) = \vec w\cdot(\vec u\times\vec v) = \vec v\cdot(\vec w\times\vec u) \]</div>
+  <p lang="th">คือปริมาตรของทรงสี่เหลี่ยมด้านขนาน (parallelepiped) ที่มี \(\vec u, \vec v, \vec w\) เป็นขอบ</p>
+  <p lang="en">This is the volume of the parallelepiped with edges \(\vec u, \vec v, \vec w\).</p>
+</div>
+<p lang="th">ตัวอย่าง: กล่อง \(\vec u = (2,0,0),\ \vec v = (0,3,0),\ \vec w = (0,0,4)\): \(\vec v\times\vec w = (12, 0, 0) = 12\hat i\) ดังนั้น \(\vec u\cdot(\vec v\times\vec w) = 2\hat i\cdot 12\hat i = 24 = 2\times3\times4\) ✓</p>
+<p lang="en">Example: the box \(\vec u = (2,0,0),\ \vec v = (0,3,0),\ \vec w = (0,0,4)\): \(\vec v\times\vec w = (12, 0, 0) = 12\hat i\), so \(\vec u\cdot(\vec v\times\vec w) = 2\hat i\cdot 12\hat i = 24 = 2\times3\times4\) ✓</p>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">ให้ \(\vec u = (1, 2, 2)\) และ \(\vec v = (2, -1, 2)\) จงหา \(\lVert\vec u\rVert\), \(\vec u\cdot\vec v\) และมุมระหว่างเวกเตอร์ทั้งสอง</p>
+    <p lang="en">Let \(\vec u = (1, 2, 2)\) and \(\vec v = (2, -1, 2)\). Find \(\lVert\vec u\rVert\), \(\vec u\cdot\vec v\) and the angle between them.</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \lVert\vec u\rVert = 3,\quad \lVert\vec v\rVert = 3,\quad \vec u\cdot\vec v = 2 - 2 + 4 = 4,\quad \cos\theta = \tfrac{4}{9} \Rightarrow \theta \approx 63.6^\circ \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">หา \(\operatorname{proj}_{\vec a}\vec u\) เมื่อ \(\vec u = (3, 4)\) และ \(\vec a = (1, 0)\) แล้วอธิบายความหมาย</p>
+    <p lang="en">Find \(\operatorname{proj}_{\vec a}\vec u\) for \(\vec u = (3, 4)\), \(\vec a = (1, 0)\) and interpret it.</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \operatorname{proj}_{\vec a}\vec u = \frac{3}{1}(1,0) = (3, 0),\qquad \vec w_2 = (0, 4) \]</div>
+      <p lang="th">คือเงาของ \(\vec u\) บนแกน \(x\) — ส่วนที่เหลือ \((0,4)\) ตั้งฉากกับแกน \(x\)</p>
+      <p lang="en">It is the shadow of \(\vec u\) on the \(x\)-axis; the remainder \((0,4)\) is perpendicular to it.</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">หาระยะทางจากจุด \((2, 3)\) ถึงเส้นตรง \(5x - 12y + 1 = 0\)</p>
+    <p lang="en">Find the distance from \((2, 3)\) to the line \(5x - 12y + 1 = 0\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ D = \frac{|10 - 36 + 1|}{\sqrt{25 + 144}} = \frac{25}{13} \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">4.</span><div class="qbody">
+    <p lang="th">หาพื้นที่สามเหลี่ยมที่มีจุดยอด \(A(0,0,0),\ B(1,2,0),\ C(3,0,1)\)</p>
+    <p lang="en">Find the area of the triangle with vertices \(A(0,0,0),\ B(1,2,0),\ C(3,0,1)\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \overrightarrow{AB}\times\overrightarrow{AC} = (1,2,0)\times(3,0,1) = (2,\ -1,\ -6),\quad \text{Area} = \tfrac12\sqrt{4+1+36} = \tfrac{\sqrt{41}}{2} \]</div>
+      <p lang="th">พื้นที่สามเหลี่ยม = ครึ่งหนึ่งของพื้นที่สี่เหลี่ยมด้านขนาน</p>
+      <p lang="en">A triangle is half of the parallelogram.</p>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>

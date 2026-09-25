@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="th" data-part="fa" data-chapter="7">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7 · Fourier Series &amp; Transform — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+<script defer src="../js/widgets.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 7</span><span lang="en">Chapter 7</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 8</span><span lang="en">Week 8</span></span></div>
+  <h1><span lang="th">อนุกรมฟูเรียร์และการแปลงฟูเรียร์</span><span lang="en">Fourier Series &amp; the Fourier Transform</span></h1>
+  <p class="lead" lang="th">ฟังก์ชันเป็นคาบใด ๆ เขียนเป็นผลรวมของ \(\sin\) และ \(\cos\) ได้ (อนุกรมฟูเรียร์) และสัญญาณทั่วไปแปลงจาก “โดเมนเวลา” ไป “โดเมนความถี่” ได้ด้วยการแปลงฟูเรียร์ ซึ่งเป็นการแปลงเชิงเส้นแบบหนึ่ง และจะใช้ในการแก้สมการเชิงอนุพันธ์</p>
+  <p class="lead" lang="en">Any periodic function can be written as a sum of sines and cosines (a Fourier series), and a general signal can be moved from the time domain to the frequency domain by the Fourier transform — itself a linear transformation, and a tool we will use for differential equations.</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_WK8_FourierSeries.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#series"><span lang="th">อนุกรมฟูเรียร์</span><span lang="en">Fourier series</span></a></li>
+    <li><a href="#square"><span lang="th">ตัวอย่าง: คลื่นสี่เหลี่ยม</span><span lang="en">Example: square wave</span></a></li>
+    <li><a href="#explore-series"><span lang="th">ทดลอง: ผลบวกบางส่วน</span><span lang="en">Explore: partial sums</span></a></li>
+    <li><a href="#transform"><span lang="th">การแปลงฟูเรียร์</span><span lang="en">The Fourier transform</span></a></li>
+    <li><a href="#pulse"><span lang="th">ตัวอย่าง: พัลส์สี่เหลี่ยม</span><span lang="en">Example: rectangular pulse</span></a></li>
+    <li><a href="#explore-pulse"><span lang="th">ทดลอง: ความกว้าง vs สเปกตรัม</span><span lang="en">Explore: width vs spectrum</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="series"><span lang="th">1. อนุกรมฟูเรียร์</span><span lang="en">1. Fourier series</span></h2>
+
+<p lang="th">ฟังก์ชัน \(f(t)\) ที่มีคาบ \(2\pi\) เขียนเป็นผลรวมของค่าคงที่ โคไซน์ และไซน์ ที่ความถี่ \(n = 1, 2, 3, \dots\):</p>
+<p lang="en">A function \(f(t)\) with period \(2\pi\) can be written as a constant plus cosines and sines of frequencies \(n = 1, 2, 3, \dots\):</p>
+
+<div class="box key">
+  <span class="label"><span lang="th">อนุกรมฟูเรียร์ (คาบ \(2\pi\))</span><span lang="en">Fourier series (period \(2\pi\))</span></span>
+  <div class="math">\[ f(t) = \frac{a_0}{2} + \sum_{n=1}^{\infty} a_n\cos nt + \sum_{n=1}^{\infty} b_n\sin nt \]</div>
+  <div class="math">\[
+  a_0 = \frac1\pi\int_0^{2\pi} f(t)\,dt,\qquad
+  a_n = \frac1\pi\int_0^{2\pi} f(t)\cos nt\,dt,\qquad
+  b_n = \frac1\pi\int_0^{2\pi} f(t)\sin nt\,dt
+  \]</div>
+</div>
+
+<div class="box tip">
+  <span class="label"><span lang="th">คาบทั่วไป \(2L\)</span><span lang="en">General period \(2L\)</span></span>
+  <p lang="th">ถ้าหนึ่งคาบยาว \(2L\) (เช่นช่วง \([-L, L]\)) ให้แทน \(nt\) ด้วย \(\dfrac{n\pi t}{L}\) และ \(\dfrac1\pi\int_0^{2\pi}\) ด้วย \(\dfrac1L\int_{-L}^{L}\):</p>
+  <p lang="en">If one period has length \(2L\) (e.g. the interval \([-L, L]\)), replace \(nt\) by \(\dfrac{n\pi t}{L}\) and \(\dfrac1\pi\int_0^{2\pi}\) by \(\dfrac1L\int_{-L}^{L}\):</p>
+  <div class="math">\[
+  a_n = \frac1L\int_{-L}^{L} f(t)\cos\frac{n\pi t}{L}\,dt,\qquad
+  b_n = \frac1L\int_{-L}^{L} f(t)\sin\frac{n\pi t}{L}\,dt
+  \]</div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="square"><span lang="th">2. ตัวอย่าง: คลื่นสี่เหลี่ยม</span><span lang="en">2. Example: a square wave</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 7.1</span><span lang="en">Example 7.1</span></span></header>
+  <div class="body">
+    <div class="math">\[ f(t) = \begin{cases} 1, & 0 &lt; t &lt; \pi \\ 0, & \pi &lt; t &lt; 2\pi \end{cases}\qquad f(t + 2\pi) = f(t) \]</div>
+    <p lang="th">เพราะ \(f = 0\) บนช่วง \((\pi, 2\pi)\) อินทิกรัลเหลือแค่ช่วง \((0, \pi)\):</p>
+    <p lang="en">Since \(f = 0\) on \((\pi, 2\pi)\), only the interval \((0, \pi)\) contributes:</p>
+    <div class="math">\[ a_0 = \frac1\pi\int_0^\pi 1\,dt = \frac1\pi\big[t\big]_0^\pi = 1 \]</div>
+    <div class="math">\[ a_n = \frac1\pi\int_0^\pi \cos nt\,dt = \frac1\pi\left[\frac{\sin nt}{n}\right]_0^\pi = 0 \quad(\sin n\pi = 0) \]</div>
+    <div class="math">\[
+    b_n = \frac1\pi\int_0^\pi \sin nt\,dt = \frac1\pi\left[-\frac{\cos nt}{n}\right]_0^\pi = \frac{1 - (-1)^n}{n\pi}
+    = \begin{cases} \dfrac{2}{n\pi}, & n \text{ odd} \\[4pt] 0, & n \text{ even} \end{cases}
+    \]</div>
+    <p lang="th">(เพราะ \(\cos n\pi = (-1)^n\): \(n = 1 \to \tfrac2\pi,\ n = 2 \to 0,\ n = 3 \to \tfrac{2}{3\pi}, \dots\))</p>
+    <p lang="en">(Using \(\cos n\pi = (-1)^n\): \(n = 1 \to \tfrac2\pi,\ n = 2 \to 0,\ n = 3 \to \tfrac{2}{3\pi}, \dots\))</p>
+    <div class="answer"><span class="label"><span lang="th">คำตอบ</span><span lang="en">Answer</span></span>
+      <div class="math">\[ f(t) = \frac12 + \sum_{n\ \text{odd}} \frac{2}{n\pi}\sin nt = \frac12 + \frac2\pi\left(\sin t + \frac{\sin 3t}{3} + \frac{\sin 5t}{5} + \cdots\right) \]</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="explore-series"><span lang="th">3. ทดลอง: ผลบวกบางส่วน</span><span lang="en">3. Explore: partial sums</span></h2>
+<p lang="th">เลื่อนแถบเพื่อเพิ่มจำนวนพจน์ไซน์ ยิ่งพจน์มากยิ่งใกล้คลื่นสี่เหลี่ยม แต่ใกล้จุดกระโดดจะมี “ยอดเกิน” ประมาณ 9% ที่ไม่หายไป เรียกว่า <strong>ปรากฏการณ์กิบส์ (Gibbs phenomenon)</strong></p>
+<p lang="en">Slide to add more sine terms. The sum approaches the square wave, but near each jump an overshoot of about 9% never disappears — the <strong>Gibbs phenomenon</strong>.</p>
+
+<section class="widget" data-widget="fourier">
+  <header><span class="label"><span lang="th">ทดลอง</span><span lang="en">Interactive</span></span><span class="title"><span lang="th">อนุกรมฟูเรียร์ของคลื่นสี่เหลี่ยม</span><span lang="en">Fourier series of the square wave</span></span></header>
+  <div class="w-body">
+    <div class="w-controls">
+      <label><span lang="th">จำนวนพจน์</span><span lang="en">Terms</span> <input type="range" min="1" max="40" value="3" step="1"></label>
+    </div>
+    <canvas></canvas>
+    <div class="w-readout" data-out></div>
+    <div class="legend"><span><i style="background:var(--fa)"></i>f(t)</span><span><i style="background:var(--la)"></i><span lang="th">ผลบวกบางส่วน</span><span lang="en">partial sum</span></span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="transform"><span lang="th">4. การแปลงฟูเรียร์</span><span lang="en">4. The Fourier transform</span></h2>
+
+<p lang="th">อนุกรมฟูเรียร์ใช้กับฟังก์ชันเป็นคาบ สำหรับสัญญาณทั่วไป (ไม่เป็นคาบ) เราใช้<strong>การแปลงฟูเรียร์</strong> ซึ่งเป็น “กล่อง” ที่เปลี่ยน \(f(t)\) ใน<strong>โดเมนเวลา</strong> เป็น \(F(\omega)\) ใน<strong>โดเมนความถี่</strong> — คล้ายการแปลงเชิงเส้น \(x \to \boxed{\ \ } \to y\) ในบทที่ 4</p>
+<p lang="en">Fourier series handle periodic functions. For a general (non-periodic) signal we use the <strong>Fourier transform</strong>, a “box” that turns \(f(t)\) in the <strong>time domain</strong> into \(F(\omega)\) in the <strong>frequency domain</strong> — just like the transformation \(x \to \boxed{\ \ } \to y\) of Chapter 4.</p>
+
+<div class="box key">
+  <span class="label"><span lang="th">การแปลงและการแปลงผกผัน</span><span lang="en">Transform and inverse</span></span>
+  <div class="math">\[
+  F(\omega) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} f(t)\,e^{-i\omega t}\,dt
+  \qquad\qquad
+  f(t) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} F(\omega)\,e^{i\omega t}\,d\omega
+  \]</div>
+  <p lang="th">\(\omega\) คือความถี่เชิงมุม บางตำราใช้ความถี่ปกติ \(\nu\) (\(\omega = 2\pi\nu\)) จะได้รูป \(F(\nu) = \int f(t)e^{-2\pi i\nu t}dt\) และ \(f(t) = \int F(\nu)e^{2\pi i\nu t}d\nu\) — เป็นเพียงการเลือกค่าคงที่ต่างกัน ความหมายเหมือนกัน</p>
+  <p lang="en">\(\omega\) is angular frequency. Some books use ordinary frequency \(\nu\) (\(\omega = 2\pi\nu\)), giving \(F(\nu) = \int f(t)e^{-2\pi i\nu t}dt\) and \(f(t) = \int F(\nu)e^{2\pi i\nu t}d\nu\). Only the constants differ; the meaning is the same.</p>
+</div>
+
+<div class="box tip">
+  <span class="label"><span lang="th">สูตรของออยเลอร์</span><span lang="en">Euler’s formula</span></span>
+  <div class="math">\[ e^{i\theta} = \cos\theta + i\sin\theta,\qquad e^{-i\theta} = \cos\theta - i\sin\theta \;\;\Longrightarrow\;\; e^{i\theta} - e^{-i\theta} = 2i\sin\theta \]</div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="pulse"><span lang="th">5. ตัวอย่าง: พัลส์สี่เหลี่ยม</span><span lang="en">5. Example: a rectangular pulse</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 7.2</span><span lang="en">Example 7.2</span></span></header>
+  <div class="body">
+    <div class="math">\[ f(t) = \begin{cases} 1, & |t| &lt; a \\ 0, & |t| &gt; a \end{cases}\qquad F(\omega) = \,? \]</div>
+    <p lang="th">แบ่งอินทิกรัลเป็น 3 ช่วง ช่วง \((-\infty, -a)\) และ \((a, \infty)\) มี \(f = 0\):</p>
+    <p lang="en">Split the integral into three pieces; on \((-\infty, -a)\) and \((a, \infty)\) we have \(f = 0\):</p>
+    <div class="math">\[
+    F(\omega) = \frac{1}{\sqrt{2\pi}}\int_{-a}^{a} e^{-i\omega t}\,dt
+    = \frac{1}{\sqrt{2\pi}}\left[\frac{e^{-i\omega t}}{-i\omega}\right]_{-a}^{a}
+    = \frac{e^{-i\omega a} - e^{i\omega a}}{-i\omega\sqrt{2\pi}}
+    = \frac{e^{i\omega a} - e^{-i\omega a}}{i\omega\sqrt{2\pi}}
+    \]</div>
+    <p lang="th">ใช้สูตรของออยเลอร์ \(e^{i\omega a} - e^{-i\omega a} = 2i\sin\omega a\):</p>
+    <p lang="en">With Euler’s formula, \(e^{i\omega a} - e^{-i\omega a} = 2i\sin\omega a\):</p>
+    <div class="math">\[ F(\omega) = \frac{2i\sin\omega a}{i\omega\sqrt{2\pi}} = \sqrt{\frac{2}{\pi}}\;\frac{\sin \omega a}{\omega} \]</div>
+    <p lang="th"><strong>ที่ \(\omega = 0\)</strong> สูตรเป็น \(0/0\) จึงคำนวณจากนิยามโดยตรง (\(e^{0} = 1\)):</p>
+    <p lang="en"><strong>At \(\omega = 0\)</strong> the formula is \(0/0\), so go back to the definition (\(e^{0} = 1\)):</p>
+    <div class="math">\[ F(0) = \frac{1}{\sqrt{2\pi}}\int_{-a}^{a} 1\,dt = \frac{2a}{\sqrt{2\pi}} = a\sqrt{\frac{2}{\pi}} \]</div>
+    <p lang="th">ซึ่งตรงกับลิมิต \(\lim_{\omega\to0}\frac{\sin\omega a}{\omega} = a\) กราฟของ \(F(\omega)\) เป็นรูป “sinc” มียอดที่ \(\omega = 0\) และตัดแกนครั้งแรกที่ \(\omega = \pm\pi/a\)</p>
+    <p lang="en">This matches the limit \(\lim_{\omega\to0}\frac{\sin\omega a}{\omega} = a\). The graph of \(F(\omega)\) is a “sinc” shape with its peak at \(\omega = 0\) and first zeros at \(\omega = \pm\pi/a\).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="explore-pulse"><span lang="th">6. ทดลอง: ความกว้างของพัลส์ vs สเปกตรัม</span><span lang="en">6. Explore: pulse width vs spectrum</span></h2>
+<p lang="th">เปลี่ยนค่า \(a\) แล้วสังเกต: พัลส์<strong>กว้าง</strong>ในเวลา → สเปกตรัม<strong>แคบ</strong>และสูงในความถี่ และในทางกลับกัน (หลักความไม่แน่นอนของสัญญาณ)</p>
+<p lang="en">Change \(a\) and watch: a pulse that is <strong>wide</strong> in time has a <strong>narrow</strong>, tall spectrum, and vice versa (the time–frequency uncertainty principle).</p>
+
+<section class="widget" data-widget="pulse">
+  <header><span class="label"><span lang="th">ทดลอง</span><span lang="en">Interactive</span></span><span class="title">\(f(t) \;\longrightarrow\; F(\omega)\)</span></header>
+  <div class="w-body">
+    <div class="w-controls">
+      <label>a <input type="range" min="0.4" max="4" value="1" step="0.05"></label>
+    </div>
+    <canvas></canvas>
+    <div class="w-readout" data-out></div>
+    <div class="legend"><span><i style="background:var(--fa)"></i><span lang="th">f(t) โดเมนเวลา</span><span lang="en">f(t), time domain</span></span><span><i style="background:var(--la)"></i><span lang="th">F(ω) โดเมนความถี่</span><span lang="en">F(ω), frequency domain</span></span></div>
+  </div>
+</section>
+
+<div class="box tip">
+  <span class="label"><span lang="th">เชื่อมกับบทก่อนและบทถัดไป</span><span lang="en">Connections</span></span>
+  <p lang="th">การแปลงฟูเรียร์<strong>เป็นเชิงเส้น</strong>: \(\mathcal F\{\alpha f + \beta g\} = \alpha\mathcal F\{f\} + \beta\mathcal F\{g\}\) และเปลี่ยนอนุพันธ์เป็นการคูณ (\(\mathcal F\{f'\} = i\omega F\)) จึงเปลี่ยน “สมการเชิงอนุพันธ์” เป็น “สมการพีชคณิต” — เราจะใช้แนวคิดนี้ (และการแปลงลาปลาซ) ในส่วน ODE</p>
+  <p lang="en">The Fourier transform <strong>is linear</strong>: \(\mathcal F\{\alpha f + \beta g\} = \alpha\mathcal F\{f\} + \beta\mathcal F\{g\}\). It also turns derivatives into multiplication (\(\mathcal F\{f'\} = i\omega F\)), converting differential equations into algebraic ones — an idea we use (with the Laplace transform) in the ODE part.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">หาอนุกรมฟูเรียร์ของ \(f(t) = -1\) บน \((-\pi, 0)\) และ \(f(t) = 1\) บน \((0, \pi)\) (คาบ \(2\pi\))</p>
+    <p lang="en">Find the Fourier series of \(f(t) = -1\) on \((-\pi, 0)\) and \(f(t) = 1\) on \((0, \pi)\) (period \(2\pi\)).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">\(f\) เป็นฟังก์ชันคี่ จึงได้ \(a_0 = a_n = 0\) และ</p>
+      <p lang="en">\(f\) is odd, so \(a_0 = a_n = 0\) and</p>
+      <div class="math">\[ b_n = \frac2\pi\int_0^\pi \sin nt\,dt = \frac{2(1 - (-1)^n)}{n\pi} \;\Rightarrow\; f(t) = \frac4\pi\left(\sin t + \frac{\sin3t}{3} + \frac{\sin5t}{5} + \cdots\right) \]</div>
+      <p lang="th">(เท่ากับ 2 เท่าของตัวอย่าง 7.1 ลบ 1 — สอดคล้องกับความเป็นเชิงเส้น)</p>
+      <p lang="en">(This is 2 × Example 7.1 minus 1 — linearity at work.)</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">พัลส์ในตัวอย่าง 7.2 ที่มี \(a = 2\): จงหา \(F(0)\) และความถี่ \(\omega &gt; 0\) แรกที่ \(F(\omega) = 0\)</p>
+    <p lang="en">For the pulse of Example 7.2 with \(a = 2\), find \(F(0)\) and the first \(\omega &gt; 0\) where \(F(\omega) = 0\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ F(0) = 2\sqrt{2/\pi} \approx 1.596,\qquad \sin 2\omega = 0 \Rightarrow \omega = \pi/2 \approx 1.571 \]</div>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>

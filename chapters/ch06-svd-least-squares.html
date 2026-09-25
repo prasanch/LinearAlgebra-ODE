@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="th" data-part="la" data-chapter="6">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6 · SVD &amp; Least Squares — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+<script defer src="../js/widgets.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 6</span><span lang="en">Chapter 6</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 7</span><span lang="en">Week 7</span></span></div>
+  <h1><span lang="th">SVD และการประมาณค่ากำลังสองน้อยที่สุด</span><span lang="en">SVD &amp; Least-Squares Approximation</span></h1>
+  <p class="lead" lang="th">แยกเมทริกซ์ใด ๆ เป็นผลคูณ \(U\Sigma V^T\) (Singular Value Decomposition) ใช้หาอินเวอร์ส และเมื่อระบบสมการ “มีสมการมากกว่าตัวแปร” จนไม่มีคำตอบตรง ๆ เราหาคำตอบที่ “ใกล้ที่สุด” ด้วยวิธีกำลังสองน้อยที่สุด และวัดความดีด้วย \(R^2\)</p>
+  <p class="lead" lang="en">Factor any matrix as \(U\Sigma V^T\) (Singular Value Decomposition) and use it to invert. When a system has more equations than unknowns and no exact solution, find the <em>closest</em> one by least squares and measure the fit with \(R^2\).</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_WK7_SVD.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#svd"><span lang="th">SVD คืออะไร</span><span lang="en">What is SVD?</span></a></li>
+    <li><a href="#why"><span lang="th">ทำไมต้องใช้</span><span lang="en">Why we need it</span></a></li>
+    <li><a href="#svd-example"><span lang="th">ตัวอย่างการหา SVD</span><span lang="en">Computing an SVD</span></a></li>
+    <li><a href="#svd-inverse"><span lang="th">อินเวอร์สผ่าน SVD</span><span lang="en">Inverse via SVD</span></a></li>
+    <li><a href="#lsq"><span lang="th">กำลังสองน้อยที่สุด</span><span lang="en">Least squares</span></a></li>
+    <li><a href="#r2"><span lang="th">สัมประสิทธิ์การตัดสินใจ \(R^2\)</span><span lang="en">Coefficient of determination \(R^2\)</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด / การบ้าน</span><span lang="en">Exercises / homework</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="svd"><span lang="th">1. SVD คืออะไร</span><span lang="en">1. What is SVD?</span></h2>
+
+<div class="box def">
+  <span class="label">Singular Value Decomposition</span>
+  <div class="math">\[ C = U\,\Sigma\,V^T \]</div>
+  <ul>
+    <li><span lang="th">\(V\) — <strong>เมทริกซ์เชิงตั้งฉาก</strong> (หลักเป็นเวกเตอร์หนึ่งหน่วยที่ตั้งฉากกัน, \(V^TV = I\)) มาจาก<strong>เวกเตอร์เฉพาะ</strong>ของ \(C^TC\)</span><span lang="en">\(V\) — an <strong>orthogonal matrix</strong> (orthonormal columns, \(V^TV = I\)) built from the <strong>eigenvectors</strong> of \(C^TC\).</span></li>
+    <li><span lang="th">\(\Sigma\) — <strong>เมทริกซ์ทแยงมุม</strong> ของค่าเอกฐาน \(\sigma_i = \sqrt{\lambda_i}\) โดย \(\lambda_i\) คือ<strong>ค่าเฉพาะ</strong>ของ \(C^TC\)</span><span lang="en">\(\Sigma\) — a <strong>diagonal matrix</strong> of singular values \(\sigma_i = \sqrt{\lambda_i}\), where \(\lambda_i\) are the <strong>eigenvalues</strong> of \(C^TC\).</span></li>
+    <li><span lang="th">\(U\) — <strong>เมทริกซ์เชิงตั้งฉาก</strong> หาได้จาก \(CV = U\Sigma\)</span><span lang="en">\(U\) — an <strong>orthogonal matrix</strong>, found from \(CV = U\Sigma\).</span></li>
+  </ul>
+</div>
+
+<div class="box key">
+  <span class="label"><span lang="th">สองสมการที่ใช้คำนวณ</span><span lang="en">The two working equations</span></span>
+  <div class="math">\[
+  \text{(1)}\quad C^TC = V\,\Sigma^T\Sigma\,V^T
+  \qquad\qquad
+  \text{(2)}\quad CV = U\Sigma \;\;\Longrightarrow\;\; \mathbf{u}_i = \frac{1}{\sigma_i}\,C\mathbf{v}_i
+  \]</div>
+  <p lang="th">(1) มาจาก \(C^TC = (V\Sigma^TU^T)(U\Sigma V^T)\) และ \(U^TU = I\) — จึงเป็นปัญหาค่าเฉพาะของ \(C^TC\) ในบทที่ 5 · (2) มาจากการคูณ \(V\) ทางขวาของ \(C = U\Sigma V^T\)</p>
+  <p lang="en">(1) follows from \(C^TC = (V\Sigma^TU^T)(U\Sigma V^T)\) with \(U^TU = I\) — an eigenvalue problem for \(C^TC\) (Chapter 5). (2) is \(C = U\Sigma V^T\) multiplied on the right by \(V\).</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="why"><span lang="th">2. ทำไมต้องใช้ — เมื่อสมการมีมากกว่าตัวแปร</span><span lang="en">2. Why — when equations outnumber unknowns</span></h2>
+<p lang="th">สองสมการ สองตัวแปร: เส้นตรงสองเส้นตัดกันที่จุดเดียว · สามสมการที่ผ่านจุดเดียวกันพอดี: ยังมีคำตอบ · แต่ข้อมูลจริงมักทำให้เส้นทั้งสามตัดกันเป็น “สามเหลี่ยม” — <strong>ไม่มีจุดใดอยู่บนทุกเส้น</strong> ระบบแบบนี้ (\(A_{3\times2}\)) ไม่มีอินเวอร์สปกติ เราจึงต้องการ (ก) วิธีแยกเมทริกซ์ที่ใช้ได้กับทุกขนาด → SVD และ (ข) วิธีหาคำตอบ “ที่ดีที่สุด” → กำลังสองน้อยที่สุด</p>
+<p lang="en">Two equations, two unknowns: two lines meet at one point. Three equations through the same point: still solvable. But real data usually makes three lines form a small <em>triangle</em> — <strong>no point lies on all of them</strong>. Such a system (\(A_{3\times2}\)) has no ordinary inverse, so we want (a) a factorisation that works for any shape → SVD, and (b) a “best possible” answer → least squares.</p>
+
+<!-- ============================================================ -->
+<h2 id="svd-example"><span lang="th">3. ตัวอย่างการหา SVD</span><span lang="en">3. Computing an SVD</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 6.1</span><span lang="en">Example 6.1</span></span><span class="title">\(C = \begin{bmatrix} 5 & 5 \\ -1 & 7 \end{bmatrix}\)</span></header>
+  <div class="body">
+    <h4><span lang="th">ขั้นที่ 1: หา \(C^TC\) และค่าเฉพาะ</span><span lang="en">Step 1: \(C^TC\) and its eigenvalues</span></h4>
+    <div class="math">\[
+    C^TC = \begin{bmatrix} 5 & -1 \\ 5 & 7 \end{bmatrix}\begin{bmatrix} 5 & 5 \\ -1 & 7 \end{bmatrix} = \begin{bmatrix} 26 & 18 \\ 18 & 74 \end{bmatrix}
+    \]</div>
+    <div class="math">\[
+    \det(C^TC - \lambda I) = (26 - \lambda)(74 - \lambda) - 18^2 = \lambda^2 - 100\lambda + 1600 = (\lambda - 20)(\lambda - 80) = 0
+    \;\Rightarrow\; \lambda = 20,\ 80
+    \]</div>
+
+    <h4><span lang="th">ขั้นที่ 2: เวกเตอร์เฉพาะ → หลักของ \(V\)</span><span lang="en">Step 2: eigenvectors → columns of \(V\)</span></h4>
+    <p lang="th">แต่ละ \(\lambda\) หา null space ของ \(C^TC - \lambda I\) แล้ว<strong>ทำให้เป็นเวกเตอร์หนึ่งหน่วย</strong> \(\mathbf{v}/\lVert\mathbf{v}\rVert\):</p>
+    <p lang="en">For each \(\lambda\), find the null space of \(C^TC - \lambda I\) and <strong>normalise</strong> to a unit vector \(\mathbf{v}/\lVert\mathbf{v}\rVert\):</p>
+    <div class="cols">
+      <div class="panel">
+        <p><strong>\(\lambda = 20\)</strong></p>
+        <div class="math">\[ \begin{bmatrix} 6 & 18 \\ 18 & 54 \end{bmatrix}\mathbf{x} = \mathbf 0 \Rightarrow x_1 = -3x_2 \]</div>
+        <div class="math">\[ (-3, 1),\ \lVert\cdot\rVert = \sqrt{10} \Rightarrow \mathbf{v}_1 = \begin{bmatrix} -3/\sqrt{10} \\ 1/\sqrt{10} \end{bmatrix} \]</div>
+      </div>
+      <div class="panel">
+        <p><strong>\(\lambda = 80\)</strong></p>
+        <div class="math">\[ \begin{bmatrix} -54 & 18 \\ 18 & -6 \end{bmatrix}\mathbf{x} = \mathbf 0 \Rightarrow x_2 = 3x_1 \]</div>
+        <div class="math">\[ (1, 3),\ \lVert\cdot\rVert = \sqrt{10} \Rightarrow \mathbf{v}_2 = \begin{bmatrix} 1/\sqrt{10} \\ 3/\sqrt{10} \end{bmatrix} \]</div>
+      </div>
+    </div>
+    <div class="math">\[
+    V = \begin{bmatrix} -3/\sqrt{10} & 1/\sqrt{10} \\ 1/\sqrt{10} & 3/\sqrt{10} \end{bmatrix},
+    \qquad
+    \Sigma = \begin{bmatrix} \sqrt{20} & 0 \\ 0 & \sqrt{80} \end{bmatrix} = \begin{bmatrix} 2\sqrt5 & 0 \\ 0 & 4\sqrt5 \end{bmatrix}
+    \]</div>
+
+    <h4><span lang="th">ขั้นที่ 3: หา \(U\) จากสมการ (2) \(CV = U\Sigma\)</span><span lang="en">Step 3: find \(U\) from equation (2), \(CV = U\Sigma\)</span></h4>
+    <div class="math">\[
+    CV = \begin{bmatrix} 5 & 5 \\ -1 & 7 \end{bmatrix}\begin{bmatrix} -3/\sqrt{10} & 1/\sqrt{10} \\ 1/\sqrt{10} & 3/\sqrt{10} \end{bmatrix}
+    = \begin{bmatrix} -\sqrt{10} & 2\sqrt{10} \\ \sqrt{10} & 2\sqrt{10} \end{bmatrix}
+    = \begin{bmatrix} 2\sqrt5\,u_{11} & 4\sqrt5\,u_{12} \\ 2\sqrt5\,u_{21} & 4\sqrt5\,u_{22} \end{bmatrix}
+    \]</div>
+    <div class="math">\[
+    u_{11} = \tfrac{-\sqrt{10}}{2\sqrt5} = -\tfrac{1}{\sqrt2},\quad
+    u_{21} = \tfrac{\sqrt{10}}{2\sqrt5} = \tfrac{1}{\sqrt2},\quad
+    u_{12} = u_{22} = \tfrac{2\sqrt{10}}{4\sqrt5} = \tfrac{1}{\sqrt2}
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>
+      <div class="math">\[
+      \begin{bmatrix} 5 & 5 \\ -1 & 7 \end{bmatrix}
+      = \underbrace{\begin{bmatrix} -\tfrac1{\sqrt2} & \tfrac1{\sqrt2} \\ \tfrac1{\sqrt2} & \tfrac1{\sqrt2} \end{bmatrix}}_{U}
+      \underbrace{\begin{bmatrix} 2\sqrt5 & 0 \\ 0 & 4\sqrt5 \end{bmatrix}}_{\Sigma}
+      \underbrace{\begin{bmatrix} -\tfrac3{\sqrt{10}} & \tfrac1{\sqrt{10}} \\ \tfrac1{\sqrt{10}} & \tfrac3{\sqrt{10}} \end{bmatrix}^{T}}_{V^T}
+      \]</div>
+    </div>
+  </div>
+</section>
+
+<div class="box tip">
+  <span class="label"><span lang="th">หมายเหตุเรื่องลำดับ</span><span lang="en">Note on ordering</span></span>
+  <p lang="th">ตำราและซอฟต์แวร์ (เช่น NumPy) มักเรียงค่าเอกฐานจาก<strong>มากไปน้อย</strong> (\(4\sqrt5\) ก่อน \(2\sqrt5\)) ถ้าสลับลำดับใน \(\Sigma\) ต้องสลับหลักของ \(U\) และ \(V\) ตามไปด้วย ผลคูณ \(U\Sigma V^T\) ยังเท่าเดิม และเครื่องหมายของเวกเตอร์เฉพาะกลับทั้งคู่ \(\mathbf u_i, \mathbf v_i\) ได้</p>
+  <p lang="en">Textbooks and software (e.g. NumPy) usually list singular values in <strong>decreasing</strong> order (\(4\sqrt5\) before \(2\sqrt5\)). If you reorder \(\Sigma\), reorder the columns of \(U\) and \(V\) the same way — the product \(U\Sigma V^T\) is unchanged. A pair \(\mathbf u_i, \mathbf v_i\) may also both flip sign.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="svd-inverse"><span lang="th">4. อินเวอร์สผ่าน SVD</span><span lang="en">4. The inverse via SVD</span></h2>
+<p lang="th">เพราะ \(U\) และ \(V\) เป็นเมทริกซ์เชิงตั้งฉาก (\(U^{-1} = U^T,\ V^{-1} = V^T\)) และอินเวอร์สของเมทริกซ์ทแยงมุมคือกลับเศษส่วนทีละตัว:</p>
+<p lang="en">Because \(U\) and \(V\) are orthogonal (\(U^{-1} = U^T,\ V^{-1} = V^T\)) and a diagonal matrix is inverted entry by entry:</p>
+<div class="box key">
+  <span class="label"><span lang="th">สูตร</span><span lang="en">Formula</span></span>
+  <div class="math">\[ A = U\Sigma V^T \;\Longrightarrow\; A^{-1} = V\,\Sigma^{-1}\,U^T, \qquad \Sigma^{-1} = \operatorname{diag}\!\left(\tfrac{1}{\sigma_1}, \tfrac{1}{\sigma_2}, \dots\right) \]</div>
+  <p lang="th">ถ้า \(A\) ไม่ใช่เมทริกซ์จัตุรัส (เช่น \(3\times2\)) ใช้สูตรเดียวกันโดยกลับเฉพาะค่า \(\sigma_i \ne 0\) ได้ <strong>pseudo-inverse</strong> \(A^{+} = V\Sigma^{+}U^T\) ซึ่งให้คำตอบกำลังสองน้อยที่สุด \(\mathbf{x} = A^{+}\mathbf{b}\)</p>
+  <p lang="en">If \(A\) is not square (e.g. \(3\times2\)), the same recipe — inverting only the non-zero \(\sigma_i\) — gives the <strong>pseudo-inverse</strong> \(A^{+} = V\Sigma^{+}U^T\), and \(\mathbf{x} = A^{+}\mathbf{b}\) is the least-squares solution.</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 6.2</span><span lang="en">Example 6.2</span></span><span class="title"><span lang="th">อินเวอร์สของ \(C\) ในตัวอย่าง 6.1</span><span lang="en">Inverse of \(C\) from Example 6.1</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    C^{-1} = \begin{bmatrix} -\tfrac3{\sqrt{10}} & \tfrac1{\sqrt{10}} \\ \tfrac1{\sqrt{10}} & \tfrac3{\sqrt{10}} \end{bmatrix}
+    \begin{bmatrix} \tfrac1{2\sqrt5} & 0 \\ 0 & \tfrac1{4\sqrt5} \end{bmatrix}
+    \begin{bmatrix} -\tfrac1{\sqrt2} & \tfrac1{\sqrt2} \\ \tfrac1{\sqrt2} & \tfrac1{\sqrt2} \end{bmatrix}
+    = \begin{bmatrix} \tfrac{7}{40} & -\tfrac18 \\ \tfrac{1}{40} & \tfrac18 \end{bmatrix}
+    \]</div>
+    <p lang="th">ตรงกับสูตร 2×2: \(\det C = 35 + 5 = 40\), \(C^{-1} = \tfrac1{40}\begin{bmatrix} 7 & -5 \\ 1 & 5 \end{bmatrix}\) ✓ (และตรงกับ RREF)</p>
+    <p lang="en">Agrees with the 2×2 formula: \(\det C = 35 + 5 = 40\), \(C^{-1} = \tfrac1{40}\begin{bmatrix} 7 & -5 \\ 1 & 5 \end{bmatrix}\) ✓ (and with RREF).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="lsq"><span lang="th">5. การประมาณค่ากำลังสองน้อยที่สุด</span><span lang="en">5. Least-squares approximation</span></h2>
+
+<p lang="th">เมื่อ \(A\mathbf{x} = \mathbf{b}\) ไม่มีคำตอบ (สมการมากกว่าตัวแปร) เราหา \(\mathbf{x}\) ที่ทำให้ผลรวมกำลังสองของความคลาดเคลื่อน \(\lVert A\mathbf{x} - \mathbf{b}\rVert^2\) น้อยที่สุด วิธีคือ “คูณทรานสโพสทั้งสองข้าง”:</p>
+<p lang="en">When \(A\mathbf{x} = \mathbf{b}\) has no solution (more equations than unknowns), we look for the \(\mathbf{x}\) that minimises the sum of squared errors \(\lVert A\mathbf{x} - \mathbf{b}\rVert^2\). The recipe is “multiply both sides by the transpose”:</p>
+<div class="box key">
+  <span class="label"><span lang="th">สมการปกติ (Normal equations)</span><span lang="en">Normal equations</span></span>
+  <div class="math">\[ A^TA\,\mathbf{x} = A^T\mathbf{b} \]</div>
+  <p lang="th">\(A^TA\) เป็นเมทริกซ์จัตุรัส จึงแก้ด้วย RREF ได้ตามปกติ</p>
+  <p lang="en">\(A^TA\) is square, so solve it with RREF as usual.</p>
+</div>
+
+<div class="box tip">
+  <span class="label"><span lang="th">เคล็ดลับจากบทที่ 1</span><span lang="en">The trick from Chapter 1</span></span>
+  <p lang="th">โมเดล \(y = bx + ax^2\) ไม่เชิงเส้นใน \(x\) แต่<strong>เชิงเส้นในสัมประสิทธิ์ \(a, b\)</strong> — ตั้ง \(x_1 = x,\ x_2 = x^2\) จะได้ \(b\,x_1 + a\,x_2 = y\) แต่ละจุดข้อมูลให้หนึ่งสมการเชิงเส้น</p>
+  <p lang="en">The model \(y = bx + ax^2\) is not linear in \(x\), but it <strong>is linear in the coefficients \(a, b\)</strong>. With \(x_1 = x,\ x_2 = x^2\) it reads \(b\,x_1 + a\,x_2 = y\) — one linear equation per data point.</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 6.3</span><span lang="en">Example 6.3</span></span><span class="title"><span lang="th">\(y = bx + ax^2\) ผ่านจุด (1, 1), (2, 5), (−1, 2)</span><span lang="en">\(y = bx + ax^2\) through (1, 1), (2, 5), (−1, 2)</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    \begin{aligned} b(1) + a(1)^2 &= 1 \\ b(2) + a(2)^2 &= 5 \\ b(-1) + a(-1)^2 &= 2 \end{aligned}
+    \quad\Rightarrow\quad
+    \underbrace{\begin{bmatrix} 1 & 1 \\ 2 & 4 \\ -1 & 1 \end{bmatrix}}_{A}\begin{bmatrix} b \\ a \end{bmatrix} = \underbrace{\begin{bmatrix} 1 \\ 5 \\ 2 \end{bmatrix}}_{\mathbf b}
+    \]</div>
+    <div class="math">\[
+    A^TA = \begin{bmatrix} 1 & 2 & -1 \\ 1 & 4 & 1 \end{bmatrix}\begin{bmatrix} 1 & 1 \\ 2 & 4 \\ -1 & 1 \end{bmatrix} = \begin{bmatrix} 6 & 8 \\ 8 & 18 \end{bmatrix},
+    \qquad
+    A^T\mathbf{b} = \begin{bmatrix} 1 + 10 - 2 \\ 1 + 20 + 2 \end{bmatrix} = \begin{bmatrix} 9 \\ 23 \end{bmatrix}
+    \]</div>
+    <div class="math">\[
+    \left[\begin{array}{cc|c} 6 & 8 & 9 \\ 8 & 18 & 23 \end{array}\right] \xrightarrow{\text{RREF}} \left[\begin{array}{cc|c} 1 & 0 & -\tfrac12 \\ 0 & 1 & \tfrac32 \end{array}\right]
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">คำตอบ</span><span lang="en">Answer</span></span>\(y = -\tfrac12x + \tfrac32x^2\)</div>
+    <p lang="th" style="margin-top:12px">ตรวจ: \(x = 1 \to 1\), \(x = 2 \to 5\), \(x = -1 \to 2\) — เส้นโค้งผ่านทั้งสามจุดพอดี (ระบบนี้บังเอิญมีคำตอบตรง ๆ และกำลังสองน้อยที่สุดก็ให้คำตอบนั้นเอง \(R^2 = 1\))</p>
+    <p lang="en" style="margin-top:12px">Check: \(x = 1 \to 1\), \(x = 2 \to 5\), \(x = -1 \to 2\). The curve passes through all three points exactly — this system happens to be consistent, and least squares returns that exact solution (\(R^2 = 1\)).</p>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 6.4</span><span lang="en">Example 6.4</span></span><span class="title"><span lang="th">4 จุด: (1, 1), (2, 5), (−1, −2), (−2, 0)</span><span lang="en">4 points: (1, 1), (2, 5), (−1, −2), (−2, 0)</span></span></header>
+  <div class="body">
+    <p lang="th">โมเดล \(y = dx + cx^2\)</p><p lang="en">Model \(y = dx + cx^2\).</p>
+    <div class="math">\[
+    A = \begin{bmatrix} 1 & 1 \\ 2 & 4 \\ -1 & 1 \\ -2 & 4 \end{bmatrix},\;
+    \mathbf{b} = \begin{bmatrix} 1 \\ 5 \\ -2 \\ 0 \end{bmatrix}
+    \;\Rightarrow\;
+    A^TA = \begin{bmatrix} 10 & 0 \\ 0 & 34 \end{bmatrix},\;
+    A^T\mathbf{b} = \begin{bmatrix} 13 \\ 19 \end{bmatrix}
+    \]</div>
+    <div class="math">\[ \begin{bmatrix} d \\ c \end{bmatrix} = \begin{bmatrix} 13/10 \\ 19/34 \end{bmatrix} \]</div>
+    <div class="answer"><span class="label"><span lang="th">เส้นโค้งที่ดีที่สุด</span><span lang="en">Best fit</span></span>\(y = \tfrac{19}{34}x^2 + \tfrac{13}{10}x\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="r2"><span lang="th">6. สัมประสิทธิ์การตัดสินใจ \(R^2\)</span><span lang="en">6. The coefficient of determination \(R^2\)</span></h2>
+
+<p lang="th">“กำลังสองน้อยที่สุด” หมายถึง <strong>ผลรวมพื้นที่สี่เหลี่ยมจัตุรัส</strong> ที่มีด้านเป็นระยะแนวตั้งจากจุดข้อมูลถึงเส้นโค้ง ต้องน้อยที่สุด เปรียบเทียบกับสี่เหลี่ยมที่วัดจาก<strong>ค่าเฉลี่ย</strong> \(\bar y\):</p>
+<p lang="en">“Least squares” means the <strong>total area of squares</strong> whose sides are the vertical gaps between data and curve is as small as possible. Compare it with squares measured from the <strong>mean</strong> \(\bar y\):</p>
+
+<div class="box key">
+  <span class="label"><span lang="th">สูตร</span><span lang="en">Formula</span></span>
+  <div class="math">\[
+  R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}},\qquad
+  SS_{\text{res}} = \sum (y_i - \hat y_i)^2,\qquad
+  SS_{\text{tot}} = \sum (y_i - \bar y)^2
+  \]</div>
+  <p lang="th">\(SS_{\text{res}}\): ผลต่างระหว่างข้อมูลจริงกับค่าทำนาย · \(SS_{\text{tot}}\): ผลต่างระหว่างข้อมูลจริงกับค่าเฉลี่ย · \(0 \le R^2 \le 1\) ยิ่งใกล้ 1 ยิ่งเข้ากับข้อมูลดี (\(R^2 = 1\) คือผ่านทุกจุดพอดี)</p>
+  <p lang="en">\(SS_{\text{res}}\): data vs. prediction. \(SS_{\text{tot}}\): data vs. mean. \(0 \le R^2 \le 1\); the closer to 1 the better (\(R^2 = 1\) means the curve hits every point).</p>
+</div>
+
+<section class="widget" data-widget="lsq" data-points="[[1,1],[2,5],[-1,-2],[-2,0]]" data-coef="[1.3,0.5588235294]">
+  <header><span class="label"><span lang="th">ทดลอง</span><span lang="en">Interactive</span></span><span class="title"><span lang="th">สี่เหลี่ยมของตัวอย่าง 6.4</span><span lang="en">The squares of Example 6.4</span></span></header>
+  <div class="w-body">
+    <div class="w-controls">
+      <button class="btn" data-mode="res"><span lang="th">SS<sub>res</sub>: เทียบกับเส้นโค้ง</span><span lang="en">SS<sub>res</sub>: vs. curve</span></button>
+      <button class="btn" data-mode="tot"><span lang="th">SS<sub>tot</sub>: เทียบกับค่าเฉลี่ย</span><span lang="en">SS<sub>tot</sub>: vs. mean</span></button>
+    </div>
+    <canvas></canvas>
+    <div class="w-readout" data-out></div>
+  </div>
+</section>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>\(x\)</th><th>\(y\)</th><th class="num">\(\hat y\)</th><th class="num">\(y - \hat y\)</th><th class="num">\((y - \hat y)^2\)</th><th class="num">\(y - \bar y\)</th><th class="num">\((y - \bar y)^2\)</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>1</td><td class="num">1.859</td><td class="num">−0.859</td><td class="num">0.738</td><td class="num">0</td><td class="num">0</td></tr>
+    <tr><td>2</td><td>5</td><td class="num">4.835</td><td class="num">0.165</td><td class="num">0.027</td><td class="num">4</td><td class="num">16</td></tr>
+    <tr><td>−1</td><td>−2</td><td class="num">−0.741</td><td class="num">−1.259</td><td class="num">1.585</td><td class="num">−3</td><td class="num">9</td></tr>
+    <tr><td>−2</td><td>0</td><td class="num">−0.365</td><td class="num">0.365</td><td class="num">0.133</td><td class="num">−1</td><td class="num">1</td></tr>
+  </tbody>
+  <tfoot><tr><td colspan="4">\(\bar y = \tfrac{1 + 5 - 2 + 0}{4} = 1\)</td><td class="num">\(SS_{\text{res}} \approx 2.482\)</td><td></td><td class="num">\(SS_{\text{tot}} = 26\)</td></tr></tfoot>
+</table>
+</div>
+<div class="math">\[ R^2 = 1 - \frac{2.482}{26} \approx 0.9045 \]</div>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด / การบ้าน</span><span lang="en">Exercises / homework</span></h2>
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th"><strong>การบ้าน:</strong> แก้ระบบ \(5x_1 + 5x_2 = 5,\ -x_1 + 7x_2 = 7\) ด้วย (ก) RREF หา \(\mathbf x\) (ข) RREF หา \(A^{-1}\) (ค) SVD หา \(A^{-1}\) แล้วเทียบผล</p>
+    <p lang="en"><strong>Homework:</strong> solve \(5x_1 + 5x_2 = 5,\ -x_1 + 7x_2 = 7\) using (a) RREF for \(\mathbf x\), (b) RREF for \(A^{-1}\), (c) SVD for \(A^{-1}\), and compare.</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">\(A\) คือ \(C\) ในตัวอย่าง 6.1 จึงใช้ \(A^{-1}\) จากตัวอย่าง 6.2 ได้เลย:</p>
+      <p lang="en">\(A\) is the \(C\) of Example 6.1, so use \(A^{-1}\) from Example 6.2:</p>
+      <div class="math">\[ \mathbf{x} = \begin{bmatrix} \tfrac7{40} & -\tfrac18 \\ \tfrac1{40} & \tfrac18 \end{bmatrix}\begin{bmatrix} 5 \\ 7 \end{bmatrix} = \begin{bmatrix} \tfrac{35}{40} - \tfrac{35}{40} \\ \tfrac{5}{40} + \tfrac{35}{40} \end{bmatrix} = \begin{bmatrix} 0 \\ 1 \end{bmatrix} \]</div>
+      <p lang="th">ทั้งสามวิธีได้ \(x_1 = 0,\ x_2 = 1\)</p><p lang="en">All three methods give \(x_1 = 0,\ x_2 = 1\).</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">หาเส้นตรง \(y = mx + c\) ที่เข้ากับจุด \((0, 1), (1, 3), (2, 4), (3, 4)\) ที่สุด</p>
+    <p lang="en">Find the best-fit line \(y = mx + c\) for \((0, 1), (1, 3), (2, 4), (3, 4)\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[
+      A = \begin{bmatrix} 0 & 1 \\ 1 & 1 \\ 2 & 1 \\ 3 & 1 \end{bmatrix},\;
+      A^TA = \begin{bmatrix} 14 & 6 \\ 6 & 4 \end{bmatrix},\;
+      A^T\mathbf{b} = \begin{bmatrix} 23 \\ 12 \end{bmatrix}
+      \;\Rightarrow\; m = 1,\ c = 1.5
+      \]</div>
+      <p>\(y = x + 1.5\)</p>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">หาค่าเอกฐานของ \(\begin{bmatrix} 3 & 0 \\ 0 & -2 \end{bmatrix}\)</p>
+    <p lang="en">Find the singular values of \(\begin{bmatrix} 3 & 0 \\ 0 & -2 \end{bmatrix}\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">\(C^TC = \operatorname{diag}(9, 4)\) จึงได้ \(\sigma = 3,\ 2\) — ค่าเอกฐานไม่เป็นลบเสมอ แม้ค่าเฉพาะของ \(C\) จะเป็น \(-2\)</p>
+      <p lang="en">\(C^TC = \operatorname{diag}(9, 4)\), so \(\sigma = 3,\ 2\). Singular values are never negative, even though \(C\) has eigenvalue \(-2\).</p>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>

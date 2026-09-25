@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="th" data-part="la" data-chapter="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1 · Linear Systems &amp; RREF — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 1</span><span lang="en">Chapter 1</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 1</span><span lang="en">Week 1</span></span></div>
+  <h1><span lang="th">ระบบสมการเชิงเส้นและ RREF</span><span lang="en">Systems of Linear Equations &amp; RREF</span></h1>
+  <p class="lead" lang="th">เริ่มต้นจากคำถามง่าย ๆ ว่า “สมการแบบไหนเรียกว่าเชิงเส้น” แล้วเรียนวิธีเขียนระบบสมการเป็นเมทริกซ์ และแก้ด้วยการดำเนินการตามแถวจนได้รูปแบบขั้นบันไดแบบแถวลดรูป (RREF)</p>
+  <p class="lead" lang="en">We start with a simple question — what makes an equation <em>linear</em>? — then write systems of equations as matrices and solve them with row operations until we reach reduced row echelon form (RREF).</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_Wk1_RREF.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#linear"><span lang="th">สมการเชิงเส้นคืออะไร</span><span lang="en">What is a linear equation?</span></a></li>
+    <li><a href="#matrix-form"><span lang="th">เขียนระบบสมการเป็นเมทริกซ์</span><span lang="en">Matrix form of a system</span></a></li>
+    <li><a href="#row-ops"><span lang="th">การดำเนินการตามแถว</span><span lang="en">Elementary row operations</span></a></li>
+    <li><a href="#rref"><span lang="th">RREF และขั้นตอนการแก้</span><span lang="en">RREF &amp; the solving strategy</span></a></li>
+    <li><a href="#ex-2x2"><span lang="th">ตัวอย่าง 2 ตัวแปร</span><span lang="en">Example: 2 unknowns</span></a></li>
+    <li><a href="#ex-3x3"><span lang="th">ตัวอย่าง 3 ตัวแปร</span><span lang="en">Example: 3 unknowns</span></a></li>
+    <li><a href="#curve-fit"><span lang="th">การประยุกต์: หาสมการเส้นโค้ง</span><span lang="en">Application: fitting curves</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="linear"><span lang="th">1. สมการเชิงเส้นคืออะไร</span><span lang="en">1. What is a linear equation?</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <p lang="th">สมการเชิงเส้นในตัวแปร \(x_1, x_2, \dots, x_n\) คือสมการที่เขียนได้ในรูป</p>
+  <p lang="en">A linear equation in the variables \(x_1, x_2, \dots, x_n\) is one that can be written as</p>
+  <div class="math">\[ a_1x_1 + a_2x_2 + \cdots + a_nx_n = b \]</div>
+  <p lang="th">โดยที่ \(a_1,\dots,a_n\) และ \(b\) เป็นค่าคงที่</p>
+  <p lang="en">where \(a_1,\dots,a_n\) and \(b\) are constants.</p>
+</div>
+
+<p lang="th">เช็กง่าย ๆ ได้ 4 ข้อ:</p>
+<p lang="en">A quick four-point check:</p>
+<ol>
+  <li><span lang="th">มีตัวแปร เช่น \(x, y, z\) หรือ \(x_1, x_2, \dots, x_n\)</span><span lang="en">It contains variables such as \(x, y, z\) or \(x_1, x_2, \dots, x_n\).</span></li>
+  <li><span lang="th">ตัวแปรทุกตัวมี <strong>ดีกรีเท่ากับ 1</strong></span><span lang="en">Every variable has <strong>degree 1</strong>.</span></li>
+  <li><span lang="th"><strong>ไม่มีการคูณหรือหารกันระหว่างตัวแปร</strong> (เช่น \(xy\), \(x/y\))</span><span lang="en"><strong>No products or quotients of variables</strong> (such as \(xy\) or \(x/y\)).</span></li>
+  <li><span lang="th">ตัวแปร<strong>ไม่อยู่ในฟังก์ชันทางคณิตศาสตร์</strong> เช่น \(\sin x\), \(\cos x\), \(e^x\), \(\ln x\)</span><span lang="en">Variables are <strong>not inside functions</strong> such as \(\sin x\), \(\cos x\), \(e^x\), \(\ln x\).</span></li>
+</ol>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">สมการ</span><span lang="en">Equation</span></th><th><span lang="th">เชิงเส้น?</span><span lang="en">Linear?</span></th><th><span lang="th">หมายเหตุ</span><span lang="en">Notes</span></th></tr></thead>
+  <tbody>
+    <tr><td>\(x + 3y = 7\)</td><td class="ok">✓</td><td><span lang="th">เส้นตรงใน 2 มิติ: \(y = -\tfrac13x + \tfrac73\)</span><span lang="en">A line in 2D: \(y = -\tfrac13x + \tfrac73\)</span></td></tr>
+    <tr><td>\(2x + 3y - z = 2\)</td><td class="ok">✓</td><td><span lang="th">ระนาบใน 3 มิติ: \(z(x,y) = 2x + 3y - 2\)</span><span lang="en">A plane in 3D: \(z(x,y) = 2x + 3y - 2\)</span></td></tr>
+    <tr><td>\(y = 5\)</td><td class="ok">✓</td><td><span lang="th">เส้นตรงแนวนอน</span><span lang="en">A horizontal line</span></td></tr>
+    <tr><td>\(x + xy = 2\)</td><td class="no">✗</td><td><span lang="th">มีพจน์ \(xy\) (ตัวแปรคูณกัน)</span><span lang="en">Contains \(xy\) (a product of variables)</span></td></tr>
+    <tr><td>\(\sin x + \cos x = 1\)</td><td class="no">✗</td><td><span lang="th">ตัวแปรอยู่ในฟังก์ชันตรีโกณมิติ</span><span lang="en">Variable inside trig functions</span></td></tr>
+    <tr><td>\(e^x = 3,\ \ \ln x = 1\)</td><td class="no">✗</td><td><span lang="th">ตัวแปรอยู่ในฟังก์ชันเลขชี้กำลัง/ลอการิทึม</span><span lang="en">Variable inside exponential/log</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="box tip">
+  <span class="label"><span lang="th">แนวคิดสำคัญ (จะใช้อีกในบท Least Squares)</span><span lang="en">Key idea (used again in Least Squares)</span></span>
+  <p lang="th">\(x^2 + 2x - 4 = 0\) ไม่เป็นเชิงเส้นใน \(x\) แต่ถ้าตั้งตัวแปรใหม่ \(x_1 = x^2\) และ \(x_2 = x\) จะได้ \(x_1 + 2x_2 - 4 = 0\) ซึ่ง<strong>เป็นเชิงเส้นในตัวแปรใหม่</strong> — เคล็ดลับนี้ทำให้เราใช้พีชคณิตเชิงเส้นหา “สัมประสิทธิ์” ของพหุนามได้</p>
+  <p lang="en">\(x^2 + 2x - 4 = 0\) is not linear in \(x\). But with new variables \(x_1 = x^2\) and \(x_2 = x\) it becomes \(x_1 + 2x_2 - 4 = 0\), which <strong>is linear in the new variables</strong>. This trick lets us use linear algebra to find the <em>coefficients</em> of a polynomial.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="matrix-form"><span lang="th">2. เขียนระบบสมการเป็นเมทริกซ์</span><span lang="en">2. Matrix form of a system</span></h2>
+
+<p lang="th">ระบบสมการเชิงเส้นเขียนย่อได้เป็น \(A\mathbf{x} = \mathbf{b}\) โดย \(A\) คือเมทริกซ์สัมประสิทธิ์ \(\mathbf{x}\) คือเวกเตอร์ตัวแปร และ \(\mathbf{b}\) คือค่าคงที่ด้านขวา</p>
+<p lang="en">A linear system can be written compactly as \(A\mathbf{x} = \mathbf{b}\), where \(A\) is the coefficient matrix, \(\mathbf{x}\) the vector of unknowns, and \(\mathbf{b}\) the right-hand side.</p>
+
+<div class="math">\[
+\begin{aligned} 5x + y &= 3 \\ 2x - y &= 4 \end{aligned}
+\quad\Longleftrightarrow\quad
+\begin{bmatrix} 5 & 1 \\ 2 & -1 \end{bmatrix}\begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}
+\quad\Longleftrightarrow\quad
+\left[\begin{array}{cc|c} 5 & 1 & 3 \\ 2 & -1 & 4 \end{array}\right]
+\]</div>
+
+<p lang="th">เมทริกซ์ทางขวาสุดเรียกว่า <strong>เมทริกซ์แต่งเติม (augmented matrix)</strong> — แต่ละ<strong>แถว</strong>คือหนึ่งสมการ แต่ละ<strong>หลัก</strong>คือหนึ่งตัวแปร</p>
+<p lang="en">The rightmost form is the <strong>augmented matrix</strong>: each <strong>row</strong> is an equation and each <strong>column</strong> belongs to one variable.</p>
+
+<div class="box tip">
+  <span class="label"><span lang="th">สังเกต</span><span lang="en">Note</span></span>
+  <p lang="th">ลำดับของสมการหรือลำดับของตัวแปรจะสลับกันอย่างไรก็ได้ (ผลเฉลยเหมือนเดิม) ขอเพียงให้หลักของเมทริกซ์ตรงกับลำดับตัวแปรในเวกเตอร์ \(\mathbf{x}\) เช่น</p>
+  <p lang="en">You may reorder the equations or the variables freely (the solution is unchanged) — just keep the matrix columns matched to the order of the unknowns in \(\mathbf{x}\). For example</p>
+  <div class="math">\[
+  \begin{bmatrix} 1 & 5 \\ -1 & 2 \end{bmatrix}\begin{bmatrix} y \\ x \end{bmatrix} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}
+  \quad\text{or}\quad
+  \begin{bmatrix} 2 & -1 \\ 5 & 1 \end{bmatrix}\begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 4 \\ 3 \end{bmatrix}
+  \]</div>
+</div>
+
+<figure>
+  <div class="fig">
+    <svg class="diagram" viewBox="0 0 400 300" role="img" aria-label="Two lines intersecting at (1, -2)">
+      <line class="axis" x1="0" y1="100" x2="395" y2="100"/>
+      <line class="axis" x1="120" y1="5" x2="120" y2="300"/>
+      <path d="M395 100 l-9 -5 v10z" style="fill:var(--muted)"/>
+      <line class="dash" x1="160" y1="100" x2="160" y2="180"/>
+      <line class="dash" x1="120" y1="180" x2="160" y2="180"/>
+      <line class="v1" x1="124" y1="0" x2="184" y2="300"/>
+      <line class="v2" x1="100" y1="300" x2="250" y2="0"/>
+      <circle cx="160" cy="180" r="6" class="t-ode"/>
+      <text x="168" y="200" class="t-ode">(1, −2)</text>
+      <text x="190" y="285" class="t-la">5x + y = 3</text>
+      <text x="238" y="40" class="t-fa">2x − y = 4</text>
+      <text x="380" y="92" class="t-muted">x</text>
+      <text x="128" y="18" class="t-muted">y</text>
+    </svg>
+  </div>
+  <figcaption><span lang="th">แต่ละสมการคือเส้นตรงหนึ่งเส้น ผลเฉลยของระบบคือจุดตัด</span><span lang="en">Each equation is a line; the solution of the system is their intersection.</span></figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<h2 id="row-ops"><span lang="th">3. การดำเนินการตามแถวขั้นมูลฐาน</span><span lang="en">3. Elementary row operations</span></h2>
+
+<p lang="th">การดำเนินการ 3 แบบต่อไปนี้<strong>ไม่เปลี่ยนผลเฉลย</strong>ของระบบสมการ:</p>
+<p lang="en">These three operations <strong>do not change the solution</strong> of the system:</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">การดำเนินการ</span><span lang="en">Operation</span></th><th><span lang="th">สัญลักษณ์</span><span lang="en">Notation</span></th><th><span lang="th">ใช้เมื่อ</span><span lang="en">Used to</span></th></tr></thead>
+  <tbody>
+    <tr><td><span lang="th">คูณทั้งแถวด้วยค่าคงที่ \(k \ne 0\)</span><span lang="en">Multiply a row by a constant \(k \ne 0\)</span></td><td>\(R_i \to kR_i\)</td><td><span lang="th">ทำให้ตัวนำเป็น 1</span><span lang="en">make the pivot equal 1</span></td></tr>
+    <tr><td><span lang="th">บวกแถวด้วยพหุคูณของแถวอื่น</span><span lang="en">Add a multiple of another row</span></td><td>\(R_i \to R_i + kR_j\)</td><td><span lang="th">ทำให้ตัวอื่นในหลักเป็น 0</span><span lang="en">make other entries in the column 0</span></td></tr>
+    <tr><td><span lang="th">สลับสองแถว</span><span lang="en">Swap two rows</span></td><td>\(R_i \leftrightarrow R_j\)</td><td><span lang="th">เมื่อตัวนำเป็น 0</span><span lang="en">when a pivot is 0</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="rref"><span lang="th">4. RREF และขั้นตอนการแก้</span><span lang="en">4. RREF &amp; the solving strategy</span></h2>
+
+<p lang="th">เป้าหมายคือเปลี่ยนเมทริกซ์แต่งเติมให้ด้านซ้ายกลายเป็นเมทริกซ์เอกลักษณ์ แล้วอ่านคำตอบจากหลักขวาสุดได้ทันที:</p>
+<p lang="en">The goal is to turn the left block of the augmented matrix into the identity matrix, so the answer can be read straight from the last column:</p>
+
+<div class="math">\[
+\left[\begin{array}{cc|c} 5 & 1 & 3 \\ 2 & -1 & 4 \end{array}\right]
+\;\longrightarrow\;
+\left[\begin{array}{cc|c} 1 & 0 & x \\ 0 & 1 & y \end{array}\right]
+\]</div>
+
+<div class="box key">
+  <span class="label"><span lang="th">กลยุทธ์ทีละหลัก (C₁, C₂, …)</span><span lang="en">Column-by-column strategy (C₁, C₂, …)</span></span>
+  <ol class="steps">
+    <li><span lang="th">จัดการ<strong>ตัวนำ</strong>ของหลักนั้นให้เป็น 1 ก่อน — ถ้าตัวนำคือ \(a\) ให้คูณทั้งแถวด้วย \(\tfrac1a\)</span><span lang="en">First make the <strong>pivot</strong> of the column equal 1 — if the pivot is \(a\), multiply the whole row by \(\tfrac1a\).</span></li>
+    <li><span lang="th">จัดการตัวอื่นในหลักเดียวกันให้เป็น 0 — ใช้ \(R_i \to R_i - (\text{ค่านั้น})\,R_{\text{pivot}}\)</span><span lang="en">Then make every other entry in that column 0 — use \(R_i \to R_i - (\text{that entry})\,R_{\text{pivot}}\).</span></li>
+    <li><span lang="th">ย้ายไปหลักถัดไปแล้วทำซ้ำ จนด้านซ้ายเป็นเมทริกซ์เอกลักษณ์</span><span lang="en">Move to the next column and repeat until the left block is the identity.</span></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ex-2x2"><span lang="th">5. ตัวอย่าง: ระบบ 2 ตัวแปร</span><span lang="en">5. Example: a system with 2 unknowns</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 1.1</span><span lang="en">Example 1.1</span></span><span class="title">\(5x + y = 3,\; 2x - y = 4\)</span></header>
+  <div class="body">
+    <h4><span lang="th">หลักที่ 1 (C₁)</span><span lang="en">Column 1 (C₁)</span></h4>
+    <div class="math">\[
+    \left[\begin{array}{cc|c} 5 & 1 & 3 \\ 2 & -1 & 4 \end{array}\right]
+    \xrightarrow{R_1 \to \frac15 R_1}
+    \left[\begin{array}{cc|c} 1 & \tfrac15 & \tfrac35 \\ 2 & -1 & 4 \end{array}\right]
+    \xrightarrow{R_2 \to R_2 - 2R_1}
+    \left[\begin{array}{cc|c} 1 & \tfrac15 & \tfrac35 \\ 0 & -\tfrac75 & \tfrac{14}{5} \end{array}\right]
+    \]</div>
+    <p class="small muted" lang="th">แถวที่ 2: \(2-2(1)=0,\;\; -1-2(\tfrac15) = -\tfrac75,\;\; 4-2(\tfrac35)=\tfrac{14}5\)</p>
+    <p class="small muted" lang="en">Row 2: \(2-2(1)=0,\;\; -1-2(\tfrac15) = -\tfrac75,\;\; 4-2(\tfrac35)=\tfrac{14}5\)</p>
+
+    <h4><span lang="th">หลักที่ 2 (C₂)</span><span lang="en">Column 2 (C₂)</span></h4>
+    <div class="math">\[
+    \xrightarrow{R_2 \to -\frac57 R_2}
+    \left[\begin{array}{cc|c} 1 & \tfrac15 & \tfrac35 \\ 0 & 1 & -2 \end{array}\right]
+    \xrightarrow{R_1 \to R_1 - \frac15 R_2}
+    \left[\begin{array}{cc|c} 1 & 0 & 1 \\ 0 & 1 & -2 \end{array}\right]
+    \]</div>
+    <p class="small muted" lang="th">แถวที่ 1: \(\tfrac35 - \tfrac15(-2) = \tfrac35 + \tfrac25 = 1\)</p>
+    <p class="small muted" lang="en">Row 1: \(\tfrac35 - \tfrac15(-2) = \tfrac35 + \tfrac25 = 1\)</p>
+
+    <div class="answer"><span class="label"><span lang="th">คำตอบ</span><span lang="en">Answer</span></span>\(x = 1,\; y = -2\)</div>
+    <p class="small" lang="th">ตรวจคำตอบ: \(5(1) + (-2) = 3\) ✓ และ \(2(1) - (-2) = 4\) ✓</p>
+    <p class="small" lang="en">Check: \(5(1) + (-2) = 3\) ✓ and \(2(1) - (-2) = 4\) ✓</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="ex-3x3"><span lang="th">6. ตัวอย่าง: ระบบ 3 ตัวแปร</span><span lang="en">6. Example: a system with 3 unknowns</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 1.2</span><span lang="en">Example 1.2</span></span></header>
+  <div class="body">
+    <div class="math">\[
+    \begin{aligned} 2x + 4y + 2z &= 6 \\ 2x + y + 4z &= 2 \\ -3x + 2y - z &= 9 \end{aligned}
+    \qquad\Longrightarrow\qquad
+    \left[\begin{array}{ccc|c} 2 & 4 & 2 & 6 \\ 2 & 1 & 4 & 2 \\ -3 & 2 & -1 & 9 \end{array}\right]
+    \]</div>
+
+    <h4>C₁</h4>
+    <div class="math">\[
+    \xrightarrow{R_1 \to \frac12 R_1}
+    \left[\begin{array}{ccc|c} 1 & 2 & 1 & 3 \\ 2 & 1 & 4 & 2 \\ -3 & 2 & -1 & 9 \end{array}\right]
+    \xrightarrow[R_3 \to R_3 + 3R_1]{R_2 \to R_2 - 2R_1}
+    \left[\begin{array}{ccc|c} 1 & 2 & 1 & 3 \\ 0 & -3 & 2 & -4 \\ 0 & 8 & 2 & 18 \end{array}\right]
+    \]</div>
+
+    <h4>C₂</h4>
+    <div class="math">\[
+    \xrightarrow{R_2 \to -\frac13 R_2}
+    \left[\begin{array}{ccc|c} 1 & 2 & 1 & 3 \\ 0 & 1 & -\tfrac23 & \tfrac43 \\ 0 & 8 & 2 & 18 \end{array}\right]
+    \xrightarrow[R_3 \to R_3 - 8R_2]{R_1 \to R_1 - 2R_2}
+    \left[\begin{array}{ccc|c} 1 & 0 & \tfrac73 & \tfrac13 \\ 0 & 1 & -\tfrac23 & \tfrac43 \\ 0 & 0 & \tfrac{22}{3} & \tfrac{22}{3} \end{array}\right]
+    \]</div>
+
+    <h4>C₃</h4>
+    <div class="math">\[
+    \xrightarrow{R_3 \to \frac{3}{22} R_3}
+    \left[\begin{array}{ccc|c} 1 & 0 & \tfrac73 & \tfrac13 \\ 0 & 1 & -\tfrac23 & \tfrac43 \\ 0 & 0 & 1 & 1 \end{array}\right]
+    \xrightarrow[R_2 \to R_2 + \frac23 R_3]{R_1 \to R_1 - \frac73 R_3}
+    \left[\begin{array}{ccc|c} 1 & 0 & 0 & -2 \\ 0 & 1 & 0 & 2 \\ 0 & 0 & 1 & 1 \end{array}\right]
+    \]</div>
+
+    <div class="answer"><span class="label"><span lang="th">คำตอบ</span><span lang="en">Answer</span></span>\(x = -2,\; y = 2,\; z = 1\)</div>
+  </div>
+</section>
+
+<div class="box tip">
+  <span class="label"><span lang="th">ผลเฉลยมีได้ 3 แบบ</span><span lang="en">Three possible outcomes</span></span>
+  <ul>
+    <li><span lang="th"><strong>มีคำตอบเดียว</strong> — ด้านซ้ายกลายเป็นเมทริกซ์เอกลักษณ์ได้ (เหมือนตัวอย่างข้างบน)</span><span lang="en"><strong>Exactly one solution</strong> — the left block reduces to the identity (as above).</span></li>
+    <li><span lang="th"><strong>ไม่มีคำตอบ</strong> — เจอแถวแบบ \([\,0\;0\;\cdots\;0 \mid c\,]\) โดย \(c \ne 0\) (เส้นขนานไม่ตัดกัน)</span><span lang="en"><strong>No solution</strong> — a row like \([\,0\;0\;\cdots\;0 \mid c\,]\) with \(c \ne 0\) appears (parallel lines).</span></li>
+    <li><span lang="th"><strong>มีคำตอบมากมายไม่จำกัด</strong> — มีแถวศูนย์ทั้งแถว ทำให้มี<em>ตัวแปรอิสระ</em> (จะเจออีกในบทที่ 4 เรื่อง null space)</span><span lang="en"><strong>Infinitely many solutions</strong> — an all-zero row leaves <em>free variables</em> (see null space in Chapter 4).</span></li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="curve-fit"><span lang="th">7. การประยุกต์: หาสมการเส้นโค้งจากจุด</span><span lang="en">7. Application: finding a curve through points</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 1.3</span><span lang="en">Example 1.3</span></span><span class="title"><span lang="th">เส้นตรงผ่านจุด (3, 4) และ (4, 2)</span><span lang="en">Line through (3, 4) and (4, 2)</span></span></header>
+  <div class="body">
+    <p lang="th">เส้นตรงมีรูป \(y = mx + c\) — แทนจุดทั้งสองจะได้ระบบสมการเชิงเส้นใน \(m, c\):</p>
+    <p lang="en">A line has the form \(y = mx + c\). Substituting both points gives a linear system in \(m, c\):</p>
+    <div class="math">\[
+    \begin{aligned} 4 &= 3m + c \\ 2 &= 4m + c \end{aligned}
+    \quad\Longrightarrow\quad
+    \begin{bmatrix} 3 & 1 \\ 4 & 1 \end{bmatrix}\begin{bmatrix} m \\ c \end{bmatrix} = \begin{bmatrix} 4 \\ 2 \end{bmatrix}
+    \]</div>
+    <div class="math">\[
+    \left[\begin{array}{cc|c} 3 & 1 & 4 \\ 4 & 1 & 2 \end{array}\right]
+    \xrightarrow{R_1 \to \frac13R_1}
+    \left[\begin{array}{cc|c} 1 & \tfrac13 & \tfrac43 \\ 4 & 1 & 2 \end{array}\right]
+    \xrightarrow{R_2 \to R_2 - 4R_1}
+    \left[\begin{array}{cc|c} 1 & \tfrac13 & \tfrac43 \\ 0 & -\tfrac13 & -\tfrac{10}{3} \end{array}\right]
+    \]</div>
+    <div class="math">\[
+    \xrightarrow{R_2 \to -3R_2}
+    \left[\begin{array}{cc|c} 1 & \tfrac13 & \tfrac43 \\ 0 & 1 & 10 \end{array}\right]
+    \xrightarrow{R_1 \to R_1 - \frac13R_2}
+    \left[\begin{array}{cc|c} 1 & 0 & -2 \\ 0 & 1 & 10 \end{array}\right]
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">คำตอบ</span><span lang="en">Answer</span></span>\(m = -2,\; c = 10 \;\Rightarrow\; y = -2x + 10\)</div>
+  </div>
+</section>
+
+<p lang="th">แนวคิดเดียวกันใช้กับพหุนามดีกรีสูงกว่าได้ เช่น พาราโบลา \(y = ax^2 + bx + c\) ผ่านจุด 3 จุด จะได้ระบบสมการ 3 สมการที่<strong>เป็นเชิงเส้นใน \(a, b, c\)</strong> (ลองทำในแบบฝึกหัดข้อ 3)</p>
+<p lang="en">The same idea works for higher-degree polynomials. A parabola \(y = ax^2 + bx + c\) through three points gives three equations that are <strong>linear in \(a, b, c\)</strong> (try Exercise 3).</p>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+
+<div class="exercises">
+  <div class="exercise">
+    <div class="q"><span class="n">1.</span><div class="qbody">
+      <p lang="th">สมการใดเป็นสมการเชิงเส้น: (a) \(3x_1 - 2x_2 + x_3 = 0\) (b) \(x^2 + y = 1\) (c) \(\sqrt{2}\,x + \pi y = e\) (d) \(\dfrac{1}{x} + y = 2\)</p>
+      <p lang="en">Which are linear equations? (a) \(3x_1 - 2x_2 + x_3 = 0\) (b) \(x^2 + y = 1\) (c) \(\sqrt{2}\,x + \pi y = e\) (d) \(\dfrac{1}{x} + y = 2\)</p>
+      <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+        <p lang="th">(a) ✓ (b) ✗ มี \(x^2\) (c) ✓ — \(\sqrt2, \pi, e\) เป็นค่าคงที่ (d) ✗ ตัวแปรอยู่ในตัวส่วน</p>
+        <p lang="en">(a) ✓ (b) ✗ has \(x^2\) (c) ✓ — \(\sqrt2, \pi, e\) are just constants (d) ✗ variable in a denominator</p>
+      </div></details>
+    </div></div>
+  </div>
+
+  <div class="exercise">
+    <div class="q"><span class="n">2.</span><div class="qbody">
+      <p lang="th">ใช้ RREF แก้ระบบสมการ</p>
+      <p lang="en">Solve with RREF:</p>
+      <div class="math">\[ \begin{aligned} x + y + z &= 6 \\ 2y + 5z &= -4 \\ 2x + 5y - z &= 27 \end{aligned} \]</div>
+      <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+        <div class="math">\[
+        \left[\begin{array}{ccc|c} 1 & 1 & 1 & 6 \\ 0 & 2 & 5 & -4 \\ 2 & 5 & -1 & 27 \end{array}\right]
+        \xrightarrow{R_3 \to R_3 - 2R_1}
+        \left[\begin{array}{ccc|c} 1 & 1 & 1 & 6 \\ 0 & 2 & 5 & -4 \\ 0 & 3 & -3 & 15 \end{array}\right]
+        \xrightarrow{R_2 \to \frac12 R_2}
+        \left[\begin{array}{ccc|c} 1 & 1 & 1 & 6 \\ 0 & 1 & \tfrac52 & -2 \\ 0 & 3 & -3 & 15 \end{array}\right]
+        \]</div>
+        <div class="math">\[
+        \xrightarrow[R_3 \to R_3 - 3R_2]{R_1 \to R_1 - R_2}
+        \left[\begin{array}{ccc|c} 1 & 0 & -\tfrac32 & 8 \\ 0 & 1 & \tfrac52 & -2 \\ 0 & 0 & -\tfrac{21}{2} & 21 \end{array}\right]
+        \xrightarrow{R_3 \to -\frac{2}{21}R_3}
+        \left[\begin{array}{ccc|c} 1 & 0 & -\tfrac32 & 8 \\ 0 & 1 & \tfrac52 & -2 \\ 0 & 0 & 1 & -2 \end{array}\right]
+        \xrightarrow[R_2 \to R_2 - \frac52R_3]{R_1 \to R_1 + \frac32R_3}
+        \left[\begin{array}{ccc|c} 1 & 0 & 0 & 5 \\ 0 & 1 & 0 & 3 \\ 0 & 0 & 1 & -2 \end{array}\right]
+        \]</div>
+        <p>\(x = 5,\; y = 3,\; z = -2\)</p>
+      </div></details>
+    </div></div>
+  </div>
+
+  <div class="exercise">
+    <div class="q"><span class="n">3.</span><div class="qbody">
+      <p lang="th">หาพาราโบลา \(y = ax^2 + bx + c\) ที่ผ่านจุด \((-3, 9)\), \((1, 1)\) และ \((3, 5)\)</p>
+      <p lang="en">Find the parabola \(y = ax^2 + bx + c\) through \((-3, 9)\), \((1, 1)\) and \((3, 5)\).</p>
+      <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+        <div class="math">\[
+        \begin{aligned} 9a - 3b + c &= 9 \\ a + b + c &= 1 \\ 9a + 3b + c &= 5 \end{aligned}
+        \quad\Longrightarrow\quad
+        \left[\begin{array}{ccc|c} 9 & -3 & 1 & 9 \\ 1 & 1 & 1 & 1 \\ 9 & 3 & 1 & 5 \end{array}\right]
+        \longrightarrow
+        \left[\begin{array}{ccc|c} 1 & 0 & 0 & \tfrac23 \\ 0 & 1 & 0 & -\tfrac23 \\ 0 & 0 & 1 & 1 \end{array}\right]
+        \]</div>
+        <p lang="th">จึงได้ \(y = \tfrac23x^2 - \tfrac23x + 1\) — ตรวจ: \(x=3\) ได้ \(6 - 2 + 1 = 5\) ✓</p>
+        <p lang="en">So \(y = \tfrac23x^2 - \tfrac23x + 1\). Check: at \(x=3\), \(6 - 2 + 1 = 5\) ✓</p>
+      </div></details>
+    </div></div>
+  </div>
+
+  <div class="exercise">
+    <div class="q"><span class="n">4.</span><div class="qbody">
+      <p lang="th">ระบบ \(x + 2y = 3,\; 2x + 4y = 7\) มีคำตอบหรือไม่? ใช้ RREF อธิบาย</p>
+      <p lang="en">Does the system \(x + 2y = 3,\; 2x + 4y = 7\) have a solution? Explain with RREF.</p>
+      <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+        <div class="math">\[
+        \left[\begin{array}{cc|c} 1 & 2 & 3 \\ 2 & 4 & 7 \end{array}\right]
+        \xrightarrow{R_2 \to R_2 - 2R_1}
+        \left[\begin{array}{cc|c} 1 & 2 & 3 \\ 0 & 0 & 1 \end{array}\right]
+        \]</div>
+        <p lang="th">แถวที่ 2 หมายถึง \(0 = 1\) ซึ่งเป็นไปไม่ได้ → <strong>ไม่มีคำตอบ</strong> (เส้นตรงสองเส้นขนานกัน)</p>
+        <p lang="en">Row 2 says \(0 = 1\), which is impossible → <strong>no solution</strong> (the two lines are parallel).</p>
+      </div></details>
+    </div></div>
+  </div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="th" data-part="ode" data-chapter="9">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9 · ODE 2: Homogeneous &amp; Exact Equations — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 9</span><span lang="en">Chapter 9</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 10</span><span lang="en">Week 10</span></span></div>
+  <h1><span lang="th">ODE 2: สมการเอกพันธ์และสมการแม่นตรง</span><span lang="en">ODE 2: Homogeneous &amp; Exact Equations</span></h1>
+  <p class="lead" lang="th">สองวิธีสำหรับสมการที่แยกตัวแปรตรง ๆ ไม่ได้: (1) สมการเอกพันธ์ — แทน \(y = vx\) แล้วกลายเป็นสมการแยกตัวแปรได้ (2) สมการแม่นตรง — สมการที่เป็นอนุพันธ์รวมของฟังก์ชัน \(f(x, y)\) บางตัว</p>
+  <p class="lead" lang="en">Two methods for equations that don’t separate directly: (1) homogeneous equations — substitute \(y = vx\) to make them separable; (2) exact equations — equations that are the total differential of some function \(f(x, y)\).</p>
+  <a class="source-link" href="../Rawdata/691_ODE_AIE_WK10_ODE%231_Homogeneous%26ExactEq.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#homogeneous"><span lang="th">สมการเอกพันธ์</span><span lang="en">Homogeneous equations</span></a></li>
+    <li><a href="#homo-examples"><span lang="th">ตัวอย่างสมการเอกพันธ์</span><span lang="en">Homogeneous examples</span></a></li>
+    <li><a href="#total"><span lang="th">อนุพันธ์รวมและกฎลูกโซ่</span><span lang="en">Total differential &amp; chain rule</span></a></li>
+    <li><a href="#exact"><span lang="th">สมการแม่นตรง</span><span lang="en">Exact equations</span></a></li>
+    <li><a href="#exact-examples"><span lang="th">ตัวอย่างสมการแม่นตรง</span><span lang="en">Exact examples</span></a></li>
+    <li><a href="#summary"><span lang="th">สรุป: เลือกวิธีไหน</span><span lang="en">Summary: which method?</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="homogeneous"><span lang="th">1. สมการเชิงอนุพันธ์เอกพันธ์</span><span lang="en">1. Homogeneous differential equations</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <p lang="th">ODE อันดับหนึ่งเป็น<strong>เอกพันธ์</strong> ถ้าเขียนได้ในรูป \(\dfrac{dy}{dx} = F\!\left(\dfrac{y}{x}\right)\) — เช็กง่าย ๆ: ทุกพจน์ใน \(M(x,y)\,dx + N(x,y)\,dy = 0\) มี<strong>ดีกรีรวมเท่ากัน</strong> (เช่น \(x^2, xy, y^2\) ดีกรี 2 ทั้งหมด)</p>
+  <p lang="en">A first-order ODE is <strong>homogeneous</strong> if it can be written \(\dfrac{dy}{dx} = F\!\left(\dfrac{y}{x}\right)\). Quick test: every term of \(M(x,y)\,dx + N(x,y)\,dy = 0\) has the <strong>same total degree</strong> (e.g. \(x^2, xy, y^2\) are all degree 2).</p>
+</div>
+
+<div class="box key">
+  <span class="label"><span lang="th">วิธีแก้: แทน \(y = vx\)</span><span lang="en">Method: substitute \(y = vx\)</span></span>
+  <div class="math">\[ y = vx \quad\Rightarrow\quad v = \frac yx, \qquad dy = v\,dx + x\,dv \]</div>
+  <ol class="steps">
+    <li><span lang="th">แทน \(y\) และ \(dy\) ลงในสมการ</span><span lang="en">Substitute \(y\) and \(dy\) into the equation.</span></li>
+    <li><span lang="th">ตัด \(x\) ที่เป็นตัวร่วม — สมการจะเหลือแค่ \(v\) กับ \(x\) และ<strong>แยกตัวแปรได้</strong></span><span lang="en">Cancel the common powers of \(x\) — only \(v\) and \(x\) remain, and the equation is <strong>separable</strong>.</span></li>
+    <li><span lang="th">อินทิเกรต แล้วแทนกลับ \(v = y/x\)</span><span lang="en">Integrate, then substitute back \(v = y/x\).</span></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="homo-examples"><span lang="th">2. ตัวอย่างสมการเอกพันธ์</span><span lang="en">2. Homogeneous examples</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 9.1</span><span lang="en">Example 9.1</span></span><span class="title">\(2x\,dy = (x + y)\,dx\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    2x(v\,dx + x\,dv) = (x + vx)\,dx
+    \;\Rightarrow\; 2v\,dx + 2x\,dv = (1 + v)\,dx
+    \;\Rightarrow\; 2x\,dv = (1 - v)\,dx
+    \]</div>
+    <p lang="th">ได้สมการแยกตัวแปรได้:</p><p lang="en">This is separable:</p>
+    <div class="math">\[
+    \int\frac{dv}{1 - v} = \int\frac{dx}{2x}
+    \;\Rightarrow\; -\ln|1 - v| = \tfrac12\ln|x| + \ln C
+    \;\Rightarrow\; \ln\left|\frac{1}{1-v}\right| = \ln\left|C\sqrt x\right|
+    \;\Rightarrow\; \frac{1}{1 - v} = C\sqrt x
+    \]</div>
+    <p lang="th">แทนกลับ \(v = y/x\): \(\dfrac{1}{1 - y/x} = \dfrac{x}{x - y} = C\sqrt x\) จัดรูปได้ \(x - y = \dfrac{\sqrt x}{C}\)</p>
+    <p lang="en">Back-substitute \(v = y/x\): \(\dfrac{1}{1 - y/x} = \dfrac{x}{x - y} = C\sqrt x\), which rearranges to \(x - y = \dfrac{\sqrt x}{C}\).</p>
+    <div class="answer"><span class="label">GS</span>\(\dfrac{1}{1 - y/x} = C\sqrt x \quad\Longleftrightarrow\quad y = x - K\sqrt x\)</div>
+    <p class="small" lang="th">ตรวจ: \(y' = 1 - \tfrac{K}{2\sqrt x}\) ดังนั้น \(2xy' = 2x - K\sqrt x = x + y\) ✓</p>
+    <p class="small" lang="en">Check: \(y' = 1 - \tfrac{K}{2\sqrt x}\), so \(2xy' = 2x - K\sqrt x = x + y\) ✓</p>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 9.2</span><span lang="en">Example 9.2</span></span><span class="title">\(y' = \dfrac{xy}{x^2 - y^2}\)</span></header>
+  <div class="body">
+    <p lang="th">(สมการที่แยกตัวแปรไม่ได้จากบทที่ 8) เขียนเป็น \((x^2 - y^2)\,dy = xy\,dx\) แล้วแทน \(y = vx\):</p>
+    <p lang="en">(The non-separable equation from Chapter 8.) Write it as \((x^2 - y^2)\,dy = xy\,dx\) and substitute \(y = vx\):</p>
+    <div class="math">\[
+    x^2(1 - v^2)(v\,dx + x\,dv) = vx^2\,dx
+    \;\Rightarrow\; v\,dx - v^3\,dx + x(1 - v^2)\,dv = v\,dx
+    \;\Rightarrow\; x(1 - v^2)\,dv = v^3\,dx
+    \]</div>
+    <div class="math">\[
+    \int\frac{dx}{x} = \int\frac{1 - v^2}{v^3}\,dv = \int v^{-3}\,dv - \int\frac{dv}{v}
+    \;\Rightarrow\; \ln|x| = -\frac{1}{2v^2} - \ln|v| + C
+    \]</div>
+    <p lang="th">แทน \(v = y/x\) และใช้ \(\ln|x| + \ln|y/x| = \ln|y|\):</p>
+    <p lang="en">Substitute \(v = y/x\) and use \(\ln|x| + \ln|y/x| = \ln|y|\):</p>
+    <div class="math">\[ \ln|x| = -\frac{x^2}{2y^2} - \ln|y| + \ln|x| + C \;\Rightarrow\; \ln|y| + \frac{x^2}{2y^2} = C \]</div>
+    <div class="answer"><span class="label">GS</span>\(\ln|y| + \dfrac{x^2}{2y^2} = C \quad\Longleftrightarrow\quad y = C_0\,e^{-x^2/(2y^2)}\)</div>
+    <p class="small" lang="th">หมายเหตุ: \(e^{a + C} = e^a\cdot e^C\) (ผลคูณ ไม่ใช่ผลบวก) จึงรวม \(e^C\) เป็นค่าคงที่ \(C_0\)</p>
+    <p class="small" lang="en">Note: \(e^{a + C} = e^a\cdot e^C\) (a product, not a sum), so \(e^C\) becomes the constant \(C_0\).</p>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 9.3</span><span lang="en">Example 9.3</span></span><span class="title">\(y' = \dfrac{2xe^{-y/x} + y}{x},\ \ y(1) = 0\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    x(v\,dx + x\,dv) = (2xe^{-v} + vx)\,dx
+    \;\Rightarrow\; v\,dx + x\,dv = 2e^{-v}\,dx + v\,dx
+    \;\Rightarrow\; x\,dv = 2e^{-v}\,dx
+    \]</div>
+    <div class="math">\[
+    \frac12\int e^{v}\,dv = \int\frac{dx}{x}
+    \;\Rightarrow\; \frac12e^{v} = \ln|x| + C
+    \;\Rightarrow\; e^{y/x} = 2\ln|x| + C \quad\text{(GS)}
+    \]</div>
+    <p lang="th">แทน \(y(1) = 0\): \(e^0 = 2\ln 1 + C \Rightarrow C = 1\)</p>
+    <p lang="en">Apply \(y(1) = 0\): \(e^0 = 2\ln 1 + C \Rightarrow C = 1\).</p>
+    <div class="answer"><span class="label">PS</span>\(e^{y/x} = 2\ln|x| + 1\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="total"><span lang="th">3. อนุพันธ์รวมและกฎลูกโซ่</span><span lang="en">3. Total differential &amp; chain rule</span></h2>
+<p lang="th">ถ้า \(z = f(x, y)\) และทั้ง \(x, y\) ขึ้นกับ \(t\) กฎลูกโซ่ให้</p>
+<p lang="en">If \(z = f(x, y)\) and both \(x, y\) depend on \(t\), the chain rule gives</p>
+<div class="math">\[ \frac{dz}{dt} = \frac{\partial z}{\partial x}\frac{dx}{dt} + \frac{\partial z}{\partial y}\frac{dy}{dt} \qquad\Longrightarrow\qquad dz = \underbrace{\frac{\partial f}{\partial x}}_{M}dx + \underbrace{\frac{\partial f}{\partial y}}_{N}dy \]</div>
+<p lang="th">ดังนั้นสมการอันดับหนึ่ง \(M\,dx + N\,dy = 0\) อาจเป็น \(dz = 0\) ของฟังก์ชัน \(f\) บางตัว ซึ่งหมายความว่า \(f(x, y) = C\) ทันที</p>
+<p lang="en">So a first-order equation \(M\,dx + N\,dy = 0\) may be \(dz = 0\) for some function \(f\) — which immediately means \(f(x, y) = C\).</p>
+
+<!-- ============================================================ -->
+<h2 id="exact"><span lang="th">4. สมการแม่นตรง (Exact DE)</span><span lang="en">4. Exact equations</span></h2>
+
+<div class="box key">
+  <span class="label"><span lang="th">การทดสอบความแม่นตรง</span><span lang="en">Test for exactness</span></span>
+  <div class="math">\[ M\,dx + N\,dy = 0 \text{ is exact} \iff \frac{\partial M}{\partial y} = \frac{\partial N}{\partial x} \]</div>
+  <p lang="th">เหตุผล: ถ้า \(M = f_x\) และ \(N = f_y\) แล้ว \(\dfrac{\partial M}{\partial y} = \dfrac{\partial^2 f}{\partial y\,\partial x}\) และ \(\dfrac{\partial N}{\partial x} = \dfrac{\partial^2 f}{\partial x\,\partial y}\) ซึ่งเท่ากันเสมอ (อนุพันธ์ย่อยผสมสลับลำดับได้)</p>
+  <p lang="en">Why: if \(M = f_x\) and \(N = f_y\), then \(\dfrac{\partial M}{\partial y} = \dfrac{\partial^2 f}{\partial y\,\partial x}\) and \(\dfrac{\partial N}{\partial x} = \dfrac{\partial^2 f}{\partial x\,\partial y}\), and mixed partials are always equal.</p>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">สมการ</span><span lang="en">Equation</span></th><th>\(\partial M/\partial y\)</th><th>\(\partial N/\partial x\)</th><th><span lang="th">แม่นตรง?</span><span lang="en">Exact?</span></th></tr></thead>
+  <tbody>
+    <tr><td>\(2xy\,dx + x^2\,dy = 0\)</td><td>\(2x\)</td><td>\(2x\)</td><td class="ok">✓</td></tr>
+    <tr><td>\(4x\sin y\,dx + 2x^2\cos y\,dy = 0\)</td><td>\(4x\cos y\)</td><td>\(4x\cos y\)</td><td class="ok">✓</td></tr>
+    <tr><td>\(3x^2y\,dx + x^3y\,dy = 0\)</td><td>\(3x^2\)</td><td>\(3x^2y\)</td><td class="no">✗</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="small" lang="th">(สมการแรกแยกตัวแปรได้ด้วย: \(\tfrac2x\,dx = -\tfrac1y\,dy\) — สมการหนึ่งอาจแก้ได้หลายวิธี)</p>
+<p class="small" lang="en">(The first one is also separable: \(\tfrac2x\,dx = -\tfrac1y\,dy\). One equation can have several methods.)</p>
+
+<div class="box key">
+  <span class="label"><span lang="th">วิธีแก้สมการแม่นตรง</span><span lang="en">Solving an exact equation</span></span>
+  <ol class="steps">
+    <li><span lang="th">ตรวจว่า \(M_y = N_x\)</span><span lang="en">Check \(M_y = N_x\).</span></li>
+    <li><span lang="th">คำนวณ \(\int M\,dx\) (มอง \(y\) เป็นค่าคงที่) และ \(\int N\,dy\) (มอง \(x\) เป็นค่าคงที่)</span><span lang="en">Compute \(\int M\,dx\) (holding \(y\) constant) and \(\int N\,dy\) (holding \(x\) constant).</span></li>
+    <li><span lang="th">รวมพจน์ทั้งหมดที่ได้ โดย<strong>นับพจน์ที่ซ้ำกันเพียงครั้งเดียว</strong> แล้วตั้งให้เท่ากับ \(C\)</span><span lang="en">Combine all terms, <strong>counting any repeated term only once</strong>, and set the result equal to \(C\).</span></li>
+  </ol>
+  <p lang="th">(วิธีทางการ: \(f = \int M\,dx + g(y)\) แล้วหา \(g(y)\) จากเงื่อนไข \(f_y = N\) — ได้ผลเหมือนกัน)</p>
+  <p lang="en">(Formal version: \(f = \int M\,dx + g(y)\), then find \(g(y)\) from \(f_y = N\). Same result.)</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="exact-examples"><span lang="th">5. ตัวอย่างสมการแม่นตรง</span><span lang="en">5. Exact examples</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 9.4</span><span lang="en">Example 9.4</span></span><span class="title">\((2x + 4y - 1)\,dx + (4x + 6y + 1)\,dy = 0\)</span></header>
+  <div class="body">
+    <p lang="th">ตรวจ: \(\dfrac{\partial M}{\partial y} = 4 = \dfrac{\partial N}{\partial x}\) ✓ แม่นตรง</p>
+    <p lang="en">Check: \(\dfrac{\partial M}{\partial y} = 4 = \dfrac{\partial N}{\partial x}\) ✓ exact.</p>
+    <div class="math">\[
+    \int M\,dx = x^2 + \boxed{4xy} - x + C_x(y),
+    \qquad
+    \int N\,dy = \boxed{4xy} + 3y^2 + y + C_y(x)
+    \]</div>
+    <p lang="th">พจน์ \(4xy\) ซ้ำกัน นับครั้งเดียว:</p>
+    <p lang="en">The term \(4xy\) appears in both — count it once:</p>
+    <div class="answer"><span class="label">GS</span>\(x^2 + 4xy - x + 3y^2 + y = C\)</div>
+    <p class="small" lang="th">ตรวจ: \(f_x = 2x + 4y - 1 = M\) ✓ และ \(f_y = 4x + 6y + 1 = N\) ✓</p>
+    <p class="small" lang="en">Check: \(f_x = 2x + 4y - 1 = M\) ✓ and \(f_y = 4x + 6y + 1 = N\) ✓</p>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 9.5</span><span lang="en">Example 9.5</span></span><span class="title">\((4x - y)\,dx + (6y - x)\,dy = 0\)</span></header>
+  <div class="body">
+    <div class="math">\[ M = 4x - y \Rightarrow M_y = -1,\qquad N = 6y - x \Rightarrow N_x = -1 \quad\checkmark \]</div>
+    <div class="math">\[ \int M\,dx = 2x^2 - xy + C_x,\qquad \int N\,dy = 3y^2 - xy + C_y \]</div>
+    <div class="answer"><span class="label">GS</span>\(2x^2 - xy + 3y^2 = C\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="summary"><span lang="th">6. สรุป: เลือกวิธีไหนดี</span><span lang="en">6. Summary: which method?</span></h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">ถ้าสมการ…</span><span lang="en">If the equation…</span></th><th><span lang="th">ใช้วิธี</span><span lang="en">Use</span></th><th><span lang="th">แนวคิดหลัก</span><span lang="en">Key idea</span></th></tr></thead>
+  <tbody>
+    <tr><td><span lang="th">เขียนเป็น \(g(x)\,dx = h(y)\,dy\) ได้</span><span lang="en">can be written \(g(x)\,dx = h(y)\,dy\)</span></td><td><span lang="th">แยกตัวแปร (บทที่ 8)</span><span lang="en">Separable (Ch. 8)</span></td><td><span lang="th">อินทิเกรตสองข้าง</span><span lang="en">integrate both sides</span></td></tr>
+    <tr><td><span lang="th">ทุกพจน์ดีกรีเท่ากัน / \(y' = F(y/x)\)</span><span lang="en">all terms same degree / \(y' = F(y/x)\)</span></td><td><span lang="th">เอกพันธ์</span><span lang="en">Homogeneous</span></td><td>\(y = vx\) → <span lang="th">แยกตัวแปรได้</span><span lang="en">separable</span></td></tr>
+    <tr><td>\(M_y = N_x\)</td><td><span lang="th">แม่นตรง</span><span lang="en">Exact</span></td><td>\(f(x,y) = C\)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">แก้สมการเอกพันธ์ \(\dfrac{dy}{dx} = \dfrac{x + y}{x}\)</p>
+    <p lang="en">Solve the homogeneous equation \(\dfrac{dy}{dx} = \dfrac{x + y}{x}\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ v + xv' = 1 + v \Rightarrow v' = \tfrac1x \Rightarrow v = \ln|x| + C \Rightarrow y = x\ln|x| + Cx \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">ตรวจความแม่นตรงแล้วแก้ \((2xy + 3)\,dx + (x^2 - 1)\,dy = 0\)</p>
+    <p lang="en">Check exactness and solve \((2xy + 3)\,dx + (x^2 - 1)\,dy = 0\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ M_y = 2x = N_x\ \checkmark;\quad \int M\,dx = x^2y + 3x,\quad \int N\,dy = x^2y - y \;\Rightarrow\; x^2y + 3x - y = C \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">แก้ \(4x\sin y\,dx + 2x^2\cos y\,dy = 0\) ด้วยวิธีสมการแม่นตรง</p>
+    <p lang="en">Solve \(4x\sin y\,dx + 2x^2\cos y\,dy = 0\) as an exact equation.</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \int 4x\sin y\,dx = 2x^2\sin y,\quad \int 2x^2\cos y\,dy = 2x^2\sin y \;\Rightarrow\; 2x^2\sin y = C \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">4.</span><div class="qbody">
+    <p lang="th">\((x^2 + y^2)\,dx + 2xy\,dy = 0\) เป็นสมการแบบใด? แก้สมการ</p>
+    <p lang="en">What type is \((x^2 + y^2)\,dx + 2xy\,dy = 0\)? Solve it.</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <p lang="th">เป็นทั้งเอกพันธ์ (ดีกรี 2 ทุกพจน์) และแม่นตรง (\(M_y = 2y = N_x\)) — วิธีแม่นตรงเร็วกว่า:</p>
+      <p lang="en">It is both homogeneous (all terms degree 2) and exact (\(M_y = 2y = N_x\)). The exact method is quicker:</p>
+      <div class="math">\[ \int M\,dx = \tfrac{x^3}{3} + xy^2,\quad \int N\,dy = xy^2 \;\Rightarrow\; \tfrac{x^3}{3} + xy^2 = C \]</div>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>
