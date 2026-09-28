@@ -43,7 +43,8 @@
     { file: 'ch06-svd-least-squares.html', part: 'la', week: 7, th: 'SVD และกำลังสองน้อยที่สุด', en: 'SVD & Least Squares' },
     { file: 'ch07-fourier.html', part: 'fa', week: 8, th: 'อนุกรมและการแปลงฟูเรียร์', en: 'Fourier Series & Transform' },
     { file: 'ch08-ode-separable.html', part: 'ode', week: 9, th: 'ODE 1: บทนำและสมการแยกตัวแปรได้', en: 'ODE 1: Intro & Separable Equations' },
-    { file: 'ch09-ode-homogeneous-exact.html', part: 'ode', week: 10, th: 'ODE 2: สมการเอกพันธ์และสมการแม่นตรง', en: 'ODE 2: Homogeneous & Exact Equations' }
+    { file: 'ch09-ode-homogeneous-exact.html', part: 'ode', week: 10, th: 'ODE 2: สมการเอกพันธ์และสมการแม่นตรง', en: 'ODE 2: Homogeneous & Exact Equations' },
+    { file: 'ch10-ode-linear.html', part: 'ode', week: 11, th: 'ODE 3: สมการเชิงเส้นอันดับหนึ่ง', en: 'ODE 3: First-Order Linear Equations' }
   ];
 
   function bi(th, en) {

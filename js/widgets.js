@@ -441,7 +441,46 @@
     update();
   }
 
-  var INIT = { transform2d: initTransform, fourier: initFourier, pulse: initPulse, lsq: initLsq };
+  /* ------------------------------------------------------------------ */
+  /* family: y = ¼e^{3x} + C e^{-x}, the GS of y' + y = e^{3x}            */
+  /* ------------------------------------------------------------------ */
+  function initFamily(root) {
+    var slider = root.querySelector('input[type="range"]');
+    var out = root.querySelector('[data-out]');
+    var canvas = root.querySelector('canvas');
+
+    function y(x, C) { return 0.25 * Math.exp(3 * x) + C * Math.exp(-x); }
+
+    var redraw = makeCanvas(canvas, function (ctx, w, h, p) {
+      var y0 = parseFloat(slider.value), C = y0 - 0.25;
+      var v = viewport(-2.5, 1.2, -3, 5, 0, 0, w, h);   // x is stretched so the exponentials stay readable
+      drawAxes(ctx, v, p, { step: 0.5, ystep: 1 });
+      ctx.save(); ctx.globalAlpha = 0.45;
+      for (var k = -3; k <= 3; k += 0.5) {
+        plotFn(ctx, v, function (x) { return y(x, k); }, p.muted, 1.1);
+      }
+      ctx.restore();
+      plotFn(ctx, v, function (x) { return y(x, C); }, p.ode, 3);
+      ctx.save(); ctx.fillStyle = p.ode;
+      ctx.beginPath(); ctx.arc(v.X(0), v.Y(y0), 6, 0, 2 * Math.PI); ctx.fill();
+      ctx.restore();
+      label(ctx, '(0, ' + fmt(y0, 2) + ')', v.X(0) + 10, v.Y(y0) - 12, p.ode);
+    });
+
+    function update() {
+      var y0 = parseFloat(slider.value), C = y0 - 0.25;
+      var sign = C < 0 ? ' − ' : ' + ';
+      out.innerHTML =
+        '<span>C = y₀ − ¼ = <b>' + fmt(C, 2) + '</b></span>' +
+        '<span>PS: <b>y = ¼e^{3x}' + sign + fmt(Math.abs(C), 2) + 'e^{−x}</b></span>';
+      out.innerHTML = out.innerHTML.replace(/\^\{([^}]*)\}/g, '<sup>$1</sup>');
+      redraw();
+    }
+    slider.addEventListener('input', update);
+    update();
+  }
+
+  var INIT = { transform2d: initTransform, fourier: initFourier, pulse: initPulse, lsq: initLsq, family: initFamily };
 
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.widget[data-widget]').forEach(function (el) {
