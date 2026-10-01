@@ -480,7 +480,79 @@
     update();
   }
 
-  var INIT = { transform2d: initTransform, fourier: initFourier, pulse: initPulse, lsq: initLsq, family: initFamily };
+  /* ------------------------------------------------------------------ */
+  /* second-order: y'' + b y' + c y = 0 with y(0) = 1, y'(0) = 0         */
+  /* ------------------------------------------------------------------ */
+  function initSecondOrder(root) {
+    var sb = root.querySelector('input[data-k="b"]');
+    var sc = root.querySelector('input[data-k="c"]');
+    var out = root.querySelector('[data-out]');
+    var canvas = root.querySelector('canvas');
+
+    function solve(b, c) {
+      var disc = b * b - 4 * c;
+      if (Math.abs(disc) < 1e-9) {                    // repeated root r: y = (1 - r x) e^{rx}
+        var r = -b / 2;
+        return { kind: 2, r: r, f: function (x) { return (1 - r * x) * Math.exp(r * x); } };
+      }
+      if (disc > 0) {                                 // distinct real roots
+        var s = Math.sqrt(disc), r1 = (-b + s) / 2, r2 = (-b - s) / 2;
+        var C1 = -r2 / (r1 - r2), C2 = r1 / (r1 - r2);
+        return { kind: 1, r1: r1, r2: r2, f: function (x) { return C1 * Math.exp(r1 * x) + C2 * Math.exp(r2 * x); } };
+      }
+      var al = -b / 2, be = Math.sqrt(-disc) / 2;     // complex α ± βi
+      return { kind: 3, al: al, be: be, f: function (x) { return Math.exp(al * x) * (Math.cos(be * x) - al / be * Math.sin(be * x)); } };
+    }
+
+    var redraw = makeCanvas(canvas, function (ctx, w, h, p) {
+      var sol = solve(parseFloat(sb.value), parseFloat(sc.value));
+      var v = viewport(-0.3, 10, -2.2, 2.2, 0, 0, w, h);
+      drawAxes(ctx, v, p, { step: 1, ystep: 1 });
+      plotFn(ctx, v, function (x) {
+        if (x < 0) return NaN;
+        var yv = sol.f(x);
+        return Math.max(-50, Math.min(50, yv));        // keep huge values drawable
+      }, p.ode, 2.6);
+      ctx.save(); ctx.fillStyle = p.ode;
+      ctx.beginPath(); ctx.arc(v.X(0), v.Y(1), 5, 0, 2 * Math.PI); ctx.fill();
+      ctx.restore();
+    });
+
+    function update() {
+      var b = parseFloat(sb.value), c = parseFloat(sc.value);
+      var sol = solve(b, c);
+      var disc = b * b - 4 * c;
+      var eq = 'r² ' + (b < 0 ? '− ' : '+ ') + fmt(Math.abs(b), 2) + 'r ' + (c < 0 ? '− ' : '+ ') + fmt(Math.abs(c), 2) + ' = 0';
+      var roots, kind;
+      if (sol.kind === 1) {
+        roots = 'r = ' + fmt(sol.r1, 3) + ', ' + fmt(sol.r2, 3);
+        kind = bi('กรณี 1: รากจริงต่างกัน', 'Case 1: distinct real roots');
+      } else if (sol.kind === 2) {
+        roots = 'r = ' + fmt(sol.r, 3) + ' (×2)';
+        kind = bi('กรณี 2: รากซ้ำ', 'Case 2: repeated root');
+      } else {
+        roots = 'r = ' + fmt(sol.al, 3) + ' ± ' + fmt(sol.be, 3) + 'i';
+        kind = bi('กรณี 3: รากเชิงซ้อน', 'Case 3: complex roots');
+      }
+      out.innerHTML =
+        '<span><b>' + eq + '</b></span>' +
+        '<span>b² − 4c = <b>' + fmt(disc, 2) + '</b></span>' +
+        '<span><b>' + kind + '</b></span>' +
+        '<span><b>' + roots + '</b></span>';
+      redraw();
+    }
+    [sb, sc].forEach(function (el) { el.addEventListener('input', update); });
+    root.querySelectorAll('[data-preset]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var v = btn.getAttribute('data-preset').split(',');
+        sb.value = v[0]; sc.value = v[1];
+        update();
+      });
+    });
+    update();
+  }
+
+  var INIT = { transform2d: initTransform, fourier: initFourier, pulse: initPulse, lsq: initLsq, family: initFamily, 'second-order': initSecondOrder };
 
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.widget[data-widget]').forEach(function (el) {

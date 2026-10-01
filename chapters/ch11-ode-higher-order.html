@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="th" data-part="ode" data-chapter="11">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11 · ODE 4: Higher-Order Equations — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+<script defer src="../js/widgets.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 11</span><span lang="en">Chapter 11</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 12</span><span lang="en">Week 12</span></span></div>
+  <h1><span lang="th">ODE 4: สมการเชิงอนุพันธ์อันดับสูงและการประยุกต์</span><span lang="en">ODE 4: Higher-Order Equations &amp; Applications</span></h1>
+  <p class="lead" lang="th">สมการเชิงเส้นอันดับสองที่มีสัมประสิทธิ์คงที่ \(Ay'' + By' + Cy = 0\) แก้ได้โดยเดาคำตอบรูป \(y = e^{rx}\) ซึ่งเปลี่ยนสมการเชิงอนุพันธ์ให้เป็นสมการพหุนาม \(Ar^2 + Br + C = 0\) — ชนิดของรากบอกรูปของคำตอบ วิธีเดียวกันใช้กับอันดับสามขึ้นไป และปิดท้ายด้วยแบบจำลองการเติบโต/การสลาย</p>
+  <p class="lead" lang="en">Second-order linear equations with constant coefficients, \(Ay'' + By' + Cy = 0\), are solved by guessing \(y = e^{rx}\), which turns the differential equation into the polynomial \(Ar^2 + Br + C = 0\). The kind of roots decides the form of the solution. The same method works for third and higher order, and we finish with growth/decay models.</p>
+  <a class="source-link" href="../Rawdata/691_ODE_All_WK12_ODE%231_HigherOrderDE%26ItsApplications.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#second"><span lang="th">สมการอันดับสอง</span><span lang="en">Second-order equations</span></a></li>
+    <li><a href="#superposition"><span lang="th">หลักการซ้อนทับ</span><span lang="en">Superposition</span></a></li>
+    <li><a href="#char"><span lang="th">สมการลักษณะเฉพาะ</span><span lang="en">The characteristic equation</span></a></li>
+    <li><a href="#cases"><span lang="th">รากสามกรณี</span><span lang="en">The three root cases</span></a></li>
+    <li><a href="#examples"><span lang="th">ตัวอย่างแต่ละกรณี</span><span lang="en">Examples of each case</span></a></li>
+    <li><a href="#explore"><span lang="th">ทดลอง: \(y'' + by' + cy = 0\)</span><span lang="en">Explore: \(y'' + by' + cy = 0\)</span></a></li>
+    <li><a href="#conditions"><span lang="th">เงื่อนไขเริ่มต้นและเงื่อนไขขอบ</span><span lang="en">Initial &amp; boundary conditions</span></a></li>
+    <li><a href="#higher"><span lang="th">อันดับสามขึ้นไป</span><span lang="en">Third order and higher</span></a></li>
+    <li><a href="#applications"><span lang="th">การประยุกต์: การเติบโตและการสลาย</span><span lang="en">Applications: growth &amp; decay</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="second"><span lang="th">1. สมการเชิงอนุพันธ์อันดับสอง</span><span lang="en">1. Second-order differential equations</span></h2>
+
+<p lang="th">ทบทวน: ODE อันดับหนึ่งที่เรียนมาแล้วมี 4 แบบ คือ แยกตัวแปรได้ เอกพันธ์ แม่นตรง และเชิงเส้น \(y' + P(x)y = Q(x)\) — คำว่า “เชิงเส้น” มาจาก \(y = mx + c\): \(y\) และอนุพันธ์ของมันปรากฏแค่ยกกำลังหนึ่ง (ต่างจาก \(\alpha y^2 + \beta y = Q(x)\) ซึ่งเป็นสมการกำลังสอง)</p>
+<p lang="en">Recap: we have four first-order types — separable, homogeneous, exact and linear \(y' + P(x)y = Q(x)\). “Linear” comes from \(y = mx + c\): \(y\) and its derivatives appear only to the first power (unlike \(\alpha y^2 + \beta y = Q(x)\), which is quadratic).</p>
+
+<div class="box def">
+  <span class="label"><span lang="th">สมการเชิงเส้นอันดับสอง</span><span lang="en">Second-order linear equation</span></span>
+  <div class="math">\[ a(x)\,y'' + b(x)\,y' + c(x)\,y = d(x) \]</div>
+  <p lang="th">อนุพันธ์ครั้งสูงสุดคือ 2 บทนี้ศึกษากรณี<strong>สัมประสิทธิ์คงที่</strong>และด้านขวาเป็นศูนย์:</p>
+  <p lang="en">The highest derivative is 2. This chapter studies <strong>constant coefficients</strong> with a zero right-hand side:</p>
+  <div class="math">\[ Ay'' + By' + Cy = 0 \]</div>
+</div>
+
+<div class="box warn">
+  <span class="label"><span lang="th">คำว่า “เอกพันธ์” มีสองความหมาย</span><span lang="en">“Homogeneous” has two meanings</span></span>
+  <p lang="th">ในบทนี้ “เอกพันธ์” หมายถึง<strong>ด้านขวาเท่ากับ 0</strong> (\(d(x) = 0\)) ซึ่ง<strong>คนละความหมาย</strong>กับสมการเอกพันธ์ \(y' = F(y/x)\) ใน<a href="ch09-ode-homogeneous-exact.html#homogeneous">บทที่ 9</a></p>
+  <p lang="en">Here “homogeneous” means the <strong>right-hand side is 0</strong> (\(d(x) = 0\)). This is <strong>a different meaning</strong> from the homogeneous equations \(y' = F(y/x)\) of <a href="ch09-ode-homogeneous-exact.html#homogeneous">Chapter 9</a>.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="superposition"><span lang="th">2. หลักการซ้อนทับ</span><span lang="en">2. The superposition principle</span></h2>
+
+<p lang="th">ก่อนจะหาคำตอบ มาดูสมบัติสำคัญสองข้อของ \(Ay'' + By' + Cy = 0\):</p>
+<p lang="en">Before solving, two key properties of \(Ay'' + By' + Cy = 0\):</p>
+
+<div class="cols">
+  <div class="panel">
+    <h4><span lang="th">(1) คูณค่าคงที่ได้</span><span lang="en">(1) Constant multiples</span></h4>
+    <p class="small" lang="th">ถ้า \(g(x)\) เป็นคำตอบ แล้ว \(C_1g(x)\) เป็นคำตอบด้วย:</p>
+    <p class="small" lang="en">If \(g(x)\) is a solution, so is \(C_1g(x)\):</p>
+    <div class="math">\[ AC_1g'' + BC_1g' + CC_1g = C_1\underbrace{\big[Ag'' + Bg' + Cg\big]}_{=\,0} = 0 \]</div>
+  </div>
+  <div class="panel">
+    <h4><span lang="th">(2) บวกกันได้</span><span lang="en">(2) Sums</span></h4>
+    <p class="small" lang="th">ถ้า \(g(x)\) และ \(h(x)\) เป็นคำตอบ แล้ว \(g + h\) เป็นคำตอบด้วย:</p>
+    <p class="small" lang="en">If \(g(x)\) and \(h(x)\) are solutions, so is \(g + h\):</p>
+    <div class="math">\[ \underbrace{\big[Ag'' + Bg' + Cg\big]}_{=\,0} + \underbrace{\big[Ah'' + Bh' + Ch\big]}_{=\,0} = 0 \]</div>
+  </div>
+</div>
+
+<div class="box key">
+  <span class="label"><span lang="th">สรุป</span><span lang="en">Conclusion</span></span>
+  <p lang="th">ถ้า \(y_1\) และ \(y_2\) เป็นคำตอบ แล้ว \(y = C_1y_1 + C_2y_2\) ก็เป็นคำตอบ — นี่คือความเป็นเชิงเส้นแบบเดียวกับ<a href="ch04-linear-transformations.html#linear">บทที่ 4</a> สมการอันดับสองต้องการคำตอบอิสระ <strong>2 ตัว</strong> (และค่าคงที่ 2 ตัว) ในผลเฉลยทั่วไป</p>
+  <p lang="en">If \(y_1\) and \(y_2\) are solutions, then \(y = C_1y_1 + C_2y_2\) is too — the same linearity as in <a href="ch04-linear-transformations.html#linear">Chapter 4</a>. A second-order equation needs <strong>two</strong> independent solutions (and two constants) in its general solution.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="char"><span lang="th">3. สมการลักษณะเฉพาะ</span><span lang="en">3. The characteristic equation</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.1</span><span lang="en">Example 11.1</span></span><span class="title">\(y'' + 5y' + 6y = 0\)</span></header>
+  <div class="body">
+    <p lang="th">สมมติให้คำตอบมีรูป \(y = e^{rx}\) จะได้ \(y' = re^{rx}\) และ \(y'' = r^2e^{rx}\) แทนค่าในสมการ:</p>
+    <p lang="en">Assume a solution of the form \(y = e^{rx}\). Then \(y' = re^{rx}\) and \(y'' = r^2e^{rx}\). Substitute:</p>
+    <div class="math">\[ r^2e^{rx} + 5re^{rx} + 6e^{rx} = 0 \;\Rightarrow\; e^{rx}\big[r^2 + 5r + 6\big] = 0 \]</div>
+    <p lang="th">\(e^{rx}\) เป็น 0 ไม่ได้ ดังนั้น \(r^2 + 5r + 6 = 0\) → \((r+2)(r+3) = 0\) → \(r = -2, -3\) ได้คำตอบสองตัว \(y_1 = e^{-2x},\ y_2 = e^{-3x}\)</p>
+    <p lang="en">\(e^{rx}\) is never 0, so \(r^2 + 5r + 6 = 0\) → \((r+2)(r+3) = 0\) → \(r = -2, -3\), giving two solutions \(y_1 = e^{-2x},\ y_2 = e^{-3x}\).</p>
+    <div class="answer"><span class="label">GS</span>\(y(x) = C_1e^{-2x} + C_2e^{-3x}\)</div>
+  </div>
+</section>
+
+<div class="box key">
+  <span class="label"><span lang="th">ทางลัด</span><span lang="en">Shortcut</span></span>
+  <p lang="th">เปลี่ยน \(y^{(n)}\) (อนุพันธ์ครั้งที่ \(n\)) เป็น \(r^{n}\) ได้เลย: \(y'' \to r^2,\ y' \to r,\ y \to 1\)</p>
+  <p lang="en">Replace \(y^{(n)}\) (the \(n\)-th derivative) by \(r^{n}\) directly: \(y'' \to r^2,\ y' \to r,\ y \to 1\).</p>
+  <div class="math">\[ Ay'' + By' + Cy = 0 \;\;\longrightarrow\;\; Ar^2 + Br + C = 0,\qquad r = \frac{-B \pm \sqrt{B^2 - 4AC}}{2A} \]</div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="cases"><span lang="th">4. รากสามกรณี</span><span lang="en">4. The three root cases</span></h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">กรณี</span><span lang="en">Case</span></th><th><span lang="th">ดิสคริมิแนนต์</span><span lang="en">Discriminant</span></th><th><span lang="th">ราก</span><span lang="en">Roots</span></th><th><span lang="th">ผลเฉลยทั่วไป</span><span lang="en">General solution</span></th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>\(B^2 - 4AC &gt; 0\)</td><td><span lang="th">จำนวนจริง 2 ค่าไม่ซ้ำ \(r_1 \ne r_2\)</span><span lang="en">two distinct real \(r_1 \ne r_2\)</span></td><td>\(y = C_1e^{r_1x} + C_2e^{r_2x}\)</td></tr>
+    <tr><td>2</td><td>\(B^2 - 4AC = 0\)</td><td><span lang="th">รากซ้ำ \(r\)</span><span lang="en">repeated root \(r\)</span></td><td>\(y = C_1e^{rx} + C_2\,x\,e^{rx}\)</td></tr>
+    <tr><td>3</td><td>\(B^2 - 4AC &lt; 0\)</td><td><span lang="th">เชิงซ้อน \(r = \alpha \pm \beta i\)</span><span lang="en">complex \(r = \alpha \pm \beta i\)</span></td><td>\(y = e^{\alpha x}\big[C_1\cos\beta x + C_2\sin\beta x\big]\)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="box tip">
+  <span class="label"><span lang="th">ทำไมกรณี 2 และ 3 เป็นแบบนี้</span><span lang="en">Why cases 2 and 3 look like this</span></span>
+  <p lang="th"><strong>กรณี 2:</strong> รากซ้ำให้ \(e^{rx}\) เพียงตัวเดียว แต่ต้องการคำตอบอิสระสองตัว จึง<strong>คูณ \(x\) เพิ่ม</strong>: \(xe^{rx}\) ก็เป็นคำตอบเช่นกัน (ตรวจได้โดยแทนค่า)</p>
+  <p lang="en"><strong>Case 2:</strong> a repeated root gives only one \(e^{rx}\), but we need two independent solutions, so <strong>multiply by \(x\)</strong>: \(xe^{rx}\) is also a solution (check by substitution).</p>
+  <p lang="th"><strong>กรณี 3:</strong> จากสูตรของออยเลอร์ (<a href="ch07-fourier.html#transform">บทที่ 7</a>) \(e^{(\alpha + \beta i)x} = e^{\alpha x}(\cos\beta x + i\sin\beta x)\) ส่วนจริงและส่วนจินตภาพแยกกันเป็นคำตอบจำนวนจริงสองตัว คือ \(e^{\alpha x}\cos\beta x\) และ \(e^{\alpha x}\sin\beta x\)</p>
+  <p lang="en"><strong>Case 3:</strong> by Euler’s formula (<a href="ch07-fourier.html#transform">Chapter 7</a>), \(e^{(\alpha + \beta i)x} = e^{\alpha x}(\cos\beta x + i\sin\beta x)\); its real and imaginary parts give two real solutions, \(e^{\alpha x}\cos\beta x\) and \(e^{\alpha x}\sin\beta x\).</p>
+</div>
+
+<h3><span lang="th">ฝึกเขียนคำตอบจากราก</span><span lang="en">Practice: from roots to solution</span></h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">ราก</span><span lang="en">Roots</span></th><th><span lang="th">ผลเฉลยทั่วไป</span><span lang="en">General solution</span></th></tr></thead>
+  <tbody>
+    <tr><td>\(2,\ 4\)</td><td>\(C_1e^{2x} + C_2e^{4x}\)</td></tr>
+    <tr><td>\(-4,\ 1\)</td><td>\(C_1e^{-4x} + C_2e^{x}\)</td></tr>
+    <tr><td>\(3,\ 3\)</td><td>\(C_1e^{3x} + C_2xe^{3x}\)</td></tr>
+    <tr><td>\(1 \pm 2i\)<span class="small muted"> \((\alpha = 1,\ \beta = 2)\)</span></td><td>\(e^{x}\big[C_1\cos2x + C_2\sin2x\big]\)</td></tr>
+    <tr><td>\(-2,\ 4,\ 5\)</td><td>\(C_1e^{-2x} + C_2e^{4x} + C_3e^{5x}\)</td></tr>
+    <tr><td>\(-2,\ 3,\ 3\)</td><td>\(C_1e^{-2x} + C_2e^{3x} + C_3xe^{3x}\)</td></tr>
+    <tr><td>\(-1,\ 3 \pm 4i\)</td><td>\(C_1e^{-x} + e^{3x}\big[C_2\cos4x + C_3\sin4x\big]\)</td></tr>
+    <tr><td>\(2,\ 3,\ 3,\ 3,\ 4,\ 5 \pm 2i\)</td><td>\(C_1e^{2x} + C_2e^{4x} + C_3e^{3x} + C_4xe^{3x} + C_5x^2e^{3x} + e^{5x}\big[C_6\cos2x + C_7\sin2x\big]\)</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="small" lang="th">รากที่ซ้ำ \(k\) ครั้งให้ \(e^{rx},\ xe^{rx},\ \dots,\ x^{k-1}e^{rx}\) — จำนวนค่าคงที่เท่ากับอันดับของสมการเสมอ (สองแถวแรกเป็นอันดับสอง สามแถวถัดมาอันดับสาม แถวสุดท้ายอันดับเจ็ด)</p>
+<p class="small" lang="en">A root repeated \(k\) times gives \(e^{rx},\ xe^{rx},\ \dots,\ x^{k-1}e^{rx}\). The number of constants always equals the order of the equation (the first rows are second order, the next three third order, the last seventh order).</p>
+
+<!-- ============================================================ -->
+<h2 id="examples"><span lang="th">5. ตัวอย่างแต่ละกรณี</span><span lang="en">5. Examples of each case</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.2 · กรณี 2</span><span lang="en">Example 11.2 · Case 2</span></span><span class="title">\(y'' - 6y' + 9y = 0\)</span></header>
+  <div class="body">
+    <div class="math">\[ r^2 - 6r + 9 = 0 \;\Rightarrow\; (r - 3)(r - 3) = 0 \;\Rightarrow\; r = 3,\ 3 \]</div>
+    <div class="answer"><span class="label">GS</span>\(y(x) = C_1e^{3x} + C_2xe^{3x}\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.3 · กรณี 2</span><span lang="en">Example 11.3 · Case 2</span></span><span class="title">\(9\dfrac{d^2y}{dx^2} + 24\dfrac{dy}{dx} + 16y = 0\)</span></header>
+  <div class="body">
+    <div class="math">\[ 9r^2 + 24r + 16 = 0 \;\Rightarrow\; (3r + 4)^2 = 0 \;\Rightarrow\; r = -\tfrac43,\ -\tfrac43 \]</div>
+    <div class="answer"><span class="label">GS</span>\(y(x) = C_1e^{-\frac43x} + C_2xe^{-\frac43x}\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.4 · กรณี 3</span><span lang="en">Example 11.4 · Case 3</span></span><span class="title">\(y'' + 8y' + 25y = 0\)</span></header>
+  <div class="body">
+    <div class="math">\[ r^2 + 8r + 25 = 0 \;\Rightarrow\; r = \frac{-8 \pm \sqrt{8^2 - 4(1)(25)}}{2(1)} = \frac{-8 \pm \sqrt{-36}}{2} = \frac{-8 \pm 6i}{2} = -4 \pm 3i \]</div>
+    <p lang="th">\(\alpha = -4,\ \beta = 3\)</p><p lang="en">\(\alpha = -4,\ \beta = 3\).</p>
+    <div class="answer"><span class="label">GS</span>\(y(x) = e^{-4x}\big[C_1\cos3x + C_2\sin3x\big]\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="explore"><span lang="th">6. ทดลอง: \(y'' + by' + cy = 0\)</span><span lang="en">6. Explore: \(y'' + by' + cy = 0\)</span></h2>
+<p lang="th">กราฟแสดงผลเฉลยที่มี \(y(0) = 1,\ y'(0) = 0\) ลองเปลี่ยน \(b\) และ \(c\) แล้วสังเกตว่ากรณีของรากเปลี่ยนรูปกราฟอย่างไร — รากจริง: ค่อย ๆ ลู่เข้าหรือพุ่งออกโดยไม่แกว่ง · รากเชิงซ้อน: แกว่ง (\(\alpha &lt; 0\) แกว่งแล้วลดลง, \(\alpha = 0\) แกว่งคงที่, \(\alpha &gt; 0\) แกว่งแรงขึ้น)</p>
+<p lang="en">The graph shows the solution with \(y(0) = 1,\ y'(0) = 0\). Change \(b\) and \(c\) and watch how the root case changes the shape. Real roots: the curve settles or blows up without oscillating. Complex roots: it oscillates (\(\alpha &lt; 0\) decaying, \(\alpha = 0\) steady, \(\alpha &gt; 0\) growing).</p>
+
+<section class="widget" data-widget="second-order">
+  <header><span class="label"><span lang="th">ทดลอง</span><span lang="en">Interactive</span></span><span class="title">\(y'' + by' + cy = 0,\ \ y(0) = 1,\ y'(0) = 0\)</span></header>
+  <div class="w-body">
+    <div class="w-controls">
+      <label>b <input type="range" min="-1" max="8" value="1" step="0.1" data-k="b"></label>
+      <label>c <input type="range" min="-4" max="26" value="4" step="0.1" data-k="c"></label>
+    </div>
+    <div class="w-controls">
+      <button class="btn" data-preset="5,6"><span lang="th">ตัวอย่าง 11.1</span><span lang="en">Example 11.1</span></button>
+      <button class="btn" data-preset="2,1"><span lang="th">รากซ้ำ</span><span lang="en">Repeated root</span></button>
+      <button class="btn" data-preset="8,25"><span lang="th">ตัวอย่าง 11.4</span><span lang="en">Example 11.4</span></button>
+      <button class="btn" data-preset="0,4"><span lang="th">แกว่งคงที่</span><span lang="en">Pure oscillation</span></button>
+      <button class="btn" data-preset="-0.4,4"><span lang="th">แกว่งแรงขึ้น</span><span lang="en">Growing oscillation</span></button>
+    </div>
+    <canvas></canvas>
+    <div class="w-readout" data-out></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="conditions"><span lang="th">7. เงื่อนไขเริ่มต้นและเงื่อนไขขอบ</span><span lang="en">7. Initial &amp; boundary conditions</span></h2>
+<p lang="th">ผลเฉลยทั่วไปมีค่าคงที่ 2 ตัว จึงต้องมีเงื่อนไข 2 ข้อเพื่อหาผลเฉลยเฉพาะ:</p>
+<p lang="en">The general solution has two constants, so two conditions are needed for a particular solution:</p>
+<ul>
+  <li><span lang="th"><strong>เงื่อนไขเริ่มต้น</strong> — กำหนดค่าที่จุดเดียวกัน เช่น \(y(0)\) และ \(y'(0)\)</span><span lang="en"><strong>Initial conditions</strong> — both given at one point, e.g. \(y(0)\) and \(y'(0)\).</span></li>
+  <li><span lang="th"><strong>เงื่อนไขขอบ</strong> — กำหนดค่าที่สองจุดต่างกัน เช่น \(y(0)\) และ \(y(1)\)</span><span lang="en"><strong>Boundary conditions</strong> — given at two different points, e.g. \(y(0)\) and \(y(1)\).</span></li>
+</ul>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.5 · เงื่อนไขเริ่มต้น</span><span lang="en">Example 11.5 · Initial conditions</span></span><span class="title">\(y'' + 4y = 0,\ \ y(0) = 4,\ y'(0) = 6\)</span></header>
+  <div class="body">
+    <div class="math">\[ r^2 + 4 = 0 \;\Rightarrow\; r^2 = -4 \;\Rightarrow\; r = \pm 2i = 0 \pm 2i \;\Rightarrow\; y = e^{0x}\big[C_1\cos2x + C_2\sin2x\big] = C_1\cos2x + C_2\sin2x \]</div>
+    <p lang="th">\(y(0) = 4\): \(4 = C_1\cos0 + C_2\sin0 = C_1 \Rightarrow C_1 = 4\)</p>
+    <p lang="en">\(y(0) = 4\): \(4 = C_1\cos0 + C_2\sin0 = C_1 \Rightarrow C_1 = 4\).</p>
+    <p lang="th">\(y'(x) = -2C_1\sin2x + 2C_2\cos2x\) และ \(y'(0) = 6\): \(6 = 2C_2 \Rightarrow C_2 = 3\)</p>
+    <p lang="en">\(y'(x) = -2C_1\sin2x + 2C_2\cos2x\) and \(y'(0) = 6\): \(6 = 2C_2 \Rightarrow C_2 = 3\).</p>
+    <div class="answer"><span class="label">PS</span>\(y(x) = 4\cos2x + 3\sin2x\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.6 · เงื่อนไขขอบ</span><span lang="en">Example 11.6 · Boundary conditions</span></span><span class="title">\(y'' - 2y' + y = 0,\ \ y(0) = 3,\ y(1) = 7e\)</span></header>
+  <div class="body">
+    <div class="math">\[ r^2 - 2r + 1 = (r - 1)^2 = 0 \;\Rightarrow\; r = 1,\ 1 \;\Rightarrow\; y = C_1e^{x} + C_2xe^{x}\ \ \text{(GS)} \]</div>
+    <p lang="th">\(y(0) = 3\): \(3 = C_1e^{0} + C_2(0)e^{0} = C_1\)</p>
+    <p lang="en">\(y(0) = 3\): \(3 = C_1e^{0} + C_2(0)e^{0} = C_1\).</p>
+    <p lang="th">\(y(1) = 7e\): \(7e = C_1e + C_2e = (C_1 + C_2)e \Rightarrow C_1 + C_2 = 7 \Rightarrow C_2 = 4\)</p>
+    <p lang="en">\(y(1) = 7e\): \(7e = C_1e + C_2e = (C_1 + C_2)e \Rightarrow C_1 + C_2 = 7 \Rightarrow C_2 = 4\).</p>
+    <div class="answer"><span class="label">PS</span>\(y(x) = 3e^{x} + 4xe^{x}\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="higher"><span lang="th">8. อันดับสามขึ้นไป</span><span lang="en">8. Third order and higher</span></h2>
+<p lang="th">ใช้วิธีเดียวกัน: แทน \(y = e^{rx}\) ได้พหุนามดีกรี \(n\) หาราก แล้วรวมคำตอบตามกฎของแต่ละราก</p>
+<p lang="en">Same method: substitute \(y = e^{rx}\) to get a degree-\(n\) polynomial, find its roots, and combine the pieces by the rule for each root.</p>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.7</span><span lang="en">Example 11.7</span></span><span class="title">\(y''' + y'' - 6y' + 4y = 0\)</span></header>
+  <div class="body">
+    <div class="math">\[ r^3 + r^2 - 6r + 4 = 0 \]</div>
+    <p lang="th">ลอง \(r = 1\): \(1 + 1 - 6 + 4 = 0\) ✓ จึงแยกตัวประกอบได้</p>
+    <p lang="en">Try \(r = 1\): \(1 + 1 - 6 + 4 = 0\) ✓, so it factors:</p>
+    <div class="math">\[ (r - 1)(r^2 + 2r - 4) = 0 \;\Rightarrow\; r = 1,\quad r = \frac{-2 \pm \sqrt{4 + 16}}{2} = -1 \pm \sqrt5 \]</div>
+    <div class="answer"><span class="label">GS</span>\(y(x) = C_1e^{x} + C_2e^{(-1+\sqrt5)x} + C_3e^{(-1-\sqrt5)x}\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.8</span><span lang="en">Example 11.8</span></span><span class="title">\(y''' + y' = 0\)</span></header>
+  <div class="body">
+    <div class="math">\[ r^3 + r = r(r^2 + 1) = 0 \;\Rightarrow\; r = 0,\quad r^2 = -1 \Rightarrow r = \pm i = 0 \pm 1i \]</div>
+    <div class="math">\[ y = C_1e^{0x} + e^{0x}\big[C_2\cos x + C_3\sin x\big] \]</div>
+    <div class="answer"><span class="label">GS</span>\(y(x) = C_1 + C_2\cos x + C_3\sin x\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="applications"><span lang="th">9. การประยุกต์: การเติบโตและการสลาย</span><span lang="en">9. Applications: growth &amp; decay</span></h2>
+<p lang="th">สมการเชิงอนุพันธ์อธิบาย<strong>อัตราการเปลี่ยนแปลง</strong> — อัตราการเติบโต (เพิ่มขึ้น) หรืออัตราการสลาย (ลดลง) ตัวอย่างเช่น</p>
+<p lang="en">Differential equations describe <strong>rates of change</strong> — rates of growth (increasing) or decay (decreasing). Examples:</p>
+<ul>
+  <li><span lang="th">การสลายของสารกัมมันตรังสี</span><span lang="en">radioactive decay</span></li>
+  <li><span lang="th">ประชากรศาสตร์</span><span lang="en">population dynamics</span></li>
+  <li><span lang="th">การเพิ่มขึ้น/ลดลงของเชื้อโรค</span><span lang="en">growth/decline of bacteria</span></li>
+</ul>
+
+<div class="box key">
+  <span class="label"><span lang="th">แบบจำลอง</span><span lang="en">The model</span></span>
+  <p lang="th">“อัตราการลดลง/เพิ่มขึ้นขึ้นอยู่กับจำนวนประชากร” — อัตราแปรผันตรงกับขนาด:</p>
+  <p lang="en">“The rate of decrease/increase depends on the population” — the rate is proportional to the size:</p>
+  <div class="math">\[ \frac{dP}{dt} \propto P \;\Longrightarrow\; \frac{dP}{dt} = kP,\qquad P(t_0) = P_0 \]</div>
+  <p lang="th">เป็นสมการอันดับหนึ่งที่แยกตัวแปรได้ (หรือเชิงเส้น หรือใช้สมการลักษณะเฉพาะ \(r = k\)) ผลเฉลยคือ</p>
+  <p lang="en">This is first order and separable (or linear, or use the characteristic equation \(r = k\)). Its solution is</p>
+  <div class="math">\[ P(t) = P_0\,e^{k(t - t_0)} \]</div>
+  <p lang="th">\(k &gt; 0\): เติบโต · \(k &lt; 0\): สลาย</p>
+  <p lang="en">\(k &gt; 0\): growth; \(k &lt; 0\): decay.</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 11.9</span><span lang="en">Example 11.9</span></span><span class="title"><span lang="th">ครึ่งชีวิตของคาร์บอน-14</span><span lang="en">Half-life of carbon-14</span></span></header>
+  <div class="body">
+    <p lang="th">คาร์บอน-14 มีครึ่งชีวิต 5730 ปี (เหลือครึ่งหนึ่งทุก 5730 ปี) ถ้าซากฟอสซิลเหลือ C-14 อยู่ 25% ของเดิม มีอายุเท่าไร?</p>
+    <p lang="en">Carbon-14 has a half-life of 5730 years (half remains after every 5730 years). If a fossil has 25% of its original C-14 left, how old is it?</p>
+    <div class="math">\[ \tfrac12P_0 = P_0e^{k\cdot5730} \;\Rightarrow\; k = -\frac{\ln2}{5730} \approx -1.21\times10^{-4}\ \text{yr}^{-1} \]</div>
+    <div class="math">\[ 0.25P_0 = P_0e^{kt} \;\Rightarrow\; t = \frac{\ln0.25}{k} = \frac{-2\ln2}{-\ln2/5730} = 2 \times 5730 = 11{,}460 \]</div>
+    <div class="answer"><span class="label"><span lang="th">คำตอบ</span><span lang="en">Answer</span></span><span lang="th">ประมาณ 11,460 ปี (สองครึ่งชีวิต: 100% → 50% → 25%)</span><span lang="en">about 11,460 years (two half-lives: 100% → 50% → 25%)</span></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">แก้ \(y'' - y' - 12y = 0\)</p>
+    <p lang="en">Solve \(y'' - y' - 12y = 0\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ r^2 - r - 12 = (r - 4)(r + 3) = 0 \Rightarrow y = C_1e^{4x} + C_2e^{-3x} \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">แก้ \(y'' + 2y' + 5y = 0,\ y(0) = 1,\ y'(0) = 1\)</p>
+    <p lang="en">Solve \(y'' + 2y' + 5y = 0,\ y(0) = 1,\ y'(0) = 1\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ r = -1 \pm 2i \Rightarrow y = e^{-x}(C_1\cos2x + C_2\sin2x);\quad y(0) = C_1 = 1;\quad y'(0) = -C_1 + 2C_2 = 1 \Rightarrow C_2 = 1 \]</div>
+      <div class="math">\[ y = e^{-x}(\cos2x + \sin2x) \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">เขียนผลเฉลยทั่วไปของสมการที่มีรากลักษณะเฉพาะ \(0,\ 0,\ -2 \pm i\)</p>
+    <p lang="en">Write the general solution for characteristic roots \(0,\ 0,\ -2 \pm i\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ y = C_1 + C_2x + e^{-2x}\big[C_3\cos x + C_4\sin x\big] \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">4.</span><div class="qbody">
+    <p lang="th">แบคทีเรียมี 500 ตัวเมื่อ \(t = 0\) และเพิ่มเป็น 1500 ตัวเมื่อ \(t = 2\) ชั่วโมง (แบบจำลอง \(dP/dt = kP\)) จงหา \(k\) และจำนวนเมื่อ \(t = 4\)</p>
+    <p lang="en">A culture has 500 bacteria at \(t = 0\) and 1500 at \(t = 2\) hours (model \(dP/dt = kP\)). Find \(k\) and the count at \(t = 4\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ 1500 = 500e^{2k} \Rightarrow k = \tfrac12\ln3 \approx 0.549;\qquad P(4) = 500e^{4k} = 500\cdot 3^2 = 4500 \]</div>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>
