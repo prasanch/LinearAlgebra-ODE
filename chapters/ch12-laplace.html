@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="th" data-part="ode" data-chapter="12">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 · Laplace Transform — Linear Algebra &amp; ODE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="../style.css">
+<script src="../js/main.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="../index.html"><span class="brand-mark">λ</span><span class="brand-text"><span class="brand-title">Linear Algebra &amp; ODE</span><span class="brand-sub"><span lang="th">พีชคณิตเชิงเส้นและสมการเชิงอนุพันธ์</span><span lang="en">Course notes</span></span></span></a>
+  <div class="controls">
+    <div class="lang-switch" role="group" aria-label="Language"><button data-set-lang="th">ไทย</button><button data-set-lang="en">EN</button><button data-set-lang="both">TH+EN</button></div>
+    <button class="icon-btn theme-toggle" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar" aria-label="Chapters"></nav>
+  <div class="scrim"></div>
+  <main class="content"><div class="inner">
+
+<header class="chapter-head">
+  <div class="kicker"><span><span lang="th">บทที่ 12</span><span lang="en">Chapter 12</span></span><span class="chip"><span lang="th">สัปดาห์ที่ 13</span><span lang="en">Week 13</span></span></div>
+  <h1><span lang="th">การแปลงลาปลาซ</span><span lang="en">The Laplace Transform</span></h1>
+  <p class="lead" lang="th">การแปลงลาปลาซเปลี่ยนฟังก์ชันของเวลา \(f(t)\) เป็นฟังก์ชันของ \(s\) และเปลี่ยน<strong>อนุพันธ์ให้เป็นการคูณด้วย \(s\)</strong> สมการเชิงอนุพันธ์จึงกลายเป็นสมการพีชคณิตที่แก้ง่าย แล้วแปลงกลับด้วยการแปลงลาปลาซผกผัน (เนื้อหาจากบทเรียน Laplace #1–#3)</p>
+  <p class="lead" lang="en">The Laplace transform turns a function of time \(f(t)\) into a function of \(s\), and turns <strong>derivatives into multiplication by \(s\)</strong>. A differential equation becomes an easy algebraic equation, which we solve and then transform back with the inverse Laplace transform. (Content from lectures Laplace #1–#3.)</p>
+  <a class="source-link" href="../Rawdata/691_ODE_All_WK13_Laplace%20Transformation%20%231-3.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg><span lang="th">เอกสารประกอบการสอนต้นฉบับ (PDF)</span><span lang="en">Original lecture notes (PDF)</span></a>
+</header>
+
+<nav class="toc" aria-label="On this page">
+  <span class="label"><span lang="th">ในบทนี้</span><span lang="en">In this chapter</span></span>
+  <ol>
+    <li><a href="#idea"><span lang="th">การแปลงเป็น “กล่อง”</span><span lang="en">Transforms as “boxes”</span></a></li>
+    <li><a href="#definition"><span lang="th">นิยามและตัวอย่างพื้นฐาน</span><span lang="en">Definition &amp; basic transforms</span></a></li>
+    <li><a href="#sin"><span lang="th">ลาปลาซของ \(\sin at\)</span><span lang="en">Transform of \(\sin at\)</span></a></li>
+    <li><a href="#linear"><span lang="th">ความเป็นเชิงเส้น</span><span lang="en">Linearity</span></a></li>
+    <li><a href="#derivatives"><span lang="th">ลาปลาซของอนุพันธ์</span><span lang="en">Transforms of derivatives</span></a></li>
+    <li><a href="#cos-poly"><span lang="th">\(\cos at\) และพหุนาม \(t^n\)</span><span lang="en">\(\cos at\) and polynomials \(t^n\)</span></a></li>
+    <li><a href="#inverse"><span lang="th">ลาปลาซผกผันและเศษส่วนย่อย</span><span lang="en">Inverse transform &amp; partial fractions</span></a></li>
+    <li><a href="#ode"><span lang="th">แก้ ODE ด้วยลาปลาซ</span><span lang="en">Solving ODEs with Laplace</span></a></li>
+    <li><a href="#shift"><span lang="th">ทฤษฎีบทการเลื่อน</span><span lang="en">The shifting theorem</span></a></li>
+    <li><a href="#table"><span lang="th">ตารางการแปลงลาปลาซ</span><span lang="en">Table of transforms</span></a></li>
+    <li><a href="#exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="idea"><span lang="th">1. การแปลงเป็น “กล่อง”</span><span lang="en">1. Transforms as “boxes”</span></h2>
+<p lang="th">ทุกการแปลงที่เรียนมามีโครงเดียวกัน: ค่าขาเข้า → <strong>กล่องฟังก์ชัน</strong> → ค่าขาออก</p>
+<p lang="en">Every transformation we have met has the same shape: input → <strong>function box</strong> → output.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th><span lang="th">ขาเข้า</span><span lang="en">Input</span></th><th><span lang="th">กล่อง</span><span lang="en">Box</span></th><th><span lang="th">ขาออก</span><span lang="en">Output</span></th><th><span lang="th">ชื่อ</span><span lang="en">Name</span></th></tr></thead>
+  <tbody>
+    <tr><td>\(x\)</td><td>\(y = mx + c\)</td><td>\(y\)</td><td><span lang="th">การแปลงเชิงเส้น (บทที่ 4)</span><span lang="en">Linear transformation (Ch. 4)</span></td></tr>
+    <tr><td>\(x\)</td><td>\(y = ax^2 + bx + c\)</td><td>\(y\)</td><td><span lang="th">การแปลงกำลังสอง</span><span lang="en">Quadratic transformation</span></td></tr>
+    <tr><td>\(t\)</td><td>\(\displaystyle\int_{-\infty}^{\infty} f(t)\,e^{-2\pi i\nu t}\,dt\)</td><td>\(\nu\)</td><td><span lang="th">การแปลงฟูเรียร์ (บทที่ 7)</span><span lang="en">Fourier transform (Ch. 7)</span></td></tr>
+    <tr><td>\(t\)</td><td>\(\displaystyle\int_{0}^{\infty} e^{-st} f(t)\,dt\)</td><td>\(s\)</td><td><strong><span lang="th">การแปลงลาปลาซ</span><span lang="en">Laplace transform</span></strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="definition"><span lang="th">2. นิยามและตัวอย่างพื้นฐาน</span><span lang="en">2. Definition &amp; basic transforms</span></h2>
+
+<div class="box def">
+  <span class="label"><span lang="th">นิยาม</span><span lang="en">Definition</span></span>
+  <div class="math">\[ \mathcal{L}\{f(t)\} = F(s) = \int_0^{\infty} e^{-st}\,f(t)\,dt \]</div>
+  <p lang="th">อินทิกรัลถึง \(\infty\) หาค่าได้เมื่อ \(e^{-st}\) ลดลงเร็วพอ — ใช้ข้อเท็จจริงว่า \(e^{-s\cdot\infty} = \dfrac{1}{e^{\infty}} \to 0\) เมื่อ \(s &gt; 0\)</p>
+  <p lang="en">The integral to \(\infty\) exists when \(e^{-st}\) decays fast enough. We use the fact that \(e^{-s\cdot\infty} = \dfrac{1}{e^{\infty}} \to 0\) for \(s &gt; 0\).</p>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.1</span><span lang="en">Example 12.1</span></span><span class="title">\(f(t) = 1\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    \mathcal{L}\{1\} = \int_0^{\infty} e^{-st}\,dt = \left[-\frac1s e^{-st}\right]_{t=0}^{t=\infty}
+    = \Big[-\tfrac1s\underbrace{e^{-s(\infty)}}_{\to\,0}\Big] - \Big[-\tfrac1s\underbrace{e^{-s(0)}}_{=\,1}\Big] = \frac1s
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>\(\mathcal{L}\{1\} = \dfrac1s\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.2</span><span lang="en">Example 12.2</span></span><span class="title">\(f(t) = e^{at}\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    \mathcal{L}\{e^{at}\} = \int_0^{\infty} e^{-st}e^{at}\,dt = \int_0^{\infty} e^{(a-s)t}\,dt = \frac{1}{a - s}\Big[e^{(a-s)(\infty)} - \underbrace{e^{(a-s)(0)}}_{=\,1}\Big]
+    \]</div>
+    <p lang="th">พิจารณาค่า \(e^{(a-s)\infty}\) สามกรณี:</p>
+    <p lang="en">Look at \(e^{(a-s)\infty}\) in three cases:</p>
+    <ol>
+      <li><span lang="th">\(a - s &gt; 0\): เลขชี้กำลังเป็นบวกมาก \(e^{+\infty} \to \infty\) → อินทิกรัลลู่ออก หาค่าไม่ได้</span><span lang="en">\(a - s &gt; 0\): the exponent is hugely positive, \(e^{+\infty} \to \infty\) → the integral diverges.</span></li>
+      <li><span lang="th">\(a - s &lt; 0\): เลขชี้กำลังติดลบมาก \(e^{-\infty} = \dfrac{1}{e^{\infty}} \to 0\) ✓</span><span lang="en">\(a - s &lt; 0\): the exponent is hugely negative, \(e^{-\infty} = \dfrac{1}{e^{\infty}} \to 0\) ✓</span></li>
+      <li><span lang="th">\(a - s = 0\): หารด้วย \(a - s = 0\) ไม่ได้</span><span lang="en">\(a - s = 0\): we cannot divide by \(a - s = 0\).</span></li>
+    </ol>
+    <p lang="th">จึงใช้ได้เฉพาะกรณีที่ 2 (\(s &gt; a\)):</p>
+    <p lang="en">So only case 2 works (\(s &gt; a\)):</p>
+    <div class="math">\[ \mathcal{L}\{e^{at}\} = \frac{1}{a - s}(0 - 1) = \frac{-1}{a - s} = \frac{1}{s - a},\qquad s &gt; a \]</div>
+    <div class="answer"><span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>\(\mathcal{L}\{e^{at}\} = \dfrac{1}{s - a}\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="sin"><span lang="th">3. ลาปลาซของ \(\sin at\) — อินทิเกรตทีละส่วนสองครั้ง</span><span lang="en">3. Transform of \(\sin at\) — integrating by parts twice</span></h2>
+
+<div class="box tip">
+  <span class="label"><span lang="th">อินทิเกรตทีละส่วน (by parts)</span><span lang="en">Integration by parts</span></span>
+  <p lang="th">จากกฎผลคูณ \(\dfrac{d(uv)}{dt} = u'v + uv'\) อินทิเกรตทั้งสองข้างได้</p>
+  <p lang="en">From the product rule \(\dfrac{d(uv)}{dt} = u'v + uv'\), integrating both sides gives</p>
+  <div class="math">\[ uv = \int u'v + \int uv' \;\Longrightarrow\; \int u'v = uv - \int uv' \]</div>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.3</span><span lang="en">Example 12.3</span></span><span class="title">\(f(t) = \sin at\)</span></header>
+  <div class="body">
+    <p lang="th"><strong>รอบที่ 1:</strong> \(u' = e^{-st},\ u = -\tfrac1s e^{-st}\) และ \(v = \sin at,\ v' = a\cos at\)</p>
+    <p lang="en"><strong>First pass:</strong> \(u' = e^{-st},\ u = -\tfrac1s e^{-st}\) and \(v = \sin at,\ v' = a\cos at\).</p>
+    <div class="math">\[ \int e^{-st}\sin at\,dt = -\tfrac1s e^{-st}\sin at + \tfrac{a}{s}\int e^{-st}\cos at\,dt \]</div>
+    <p lang="th"><strong>รอบที่ 2</strong> กับ \(\int e^{-st}\cos at\,dt\): \(v = \cos at,\ v' = -a\sin at\)</p>
+    <p lang="en"><strong>Second pass</strong> on \(\int e^{-st}\cos at\,dt\): \(v = \cos at,\ v' = -a\sin at\).</p>
+    <div class="math">\[ \int e^{-st}\cos at\,dt = -\tfrac1s e^{-st}\cos at - \tfrac{a}{s}\int e^{-st}\sin at\,dt \]</div>
+    <p lang="th">แทนกลับ — อินทิกรัลเดิม \(\mathcal{L}\{\sin at\}\) ปรากฏขึ้นอีกครั้งทางขวา:</p>
+    <p lang="en">Substitute back — the original integral \(\mathcal{L}\{\sin at\}\) reappears on the right:</p>
+    <div class="math">\[ \mathcal{L}\{\sin at\} = \Big[-\tfrac1s e^{-st}\sin at - \tfrac{a}{s^2}e^{-st}\cos at\Big]_0^{\infty} - \frac{a^2}{s^2}\,\mathcal{L}\{\sin at\} \]</div>
+    <p lang="th">ย้ายข้าง แล้วประเมินค่าขอบ (ที่ \(t = \infty\) ได้ 0 เพราะ \(e^{-st} \to 0\); ที่ \(t = 0\) ได้ \(-\tfrac{a}{s^2}\)):</p>
+    <p lang="en">Move it to the left and evaluate the bracket (0 at \(t = \infty\) since \(e^{-st} \to 0\); \(-\tfrac{a}{s^2}\) at \(t = 0\)):</p>
+    <div class="math">\[
+    \left(1 + \frac{a^2}{s^2}\right)\mathcal{L}\{\sin at\} = 0 - \left(-\frac{a}{s^2}\right) = \frac{a}{s^2}
+    \;\Rightarrow\;
+    \frac{s^2 + a^2}{s^2}\,\mathcal{L}\{\sin at\} = \frac{a}{s^2}
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>\(\mathcal{L}\{\sin at\} = \dfrac{a}{s^2 + a^2}\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="linear"><span lang="th">4. ลาปลาซเป็นการดำเนินการเชิงเส้น</span><span lang="en">4. Laplace is a linear operation</span></h2>
+<div class="math">\[
+\mathcal{L}\{c_1f(t) + c_2g(t)\} = \int_0^{\infty} e^{-st}\big[c_1f(t) + c_2g(t)\big]dt
+= c_1\int_0^{\infty} e^{-st}f(t)\,dt + c_2\int_0^{\infty} e^{-st}g(t)\,dt
+\]</div>
+<div class="box key">
+  <span class="label"><span lang="th">ความเป็นเชิงเส้น</span><span lang="en">Linearity</span></span>
+  <div class="math">\[ \mathcal{L}\{c_1f + c_2g\} = c_1\,\mathcal{L}\{f\} + c_2\,\mathcal{L}\{g\} \]</div>
+  <p lang="th">ลาปลาซของฟังก์ชันที่บวกกัน = ลาปลาซแยกทีละฟังก์ชันแล้วนำมาบวกกัน (เงื่อนไขเดียวกับการแปลงเชิงเส้นใน<a href="ch04-linear-transformations.html#linear">บทที่ 4</a>)</p>
+  <p lang="en">The transform of a sum = the sum of the separate transforms (the same condition as linear transformations in <a href="ch04-linear-transformations.html#linear">Chapter 4</a>).</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="derivatives"><span lang="th">5. ลาปลาซของอนุพันธ์</span><span lang="en">5. Transforms of derivatives</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.4</span><span lang="en">Example 12.4</span></span><span class="title">\(\mathcal{L}\{f'(t)\}\)</span></header>
+  <div class="body">
+    <p lang="th">อินทิเกรตทีละส่วนในรูป \(\int uv' = uv - \int u'v\) โดย \(u = e^{-st},\ u' = -se^{-st}\) และ \(v' = f'(t),\ v = f(t)\):</p>
+    <p lang="en">Integrate by parts as \(\int uv' = uv - \int u'v\) with \(u = e^{-st},\ u' = -se^{-st}\) and \(v' = f'(t),\ v = f(t)\):</p>
+    <div class="math">\[
+    \mathcal{L}\{f'\} = \Big[e^{-st}f(t)\Big]_0^{\infty} + s\underbrace{\int_0^{\infty} e^{-st}f(t)\,dt}_{\mathcal{L}\{f\}}
+    = \big[0 - f(0)\big] + s\,\mathcal{L}\{f\}
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>\(\mathcal{L}\{f'(t)\} = s\,\mathcal{L}\{f(t)\} - f(0)\)</div>
+  </div>
+</section>
+
+<p lang="th">ใช้สูตรนี้ซ้ำกับ \(f'\) จะได้อนุพันธ์อันดับสูงขึ้น:</p>
+<p lang="en">Apply the same rule to \(f'\) to get higher derivatives:</p>
+<div class="math">\[ \mathcal{L}\{f''\} = s\,\mathcal{L}\{f'\} - f'(0) = s\big[s\,\mathcal{L}\{f\} - f(0)\big] - f'(0) = s^2\mathcal{L}\{f\} - sf(0) - f'(0) \]</div>
+
+<div class="box key">
+  <span class="label"><span lang="th">ลาปลาซของอนุพันธ์ (เขียน \(Y = \mathcal{L}\{y\}\))</span><span lang="en">Transforms of derivatives (write \(Y = \mathcal{L}\{y\}\))</span></span>
+  <div class="math">\[
+  \begin{aligned}
+  \mathcal{L}\{y'\} &= sY - y(0) \\
+  \mathcal{L}\{y''\} &= s^2Y - sy(0) - y'(0) \\
+  \mathcal{L}\{y''''\} &= s^4Y - s^3y(0) - s^2y'(0) - sy''(0) - y'''(0) \\
+  \mathcal{L}\{y^{(n)}\} &= s^nY - s^{n-1}y(0) - s^{n-2}y'(0) - \cdots - y^{(n-1)}(0)
+  \end{aligned}
+  \]</div>
+  <p lang="th">รูปแบบ: กำลังของ \(s\) ลดลงทีละหนึ่ง ขณะที่จำนวนครั้งของอนุพันธ์ของ \(y\) เพิ่มขึ้นทีละหนึ่ง</p>
+  <p lang="en">Pattern: the power of \(s\) goes down by one while the derivative order of \(y\) goes up by one.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="cos-poly"><span lang="th">6. \(\cos at\) และพหุนาม \(t^n\)</span><span lang="en">6. \(\cos at\) and polynomials \(t^n\)</span></h2>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.5</span><span lang="en">Example 12.5</span></span><span class="title">\(\mathcal{L}\{\cos at\}\)</span></header>
+  <div class="body">
+    <p lang="th">ไม่ต้องอินทิเกรตใหม่: \(\cos at\) เป็นอนุพันธ์ของ \(f(t) = \tfrac1a\sin at\) และ \(f(0) = 0\)</p>
+    <p lang="en">No new integral needed: \(\cos at\) is the derivative of \(f(t) = \tfrac1a\sin at\), and \(f(0) = 0\).</p>
+    <div class="math">\[ \mathcal{L}\{\cos at\} = s\,\mathcal{L}\left\{\tfrac1a\sin at\right\} - \tfrac1a\sin 0 = \frac{s}{a}\cdot\frac{a}{s^2 + a^2} = \frac{s}{s^2 + a^2} \]</div>
+    <div class="answer"><span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>\(\mathcal{L}\{\cos at\} = \dfrac{s}{s^2 + a^2}\)</div>
+  </div>
+</section>
+
+<p lang="th">จัดรูปสูตรอนุพันธ์ใหม่ เพื่อหาลาปลาซของ \(f\) จากลาปลาซของ \(f'\):</p>
+<p lang="en">Rearrange the derivative rule to get the transform of \(f\) from that of \(f'\):</p>
+<div class="math">\[ \mathcal{L}\{f\} = \frac1s\Big[\mathcal{L}\{f'\} + f(0)\Big] \]</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.6</span><span lang="en">Example 12.6</span></span><span class="title">\(t,\ t^2,\ t^3\)</span></header>
+  <div class="body">
+    <div class="math">\[
+    \begin{aligned}
+    \mathcal{L}\{t\} &= \tfrac1s\big[\mathcal{L}\{1\} + 0\big] = \tfrac1s\cdot\tfrac1s = \frac{1}{s^2} \\
+    \mathcal{L}\{t^2\} &= \tfrac1s\big[\mathcal{L}\{2t\} + 0\big] = \tfrac1s\cdot\tfrac{2}{s^2} = \frac{2}{s^3} \\
+    \mathcal{L}\{t^3\} &= \tfrac1s\big[\mathcal{L}\{3t^2\} + 0\big] = \tfrac1s\cdot 3\cdot\tfrac{2}{s^3} = \frac{3\cdot2}{s^4}
+    \end{aligned}
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">รูปทั่วไป</span><span lang="en">General form</span></span>\(\mathcal{L}\{t^n\} = \dfrac{n!}{s^{n+1}}\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="inverse"><span lang="th">7. ลาปลาซผกผันและเศษส่วนย่อย</span><span lang="en">7. The inverse transform &amp; partial fractions</span></h2>
+
+<p lang="th">การหา \(y\) จาก \(\mathcal{L}\{y\}\) เรียกว่า <strong>การแปลงลาปลาซผกผัน</strong> \(\mathcal{L}^{-1}\) — อ่านตารางย้อนกลับ เช่น \(\dfrac{1}{s - a} \to e^{at}\) ถ้าเศษส่วนซับซ้อน ให้<strong>แยกเป็นเศษส่วนย่อย</strong>ก่อน (ย้อนกระบวนการ “รวมเศษส่วน” เช่น \(\tfrac23 + \tfrac57 = \tfrac{2(7) + 5(3)}{(3)(7)} = \tfrac{29}{21}\))</p>
+<p lang="en">Finding \(y\) from \(\mathcal{L}\{y\}\) is the <strong>inverse Laplace transform</strong> \(\mathcal{L}^{-1}\): read the table backwards, e.g. \(\dfrac{1}{s - a} \to e^{at}\). If the fraction is complicated, first <strong>split it into partial fractions</strong> (the reverse of adding fractions, e.g. \(\tfrac23 + \tfrac57 = \tfrac{2(7) + 5(3)}{(3)(7)} = \tfrac{29}{21}\)).</p>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.7</span><span lang="en">Example 12.7</span></span><span class="title">\(\mathcal{L}\{y\} = \dfrac{2s + 13}{s^2 + 5s + 6}\)</span></header>
+  <div class="body">
+    <div class="math">\[ \frac{2s + 13}{(s + 3)(s + 2)} = \frac{A}{s + 3} + \frac{B}{s + 2} = \frac{A(s + 2) + B(s + 3)}{(s + 3)(s + 2)} \]</div>
+    <p lang="th">เทียบสัมประสิทธิ์: \((A + B)s = 2s\) และ \(2A + 3B = 13\) จึงได้ \(A + B = 2\) → \(A = -7,\ B = 9\)</p>
+    <p lang="en">Match coefficients: \((A + B)s = 2s\) and \(2A + 3B = 13\), so \(A + B = 2\) → \(A = -7,\ B = 9\).</p>
+    <div class="math">\[
+    \mathcal{L}\{y\} = -7\cdot\frac{1}{s - (-3)} + 9\cdot\frac{1}{s - (-2)} = -7\,\mathcal{L}\{e^{-3t}\} + 9\,\mathcal{L}\{e^{-2t}\} = \mathcal{L}\{9e^{-2t} - 7e^{-3t}\}
+    \]</div>
+    <div class="answer"><span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>\(y = 9e^{-2t} - 7e^{-3t}\)</div>
+  </div>
+</section>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.8</span><span lang="en">Example 12.8</span></span><span class="title">\(\mathcal{L}\{y\} = \dfrac{s - 1}{s^2 - s - 2}\)</span></header>
+  <div class="body">
+    <div class="math">\[ \frac{s - 1}{(s - 2)(s + 1)} = \frac{A}{s - 2} + \frac{B}{s + 1} \;\Rightarrow\; (A + B)s + (A - 2B) = s - 1 \]</div>
+    <p lang="th">\(A + B = 1,\ A - 2B = -1\) → \(A = \tfrac13,\ B = \tfrac23\)</p>
+    <p lang="en">\(A + B = 1,\ A - 2B = -1\) → \(A = \tfrac13,\ B = \tfrac23\).</p>
+    <div class="math">\[ \mathcal{L}\{y\} = \frac13\cdot\frac{1}{s - 2} + \frac23\cdot\frac{1}{s - (-1)} \]</div>
+    <div class="answer"><span class="label"><span lang="th">ผลลัพธ์</span><span lang="en">Result</span></span>\(y(t) = \tfrac13e^{2t} + \tfrac23e^{-t}\)</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="ode"><span lang="th">8. แก้สมการเชิงอนุพันธ์ด้วยลาปลาซ</span><span lang="en">8. Solving differential equations with Laplace</span></h2>
+
+<figure>
+  <div class="fig">
+    <svg class="diagram" viewBox="0 0 520 210" role="img" aria-label="Laplace method: ODE in t, transform to algebra in s, solve for Y(s), inverse transform to y(t)">
+      <defs>
+        <marker id="lp-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" class="t-muted"/></marker>
+      </defs>
+      <rect x="10" y="20" width="200" height="56" rx="10" style="fill:var(--ode-soft);stroke:var(--ode);stroke-width:1.5"/>
+      <text x="110" y="44" text-anchor="middle" class="t-ode" style="font-weight:600">ODE in t</text>
+      <text x="110" y="64" text-anchor="middle" class="t-muted" style="font-size:13px">y'' + 5y' + 6y = 0</text>
+      <rect x="310" y="20" width="200" height="56" rx="10" style="fill:var(--la-soft);stroke:var(--la);stroke-width:1.5"/>
+      <text x="410" y="44" text-anchor="middle" class="t-la" style="font-weight:600">Algebra in s</text>
+      <text x="410" y="64" text-anchor="middle" class="t-muted" style="font-size:13px">(s² + 5s + 6)Y = 2s + 13</text>
+      <rect x="310" y="134" width="200" height="56" rx="10" style="fill:var(--la-soft);stroke:var(--la);stroke-width:1.5"/>
+      <text x="410" y="158" text-anchor="middle" class="t-la" style="font-weight:600">Y(s)</text>
+      <text x="410" y="178" text-anchor="middle" class="t-muted" style="font-size:13px">(2s + 13)/(s² + 5s + 6)</text>
+      <rect x="10" y="134" width="200" height="56" rx="10" style="fill:var(--ode-soft);stroke:var(--ode);stroke-width:1.5"/>
+      <text x="110" y="158" text-anchor="middle" class="t-ode" style="font-weight:600">y(t)</text>
+      <text x="110" y="178" text-anchor="middle" class="t-muted" style="font-size:13px">9e^(−2t) − 7e^(−3t)</text>
+      <line x1="212" y1="48" x2="306" y2="48" style="stroke:var(--muted);stroke-width:2" marker-end="url(#lp-ah)"/>
+      <text x="259" y="40" text-anchor="middle" style="font-weight:600">ℒ</text>
+      <line x1="410" y1="78" x2="410" y2="130" style="stroke:var(--muted);stroke-width:2" marker-end="url(#lp-ah)"/>
+      <text x="420" y="108" class="t-muted" style="font-size:13px">solve</text>
+      <line x1="308" y1="162" x2="214" y2="162" style="stroke:var(--muted);stroke-width:2" marker-end="url(#lp-ah)"/>
+      <text x="259" y="154" text-anchor="middle" style="font-weight:600">ℒ⁻¹</text>
+    </svg>
+  </div>
+  <figcaption><span lang="th">แปลงไปโดเมน \(s\) → แก้สมการพีชคณิต → แปลงกลับ (เงื่อนไขเริ่มต้นถูกใส่มาในขั้นแรกเลย)</span><span lang="en">Transform to the \(s\)-domain → solve the algebra → transform back (the initial conditions enter in the first step).</span></figcaption>
+</figure>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.9</span><span lang="en">Example 12.9</span></span><span class="title">\(y'' + 5y' + 6y = 0,\ \ y(0) = 2,\ y'(0) = 3\)</span></header>
+  <div class="body">
+    <p lang="th"><strong>ขั้นที่ 1:</strong> ลาปลาซทั้งสองข้าง (ใช้ความเป็นเชิงเส้น):</p>
+    <p lang="en"><strong>Step 1:</strong> take the Laplace transform of both sides (linearity):</p>
+    <div class="math">\[ \mathcal{L}\{y''\} + 5\,\mathcal{L}\{y'\} + 6\,\mathcal{L}\{y\} = 0 \]</div>
+    <div class="math">\[ \big[s^2Y - s\underbrace{y(0)}_{2} - \underbrace{y'(0)}_{3}\big] + 5\big[sY - \underbrace{y(0)}_{2}\big] + 6Y = 0 \]</div>
+    <p lang="th"><strong>ขั้นที่ 2:</strong> แก้หา \(Y\):</p>
+    <p lang="en"><strong>Step 2:</strong> solve for \(Y\):</p>
+    <div class="math">\[ (s^2 + 5s + 6)\,Y - 2s - 3 - 10 = 0 \;\Rightarrow\; Y = \frac{2s + 13}{s^2 + 5s + 6} \]</div>
+    <p lang="th"><strong>ขั้นที่ 3:</strong> ลาปลาซผกผัน — คือตัวอย่าง 12.7 พอดี</p>
+    <p lang="en"><strong>Step 3:</strong> inverse transform — this is exactly Example 12.7.</p>
+    <div class="answer"><span class="label">PS</span>\(y = 9e^{-2t} - 7e^{-3t}\)</div>
+    <p class="small" lang="th">ตรวจ: \(y(0) = 9 - 7 = 2\) ✓ และ \(y'(0) = -18 + 21 = 3\) ✓ — สมการเดียวกับตัวอย่าง 11.1 ใน<a href="ch11-ode-higher-order.html#char">บทที่ 11</a> (รากลักษณะเฉพาะ \(-2, -3\)) แต่ลาปลาซหาผลเฉลยเฉพาะได้ในขั้นตอนเดียว</p>
+    <p class="small" lang="en">Check: \(y(0) = 9 - 7 = 2\) ✓ and \(y'(0) = -18 + 21 = 3\) ✓. It is the same equation as Example 11.1 in <a href="ch11-ode-higher-order.html#char">Chapter 11</a> (characteristic roots \(-2, -3\)), but Laplace delivers the particular solution in one pass.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="shift"><span lang="th">9. ทฤษฎีบทการเลื่อน</span><span lang="en">9. The shifting theorem</span></h2>
+
+<p lang="th">คูณ \(f(t)\) ด้วย \(e^{at}\) จะได้</p>
+<p lang="en">Multiplying \(f(t)\) by \(e^{at}\) gives</p>
+<div class="math">\[ \mathcal{L}\{e^{at}f(t)\} = \int_0^{\infty} e^{-st}e^{at}f(t)\,dt = \int_0^{\infty} e^{-(s - a)t}f(t)\,dt \]</div>
+<p lang="th">ซึ่งคือนิยามของ \(F(s)\) ที่แทน \(s\) ด้วย \(s - a\):</p>
+<p lang="en">which is the definition of \(F(s)\) with \(s\) replaced by \(s - a\):</p>
+<div class="box key">
+  <span class="label"><span lang="th">ทฤษฎีบทการเลื่อน</span><span lang="en">Shifting theorem</span></span>
+  <div class="math">\[ \mathcal{L}\{e^{at}f(t)\} = F(s - a) \]</div>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.10</span><span lang="en">Example 12.10</span></span><span class="title">\(\mathcal{L}\{e^{3t}\cos2t\}\)</span></header>
+  <div class="body">
+    <div class="math">\[ \mathcal{L}\{\cos2t\} = F(s) = \frac{s}{s^2 + 4} \;\Rightarrow\; \mathcal{L}\{e^{3t}\cos2t\} = F(s - 3) = \frac{s - 3}{(s - 3)^2 + 4} \]</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="table"><span lang="th">10. ตารางการแปลงลาปลาซ</span><span lang="en">10. Table of Laplace transforms</span></h2>
+<p lang="th">ในทางปฏิบัติไม่ต้องอินทิเกรตทุกครั้ง — เปิดตาราง (อ่านจากซ้ายไปขวาสำหรับ \(\mathcal{L}\) และขวาไปซ้ายสำหรับ \(\mathcal{L}^{-1}\)):</p>
+<p lang="en">In practice you don’t integrate every time — use a table (left to right for \(\mathcal{L}\), right to left for \(\mathcal{L}^{-1}\)):</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>\(f(t) = \mathcal{L}^{-1}\{F(s)\}\)</th><th>\(F(s) = \mathcal{L}\{f(t)\}\)</th><th>\(f(t)\)</th><th>\(F(s)\)</th></tr></thead>
+  <tbody>
+    <tr><td>\(1\)</td><td>\(\dfrac1s\)</td><td>\(e^{at}\)</td><td>\(\dfrac{1}{s - a}\)</td></tr>
+    <tr><td>\(t^n\)</td><td>\(\dfrac{n!}{s^{n+1}}\)</td><td>\(t^ne^{at}\)</td><td>\(\dfrac{n!}{(s - a)^{n+1}}\)</td></tr>
+    <tr><td>\(\sin at\)</td><td>\(\dfrac{a}{s^2 + a^2}\)</td><td>\(\cos at\)</td><td>\(\dfrac{s}{s^2 + a^2}\)</td></tr>
+    <tr><td>\(t\sin at\)</td><td>\(\dfrac{2as}{(s^2 + a^2)^2}\)</td><td>\(t\cos at\)</td><td>\(\dfrac{s^2 - a^2}{(s^2 + a^2)^2}\)</td></tr>
+    <tr><td>\(\sinh at\)</td><td>\(\dfrac{a}{s^2 - a^2}\)</td><td>\(\cosh at\)</td><td>\(\dfrac{s}{s^2 - a^2}\)</td></tr>
+    <tr><td>\(e^{at}\sin bt\)</td><td>\(\dfrac{b}{(s - a)^2 + b^2}\)</td><td>\(e^{at}\cos bt\)</td><td>\(\dfrac{s - a}{(s - a)^2 + b^2}\)</td></tr>
+    <tr><td>\(e^{ct}f(t)\)</td><td>\(F(s - c)\)</td><td>\(f(ct)\)</td><td>\(\dfrac1cF\!\left(\dfrac sc\right)\)</td></tr>
+    <tr><td>\(f'(t)\)</td><td>\(sF(s) - f(0)\)</td><td>\(f''(t)\)</td><td>\(s^2F(s) - sf(0) - f'(0)\)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<section class="example">
+  <header><span class="label"><span lang="th">ตัวอย่าง 12.11</span><span lang="en">Example 12.11</span></span><span class="title"><span lang="th">ใช้ตาราง</span><span lang="en">Using the table</span></span></header>
+  <div class="body">
+    <div class="math">\[ \mathcal{L}\{t\sin2t\} = \frac{2(2)s}{(s^2 + 2^2)^2} = \frac{4s}{(s^2 + 4)^2} \]</div>
+    <div class="math">\[ \mathcal{L}\{y\} = \frac{s}{s^2 + 5} = \frac{s}{s^2 + (\sqrt5)^2} \;\Rightarrow\; y = \cos\sqrt5\,t \]</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<h2 id="exercises"><span lang="th">แบบฝึกหัด</span><span lang="en">Exercises</span></h2>
+<div class="exercises">
+  <div class="exercise"><div class="q"><span class="n">1.</span><div class="qbody">
+    <p lang="th">หา \(\mathcal{L}\{3 - 2e^{4t} + 5\sin3t\}\)</p>
+    <p lang="en">Find \(\mathcal{L}\{3 - 2e^{4t} + 5\sin3t\}\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \frac3s - \frac{2}{s - 4} + \frac{15}{s^2 + 9} \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">2.</span><div class="qbody">
+    <p lang="th">หา \(\mathcal{L}^{-1}\left\{\dfrac{3s + 1}{s^2 + 1}\right\}\) และ \(\mathcal{L}\{e^{-2t}\sin3t\}\)</p>
+    <p lang="en">Find \(\mathcal{L}^{-1}\left\{\dfrac{3s + 1}{s^2 + 1}\right\}\) and \(\mathcal{L}\{e^{-2t}\sin3t\}\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ 3\cdot\frac{s}{s^2 + 1} + \frac{1}{s^2 + 1} \;\to\; 3\cos t + \sin t;\qquad \mathcal{L}\{e^{-2t}\sin3t\} = \frac{3}{(s + 2)^2 + 9} \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">3.</span><div class="qbody">
+    <p lang="th">ใช้ลาปลาซแก้ \(y' - y = 0,\ y(0) = 3\) (เทียบกับตัวอย่าง 8.5)</p>
+    <p lang="en">Use Laplace to solve \(y' - y = 0,\ y(0) = 3\) (compare Example 8.5).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ sY - 3 - Y = 0 \Rightarrow Y = \frac{3}{s - 1} \Rightarrow y = 3e^{t} \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">4.</span><div class="qbody">
+    <p lang="th">ใช้ลาปลาซแก้ \(y'' - 3y' + 2y = 0,\ y(0) = 1,\ y'(0) = 0\)</p>
+    <p lang="en">Use Laplace to solve \(y'' - 3y' + 2y = 0,\ y(0) = 1,\ y'(0) = 0\).</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ s^2Y - s - 3(sY - 1) + 2Y = 0 \Rightarrow Y = \frac{s - 3}{(s - 1)(s - 2)} = \frac{2}{s - 1} - \frac{1}{s - 2} \Rightarrow y = 2e^{t} - e^{2t} \]</div>
+    </div></details>
+  </div></div></div>
+
+  <div class="exercise"><div class="q"><span class="n">5.</span><div class="qbody">
+    <p lang="th">เขียน \(\mathcal{L}\{y'''\}\) ในรูปของ \(Y\) และเงื่อนไขเริ่มต้น</p>
+    <p lang="en">Write \(\mathcal{L}\{y'''\}\) in terms of \(Y\) and the initial conditions.</p>
+    <details class="solution"><summary><span lang="th">ดูเฉลย</span><span lang="en">Show solution</span></summary><div class="sol-body">
+      <div class="math">\[ \mathcal{L}\{y'''\} = s^3Y - s^2y(0) - sy'(0) - y''(0) \]</div>
+    </div></details>
+  </div></div></div>
+</div>
+
+<nav class="pager" id="pager" aria-label="Chapter navigation"></nav>
+
+  </div></main>
+</div>
+</body>
+</html>
