@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Visit counter for the Linear Algebra & ODE course site.
+// Anyone may read the counts. Anyone may add exactly 1 to a counter (that is
+// how a visit is recorded), but nobody can lower, overwrite or delete them.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /views/{id} {
+      allow read: if true;
+
+      // first visit of a (week, page) pair creates its counter at 1
+      allow create: if request.resource.data.keys().hasOnly(['week', 'page', 'total'])
+                    && request.resource.data.total == 1
+                    && request.resource.data.page is string
+                    && request.resource.data.week is string
+                    && request.resource.data.page.matches('site|home|ch[0-9]{2}')
+                    && request.resource.data.week.matches('all|[0-9]{4}-W[0-9]{2}')
+                    && id == request.resource.data.week + '__' + request.resource.data.page;
+
+      // later visits may only add 1 to `total`
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['total'])
+                    && request.resource.data.total == resource.data.total + 1;
+
+      allow delete: if false;
+    }
+
+    // everything else is closed
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

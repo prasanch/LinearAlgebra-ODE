@@ -113,6 +113,9 @@
         '<span class="num">' + String(i + 1).padStart(2, '0') + '</span><span>' + bi(c.th, c.en) + '</span></a></li>';
     }
     html += '</ul>';
+    html += '<a class="side-home" href="../stats.html" style="margin-top:18px">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>' +
+      bi('สถิติการเข้าชม', 'Visit statistics') + '</a>';
     sidebar.innerHTML = html;
   }
 
