@@ -14,7 +14,6 @@
 <link rel="stylesheet" href="style.css">
 <script src="js/main.js"></script>
 <script src="js/analytics.js"></script>
-<script src="js/goatcounter.js"></script>
 </head>
 <body>
 <header class="topbar">
@@ -170,10 +169,17 @@
     <span lang="th">เนื้อหาเรียบเรียงจากเอกสารประกอบการบรรยาย (ต้นฉบับ PDF อยู่ในโฟลเดอร์ Rawdata และลิงก์ไว้ในแต่ละบท)</span>
     <span lang="en">Content compiled from the handwritten lecture notes (original PDFs are in the Rawdata folder and linked from each chapter).</span>
     <div><button type="button" class="cookie-settings" data-open-consent hidden><span lang="th">ตั้งค่าคุกกี้</span><span lang="en">Cookie settings</span></button></div>
-    <div class="visitor-counter" id="visitor-counter" hidden>
-      <span lang="th">จำนวนผู้เข้าชมทั้งหมด</span><span lang="en">Total visitors</span>
-      <b id="visitor-total"></b>
-    </div>
+    <!-- Custom Visitor Counter -->
+    <section class="visitor-analytics" id="visitor-analytics" aria-label="Visitor analytics">
+      <h4><span lang="th">สถิติผู้เข้าชม</span><span lang="en">Visitor Analytics</span></h4>
+      <div class="va-grid">
+        <div><span class="va-label"><span lang="th">วันนี้</span><span lang="en">Today</span></span><strong id="cnt-daily">…</strong></div>
+        <div><span class="va-label"><span lang="th">สัปดาห์นี้</span><span lang="en">This week</span></span><strong id="cnt-weekly">…</strong></div>
+        <div><span class="va-label"><span lang="th">เดือนนี้</span><span lang="en">This month</span></span><strong id="cnt-monthly">…</strong></div>
+        <div><span class="va-label"><span lang="th">ทั้งหมด</span><span lang="en">Overall</span></span><strong id="cnt-overall">…</strong></div>
+      </div>
+    </section>
+    <script src="js/visitor-counter.js"></script>
   </footer>
 </main>
 </body>

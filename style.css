@@ -735,9 +735,22 @@ svg.diagram .t-muted { fill: var(--muted); }
 .cookie-settings { color: var(--muted); font-size: .85rem; }
 .site-footer .cookie-settings { padding: 0; margin-top: 8px; display: inline-block; border: 0; background: none; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---------- Visitor counter (GoatCounter) ---------- */
-.visitor-counter { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-top: 14px; }
-.visitor-counter b { color: var(--ink); font-weight: 600; font-size: 1rem; }
+/* ---------- Visitor counter (home footer) ---------- */
+.visitor-analytics {
+  margin-top: 28px;
+  padding: 20px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.visitor-analytics h4 { margin: 0 0 14px; font-size: 1rem; color: var(--ink); }
+.va-grid { display: flex; justify-content: center; gap: 12px 32px; flex-wrap: wrap; }
+.va-grid > div { min-width: 90px; }
+.va-label { display: block; font-size: .78rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.va-grid strong { display: block; font-size: 1.35rem; font-weight: 600; color: var(--ink); margin-top: 2px; }
+html[data-lang="both"] .va-label span[lang="en"] { display: inline; font-size: inherit; color: inherit; }
+html[data-lang="both"] .va-label span[lang="en"]::before { content: " / "; color: var(--muted); }
 
 /* ---------- Print ---------- */
 @media print {
